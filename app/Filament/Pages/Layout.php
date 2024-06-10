@@ -51,7 +51,6 @@ class Layout extends Page implements HasForms
                 ->helperText('Enable to display stacktraces on error pages or if cache files should be dynamically rebuilt on each request')
                 ->label('App Debugging')
                 ->required()
-                ->default(env('APP_DEBUG', false))
                 ->boolean(),
 
             Forms\Components\TextInput::make('app_secret')
