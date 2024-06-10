@@ -69,4 +69,12 @@ class Event extends Model
         return $this->hasMany(EventTranslation::class, 'translatable_id');
     }
 
+    /**
+     * @return HasMany
+     */
+    public function eventDates(): HasMany
+    {
+        return $this->hasMany(EventDate::class);
+    }
+
 }
