@@ -64,6 +64,9 @@ class Venue extends Model
             Event::class,
             EventDate::class,
             'event_id',
+            'id',
+            'id',
+            'event_id'
         );
     }
 
@@ -73,6 +76,19 @@ class Venue extends Model
     public function venueTranslations(): HasMany
     {
         return $this->hasMany(VenueTranslation::class, 'translatable_id');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function venueType(): BelongsTo
+    {
+        return $this->belongsTo(VenueType::class, 'type_id');
+    }
+
+    public function amenities()
+    {
+        return $this->belongsToMany(Amenity::class, 'eventic_venue_amenity');
     }
 
 }
