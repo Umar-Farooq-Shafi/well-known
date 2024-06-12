@@ -44,4 +44,12 @@ class HelpCenterCategory extends Model
         return $this->hasMany(HelpCenterCategoryTranslation::class, 'translatable_id');
     }
 
+    /**
+     * @return HasMany
+     */
+    public function helpCenterArticles(): HasMany
+    {
+        return $this->hasMany(HelpCenterArticle::class, 'category_id');
+    }
+
 }
