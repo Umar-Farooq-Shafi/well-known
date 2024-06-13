@@ -5,7 +5,9 @@ namespace App\Filament\Pages;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\App;
 
 class Layout extends Page implements HasForms
 {
@@ -17,7 +19,9 @@ class Layout extends Page implements HasForms
 
     protected static ?string $navigationGroup = 'Settings';
 
-    public ?array $data = [
+    public array $data = [];
+
+    public ?array $validation = [
         'app_env' => 'required',
         'debug' => 'required',
     ];
@@ -32,7 +36,23 @@ class Layout extends Page implements HasForms
         $this->form->fill([
             'app_env' => env('APP_ENV', 'development'),
             'debug' => env('APP_DEBUG', false),
+            'app_secret' => env('APP_KEY', 'secret'),
+            'maintenance_mode' => app()->isDownForMaintenance(),
+            'date_time_format' => "eee dd MMM y, h:mm a z",
+            'date_format' => 'd/m/Y, g:i A T',
+            'timezone' => config('app.timezone'),
+            'default_language' => App::getLocale(),
+            'available_languages' => ['en'],
+            'website_name' => env('APP_NAME', 'Laravel'),
+            'website_url' => env('APP_URL'),
         ]);
+    }
+
+    public function form(Form $form): Form
+    {
+        return $form
+            ->statePath('data')
+            ->schema($this->getFormSchema());
     }
 
     protected function getFormSchema(): array
@@ -43,6 +63,7 @@ class Layout extends Page implements HasForms
                 ->label('App Environment')
                 ->required()
                 ->options([
+                    'local' => 'Local',
                     'production' => 'Production',
                     'development' => 'Development',
                 ]),
@@ -63,17 +84,14 @@ class Layout extends Page implements HasForms
                 ->helperText('Enable maintenance mode to display a maintenance page for all users but the users who are granted the ROLE_ADMINISTRATOR role, if you lost your session, you can edit the MAINTENANCE_MODE parameter directly in the .env file')
                 ->boolean()
                 ->options([
-                    'enabled' => 'Enabled',
-                    'disabled' => 'Disabled',
+                    'Enabled',
+                    'Disabled',
                 ])
                 ->required(),
 
-            Forms\Components\Textarea::make('maintenance_message')
-                ->label('Maintenance mode custom message'),
-
             Forms\Components\TextInput::make('date_time_format')
                 ->label('Alternative date and time format')
-                ->helperText('Used in some specific cases, follow this link for a list of supported characters: https://www.php.net/manual/en/datetime.format.php . Please make sure to keep the double quotes " " around the format string')
+                ->helperText('Used in some specific cases, follow this link for a list of supported characters: https://www.php.net/manual/en/datetime.format.php')
                 ->required(),
 
             Forms\Components\TextInput::make('date_format')
