@@ -2,22 +2,28 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\Setting as ESetting;
+use App\Models\AppLayoutSetting;
+use App\Models\Setting;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Storage;
 
 class Layout extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static string $view = 'filament.pages.layout';
 
     protected static ?string $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 1;
 
     public array $data = [];
 
@@ -33,6 +39,8 @@ class Layout extends Page implements HasForms
 
     public function mount()
     {
+        $layout = AppLayoutSetting::query()->first();
+
         $this->form->fill([
             'app_env' => env('APP_ENV', 'development'),
             'debug' => env('APP_DEBUG', false),
@@ -45,6 +53,24 @@ class Layout extends Page implements HasForms
             'available_languages' => ['en'],
             'website_name' => env('APP_NAME', 'Laravel'),
             'website_url' => env('APP_URL'),
+            'web_description_en' => Setting::query()->where('key', ESetting::WEBSITE_DESCRIPTION_EN)->first()?->value,
+            'web_description_fr' => Setting::query()->where('key', ESetting::WEBSITE_DESCRIPTION_FR)->first()?->value,
+            'web_description_es' => Setting::query()->where('key', ESetting::WEBSITE_DESCRIPTION_ES)->first()?->value,
+            'web_description_ar' => Setting::query()->where('key', ESetting::WEBSITE_DESCRIPTION_AR)->first()?->value,
+            'web_keywords_en' => Setting::query()->where('key', ESetting::WEBSITE_KEYWORDS_EN)->first()?->value,
+            'web_keywords_fr' => Setting::query()->where('key', ESetting::WEBSITE_KEYWORDS_FR)->first()?->value,
+            'web_keywords_es' => Setting::query()->where('key', ESetting::WEBSITE_KEYWORDS_ES)->first()?->value,
+            'web_keywords_ar' => Setting::query()->where('key', ESetting::WEBSITE_KEYWORDS_AR)->first()?->value,
+            'contact_email' => Setting::query()->where('key', ESetting::CONTACT_EMAIL)->first()?->value,
+            'contact_phone' => Setting::query()->where('key', ESetting::CONTACT_PHONE)->first()?->value,
+            'facebook_url' => Setting::query()->where('key', ESetting::FACEBOOK_URL)->first()?->value,
+            'youtube_url' => Setting::query()->where('key', ESetting::YOUTUBE_URL)->first()?->value,
+            'twitter_url' => Setting::query()->where('key', ESetting::TWITTER_URL)->first()?->value,
+            'primary_color' => Setting::query()->where('key', ESetting::PRIMARY_COLOR)->first()?->value,
+            'primary_email' => Setting::query()->where('key', ESetting::NO_REPLY_EMAIL)->first()?->value,
+            'logo' => $layout?->logo_name,
+            'logo_original_name' => $layout?->logo_original_name,
+            'show_terms_of_service_page' => Setting::query()->where('key', ESetting::SHOW_TERMS_OF_SERVICE_PAGE)->first()?->value,
         ]);
     }
 
@@ -139,13 +165,55 @@ class Layout extends Page implements HasForms
                 ->label('Website URL')
                 ->required(),
 
-            Forms\Components\TextInput::make('website_description')
-                ->label('Website description')
-                ->required(),
+            Forms\Components\Tabs::make('Website description')
+                ->columnSpanFull()
+                ->tabs([
+                    Forms\Components\Tabs\Tab::make('Website description')
+                        ->schema([
+                            Forms\Components\TextInput::make('web_description_en')
+                                ->required()
+                        ]),
+                    Forms\Components\Tabs\Tab::make('Description du site Web')
+                        ->schema([
+                            Forms\Components\TextInput::make('web_description_fr')
+                                ->required()
+                        ]),
+                    Forms\Components\Tabs\Tab::make('Descripcion del Sitio Web')
+                        ->schema([
+                            Forms\Components\TextInput::make('web_description_es')
+                                ->required()
+                        ]),
+                    Forms\Components\Tabs\Tab::make('وصف الموقع')
+                        ->schema([
+                            Forms\Components\TextInput::make('web_description_ar')
+                                ->required()
+                        ]),
+                ]),
 
-            Forms\Components\TextInput::make('website_keywords')
-                ->label('Website keywords')
-                ->required(),
+            Forms\Components\Tabs::make('Website description')
+                ->columnSpanFull()
+                ->tabs([
+                    Forms\Components\Tabs\Tab::make('Website keywords')
+                        ->schema([
+                            Forms\Components\TextInput::make('web_keywords_en')
+                                ->required()
+                        ]),
+                    Forms\Components\Tabs\Tab::make('Mots-clés du site Web')
+                        ->schema([
+                            Forms\Components\TextInput::make('website_keywords_fr')
+                                ->required()
+                        ]),
+                    Forms\Components\Tabs\Tab::make('Palabras clave del sitio web')
+                        ->schema([
+                            Forms\Components\TextInput::make('website_keywords_es')
+                                ->required()
+                        ]),
+                    Forms\Components\Tabs\Tab::make('الكلمات الرئيسية لموقع الويب')
+                        ->schema([
+                            Forms\Components\TextInput::make('website_keywords_ar')
+                                ->required()
+                        ]),
+                ]),
 
             Forms\Components\TextInput::make('contact_email')
                 ->label('Contact email')
@@ -177,14 +245,21 @@ class Layout extends Page implements HasForms
 
             Forms\Components\FileUpload::make('logo')
                 ->label('Logo')
+                ->disk('local')
+                ->directory('public/layout')
+                ->visibility('public')
+                ->storeFileNamesIn('')
                 ->helperText('Please choose a 200x50 image size to ensure compatibility with the website design'),
 
             Forms\Components\FileUpload::make('favicon')
                 ->label('Favicon'),
 
-            Forms\Components\Radio::make('show_term')
+            Forms\Components\Radio::make('show_terms_of_service_page')
                 ->label('Show the terms of service page link')
-                ->boolean()
+                ->options([
+                    'yes' => 'Yes',
+                    'no' => 'No'
+                ])
                 ->required(),
 
             Forms\Components\Select::make('term_slug')
