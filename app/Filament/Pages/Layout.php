@@ -5,13 +5,14 @@ namespace App\Filament\Pages;
 use App\Enums\Setting as ESetting;
 use App\Models\AppLayoutSetting;
 use App\Models\Setting;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan;
 
 class Layout extends Page implements HasForms
 {
@@ -71,6 +72,11 @@ class Layout extends Page implements HasForms
             'logo' => $layout?->logo_name,
             'logo_original_name' => $layout?->logo_original_name,
             'show_terms_of_service_page' => Setting::query()->where('key', ESetting::SHOW_TERMS_OF_SERVICE_PAGE)->first()?->value,
+            'terms_of_service_page_content' => Setting::query()->where('key', ESetting::TERMS_OF_SERVICE_PAGE_CONTENT)->first()?->value,
+            'show_privacy_policy_page' => Setting::query()->where('key', ESetting::SHOW_PRIVACY_POLICY_PAGE)->first()?->value,
+            'privacy_policy_page_content' => Setting::query()->where('key', ESetting::PRIVACY_POLICY_PAGE_CONTENT)->first()?->value,
+            'show_cookie_policy_page' => Setting::query()->where('key', ESetting::SHOW_COOKIE_POLICY_PAGE)->first()?->value,
+            'cookie_policy_page_content' => Setting::query()->where('key', ESetting::COOKIE_POLICY_PAGE_CONTENT)->first()?->value,
         ]);
     }
 
@@ -262,46 +268,52 @@ class Layout extends Page implements HasForms
                 ])
                 ->required(),
 
-            Forms\Components\Select::make('term_slug')
+            Forms\Components\Select::make('terms_of_service_page_content')
                 ->label('Terms of service page slug')
                 ->required()
                 ->options([
-                    'about_us' => 'About us',
-                    'payment_delivery_and_return' => 'Payment, delivery and return',
-                    'privacy_policy' => 'Privacy policy',
-                    'sell_tickets' => 'Sell tickets',
-                    'terms_of_service' => 'Terms of service',
+                    'about_us_page_content' => 'About us',
+                    'payment_delivery_and_return_page_content' => 'Payment, delivery and return',
+                    'privacy_policy_page_content' => 'Privacy policy',
+                    'sell_tickets_page_content' => 'Sell tickets',
+                    'terms_of_service_page_content' => 'Terms of service',
                 ]),
 
-            Forms\Components\Radio::make('privacy_policy_page')
+            Forms\Components\Radio::make('show_privacy_policy_page')
                 ->label('Show the privacy policy page link')
-                ->boolean()
-                ->required(),
-
-            Forms\Components\Select::make('privacy_policy_slug')
-                ->label('Privacy policy page slug')
                 ->options([
-                    'about_us' => 'About us',
-                    'payment_delivery_and_return' => 'Payment, delivery and return',
-                    'privacy_policy' => 'Privacy policy',
-                    'sell_tickets' => 'Sell tickets',
-                    'terms_of_service' => 'Terms of service',
+                    'yes' => 'Yes',
+                    'no' => 'No'
                 ])
                 ->required(),
 
-            Forms\Components\Radio::make('cookies_page')
-                ->label('Show the cookie policy page link')
-                ->boolean()
+            Forms\Components\Select::make('privacy_policy_page_content')
+                ->label('Privacy policy page slug')
+                ->options([
+                    'about_us_page_content' => 'About us',
+                    'payment_delivery_and_return_page_content' => 'Payment, delivery and return',
+                    'privacy_policy_page_content' => 'Privacy policy',
+                    'sell_tickets_page_content' => 'Sell tickets',
+                    'terms_of_service_page_content' => 'Terms of service',
+                ])
                 ->required(),
 
-            Forms\Components\Select::make('cookies_slug')
+            Forms\Components\Radio::make('show_cookie_policy_page')
+                ->label('Show the cookie policy page link')
+                ->options([
+                    'yes' => 'Yes',
+                    'no' => 'No'
+                ])
+                ->required(),
+
+            Forms\Components\Select::make('cookie_policy_page_content')
                 ->label('Cookie policy page slug')
                 ->options([
-                    'about_us' => 'About us',
-                    'payment_delivery_and_return' => 'Payment, delivery and return',
-                    'privacy_policy' => 'Privacy policy',
-                    'sell_tickets' => 'Sell tickets',
-                    'terms_of_service' => 'Terms of service',
+                    'about_us_page_content' => 'About us',
+                    'payment_delivery_and_return_page_content' => 'Payment, delivery and return',
+                    'privacy_policy_page_content' => 'Privacy policy',
+                    'sell_tickets_page_content' => 'Sell tickets',
+                    'terms_of_service_page_content' => 'Terms of service',
                 ])
         ];
     }
@@ -309,6 +321,56 @@ class Layout extends Page implements HasForms
     public function submit()
     {
         $this->validate();
+
+        putenv('APP_ENV=' . $this->data['app_env']);
+        Setting::query()->where('key', ESetting::APP_ENVIRONMENT)->update(['value' => $this->data['app_env']]);
+
+        putenv('APP_DEBUG=' . $this->data['debug']);
+        putenv('APP_KEY=' . $this->data['app_secret']);
+
+        Setting::query()->where('key', ESetting::MAINTENANCE_MODE)->update(['value' => $this->data['maintenance_mode']]);
+
+        if ($this->data['maintenance_mode']) {
+            Artisan::call('down');
+        } else {
+            Artisan::call('up');
+        }
+
+        Setting::query()->where('key', ESetting::WEBSITE_DESCRIPTION_EN)->update(['value' => $this->data['web_description_en']]);
+        Setting::query()->where('key', ESetting::WEBSITE_DESCRIPTION_FR)->update(['value' => $this->data['web_description_fr']]);
+        Setting::query()->where('key', ESetting::WEBSITE_DESCRIPTION_ES)->update(['value' => $this->data['web_description_es']]);
+        Setting::query()->where('key', ESetting::WEBSITE_DESCRIPTION_AR)->update(['value' => $this->data['web_description_ar']]);
+        Setting::query()->where('key', ESetting::WEBSITE_KEYWORDS_EN)->update(['value' => $this->data['web_keywords_en']]);
+        Setting::query()->where('key', ESetting::WEBSITE_KEYWORDS_FR)->update(['value' => $this->data['web_keywords_fr']]);
+        Setting::query()->where('key', ESetting::WEBSITE_KEYWORDS_ES)->update(['value' => $this->data['web_keywords_es']]);
+        Setting::query()->where('key', ESetting::WEBSITE_KEYWORDS_AR)->update(['value' => $this->data['web_keywords_ar']]);
+        Setting::query()->where('key', ESetting::CONTACT_EMAIL)->update(['value' => $this->data['contact_email']]);
+        Setting::query()->where('key', ESetting::CONTACT_PHONE)->update(['value' => $this->data['contact_phone']]);
+        Setting::query()->where('key', ESetting::FACEBOOK_URL)->update(['value' => $this->data['facebook_url']]);
+        Setting::query()->where('key', ESetting::YOUTUBE_URL)->update(['value' => $this->data['youtube_url']]);
+        Setting::query()->where('key', ESetting::TWITTER_URL)->update(['value' => $this->data['twitter_url']]);
+        Setting::query()->where('key', ESetting::PRIMARY_COLOR)->update(['value' => $this->data['primary_color']]);
+        Setting::query()->where('key', ESetting::NO_REPLY_EMAIL)->update(['value' => $this->data['primary_email']]);
+        Setting::query()->where('key', ESetting::SHOW_TERMS_OF_SERVICE_PAGE)->update(['value' => $this->data['show_terms_of_service_page']]);
+        Setting::query()->where('key', ESetting::TERMS_OF_SERVICE_PAGE_CONTENT)->update(['value' => $this->data['terms_of_service_page_content']]);
+        Setting::query()->where('key', ESetting::SHOW_PRIVACY_POLICY_PAGE)->update(['value' => $this->data['show_privacy_policy_page']]);
+        Setting::query()->where('key', ESetting::PRIVACY_POLICY_PAGE_CONTENT)->update(['value' => $this->data['privacy_policy_page_content']]);
+        Setting::query()->where('key', ESetting::SHOW_COOKIE_POLICY_PAGE)->update(['value' => $this->data['show_cookie_policy_page']]);
+        Setting::query()->where('key', ESetting::COOKIE_POLICY_PAGE_CONTENT)->update(['value' => $this->data['cookie_policy_page_content']]);
+
+        Carbon::setToStringFormat($this->data['date_time_format']);
+        \app()->setLocale($this->data['default_language']);
+
+        putenv('APP_NAME=' . $this->data['website_name']);
+        putenv('APP_URL=' . $this->data['website_url']);
+        date_default_timezone_set($this->data['timezone']);
+
+//        [
+//            'date_time_format' => "eee dd MMM y, h:mm a z",
+//            'date_format' => 'd/m/Y, g:i A T',
+//            'logo' => $layout?->logo_name,
+//            'logo_original_name' => $layout?->logo_original_name,
+//        ]
 
         // SAVE THE SETTINGS HERE
     }
