@@ -40,8 +40,27 @@ class PaymentGatewayResource extends Resource
                     ->label('Status')
                     ->formatStateUsing(fn($state) => $state ? 'Hidden' : 'Visible')
                     ->color(fn($state) => $state ? 'danger' : 'primary')
-                    ->icon(fn ($state) => $state ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->icon(fn($state) => $state ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->badge(),
+
+                Tables\Columns\CheckboxColumn::make('membership_types')
+                    ->label('Free')
+                    ->beforeStateUpdated(function ($state, $record) {
+                        $membershipType = $record->membership_type ?? [];
+
+                        if ($state) {
+                            $membershipType[] = 'free';
+                        } elseif (array_key_exists('free', $membershipType)) {
+                            unset($membershipType['free']);
+                        }
+
+                        $record->update(['membership_type' => array_unique($membershipType)]);
+                    })
+                    ->state(fn($record) => in_array('free', $record->membership_type ?? [])),
+
+                Tables\Columns\CheckboxColumn::make('id')
+                    ->label('Commission')
+                    ->state(fn($record) => in_array('comission', $record->membership_type ?? [])),
             ])
             ->filters([
                 //

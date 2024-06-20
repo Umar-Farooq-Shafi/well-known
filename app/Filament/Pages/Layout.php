@@ -28,11 +28,6 @@ class Layout extends Page implements HasForms
 
     public array $data = [];
 
-    public ?array $validation = [
-        'app_env' => 'required',
-        'debug' => 'required',
-    ];
-
     public static function getNavigationLabel(): string
     {
         return 'Layout, Parameter and SEO';

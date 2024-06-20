@@ -27,6 +27,10 @@ class PaymentGateway extends Model
         'membership_type'
     ];
 
+    protected $casts = [
+        'membership_type' => 'array'
+    ];
+
     /**
      * @return BelongsTo
      */
