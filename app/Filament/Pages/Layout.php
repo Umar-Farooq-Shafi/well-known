@@ -6,6 +6,7 @@ use App\Enums\Setting as ESetting;
 use App\Models\AppLayoutSetting;
 use App\Models\Setting;
 use Carbon\Carbon;
+use Filament\Actions\CreateAction;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -13,6 +14,7 @@ use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
 
 class Layout extends Page implements HasForms
 {
@@ -368,6 +370,15 @@ class Layout extends Page implements HasForms
 //        ]
 
         // SAVE THE SETTINGS HERE
+    }
+
+    /**
+     * @return CreateAction
+     */
+    public function getFormAction()
+    {
+        return CreateAction::make()
+            ->label('Submit');
     }
 
 }

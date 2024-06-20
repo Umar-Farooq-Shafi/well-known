@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PaymentGatewayResource\Pages;
-use App\Filament\Resources\PaymentGatewayResource\RelationManagers;
 use App\Models\PaymentGateway;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -56,10 +55,23 @@ class PaymentGatewayResource extends Resource
 
                         $record->update(['membership_type' => array_unique($membershipType)]);
                     })
+                    ->updateStateUsing(fn ($record) => $record)
                     ->state(fn($record) => in_array('free', $record->membership_type ?? [])),
 
                 Tables\Columns\CheckboxColumn::make('id')
                     ->label('Commission')
+                    ->beforeStateUpdated(function ($state, $record) {
+                        $membershipType = $record->membership_type ?? [];
+
+                        if ($state) {
+                            $membershipType[] = 'comission';
+                        } elseif (array_key_exists('comission', $membershipType)) {
+                            unset($membershipType['comission']);
+                        }
+
+                        $record->update(['membership_type' => array_unique($membershipType)]);
+                    })
+                    ->updateStateUsing(fn ($record) => $record)
                     ->state(fn($record) => in_array('comission', $record->membership_type ?? [])),
             ])
             ->filters([

@@ -1,3 +1,9 @@
 <x-filament-panels::page>
-    {{ $this->form }}
+    <form wire:submit.prevent="submit">
+        {{ $this->form }}
+
+        <div class="pt-4">
+            {{ $this->getFormAction() }}
+        </div>
+    </form>
 </x-filament-panels::page>
