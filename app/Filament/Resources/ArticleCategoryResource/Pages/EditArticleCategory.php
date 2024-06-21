@@ -32,6 +32,10 @@ class EditArticleCategory extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        $record->update([
+            'icon' => $data['icon']
+        ]);
+
         foreach ($record->helpCenterCategoryTranslations as $translation) {
             if ($translation->locale === 'ar') {
                 $translation->name = $data['name-ar'];

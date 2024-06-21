@@ -98,13 +98,66 @@ class ArticlesResource extends Resource
     {
         return $table
             ->columns([
-                //
-            ])
-            ->filters([
-                //
+                Tables\Columns\TextColumn::make('id')
+                    ->label('Title')
+                    ->formatStateUsing(fn($record) => $record->helpCenterTranslations()->where('locale', App::getLocale())->first()?->title)
+                    ->searchable(isIndividual: true)
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->formatStateUsing(fn ($record) => $record->helpCenterCategory->helpCenterCategoryTranslations()->where('locale', App::getLocale())->first()?->name)
+                    ->label('Category')
+                    ->searchable(isIndividual: true)
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('views')
+                    ->searchable(isIndividual: true)
+                    ->formatStateUsing(fn($record) => $record->views ? $record->views . " views" : "0 views")
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Last updated')
+                    ->date()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('hidden')
+                    ->label('Status')
+                    ->formatStateUsing(fn($state) => $state ? 'Hidden' : 'Visible')
+                    ->color(fn($state) => $state ? 'danger' : 'primary')
+                    ->icon(fn($state) => $state ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->badge(),
+
+                Tables\Columns\TextColumn::make('featured')
+                    ->formatStateUsing(fn($state) => $state ? 'Featured' : '')
+                    ->color(fn($state) => $state ? 'success' : '')
+                    ->icon(fn($state) => $state ? 'heroicon-o-star' : '')
+                    ->badge(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('Mark as featured')
+                        ->icon('heroicon-o-star')
+                        ->hidden(fn($record) => $record->featured)
+                        ->action(fn ($record) => $record->update(['featured' => 1])),
+
+                    Tables\Actions\Action::make('Mark as not featured')
+                        ->icon('heroicon-o-tag')
+                        ->visible(fn($record) => $record->featured)
+                        ->action(fn ($record) => $record->update(['featured' => 0])),
+
+                    Tables\Actions\Action::make('Hide')
+                        ->icon('heroicon-o-eye-slash')
+                        ->hidden(fn($record) => $record->hidden)
+                        ->action(fn($record) => $record->update(['hidden' => true])),
+
+                    Tables\Actions\Action::make('Show')
+                        ->icon('heroicon-o-eye')
+                        ->visible(fn($record) => $record->hidden)
+                        ->action(fn($record) => $record->update(['hidden' => false])),
+
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
