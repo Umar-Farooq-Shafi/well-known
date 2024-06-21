@@ -14,7 +14,8 @@
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
-        "owenvoke/blade-fontawesome": "^2.6"
+        "owenvoke/blade-fontawesome": "^2.6",
+        "symfony/dotenv": "^7.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",
