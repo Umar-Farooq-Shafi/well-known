@@ -3,8 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ArticleCategoryResource\Pages;
-use App\Filament\Resources\ArticleCategoryResource\RelationManagers;
-use App\Models\ArticleCategory;
 use App\Models\HelpCenterCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -19,11 +17,13 @@ class ArticleCategoryResource extends Resource
 {
     protected static ?string $model = HelpCenterCategory::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-gears';
 
     protected static ?string $navigationGroup = 'Help Center';
 
     protected static ?string $navigationLabel = 'Categories';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -35,22 +35,23 @@ class ArticleCategoryResource extends Resource
                         Forms\Components\Tabs\Tab::make('En (Default)')
                             ->schema([
                                 Forms\Components\TextInput::make('name-en')
+                                    ->label('Name')
                                     ->required()
                             ]),
                         Forms\Components\Tabs\Tab::make('Fr')
                             ->schema([
                                 Forms\Components\TextInput::make('name-fr')
-                                    ->required()
+                                    ->label('Nom')
                             ]),
                         Forms\Components\Tabs\Tab::make('Es')
                             ->schema([
                                 Forms\Components\TextInput::make('name-es')
-                                    ->required()
+                                    ->label('Nombre')
                             ]),
                         Forms\Components\Tabs\Tab::make('Ar')
                             ->schema([
                                 Forms\Components\TextInput::make('name-ar')
-                                    ->required()
+                                    ->label('اسم')
                             ]),
                     ]),
 
@@ -75,6 +76,7 @@ class ArticleCategoryResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Articles Count')
                     ->formatStateUsing(fn($record) => count($record->helpCenterArticles))
                     ->sortable(),
 
@@ -88,11 +90,16 @@ class ArticleCategoryResource extends Resource
                     ->icon(fn($state) => $state ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->badge(),
             ])
-            ->filters([
-                //
-            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('Hide')
+                    ->icon('heroicon-o-eye-slash')
+                    ->hidden(fn ($record) => $record->hidden)
+                    ->action(fn ($record) => $record->update(['hidden' => true])),
+                Tables\Actions\Action::make('Show')
+                    ->icon('heroicon-o-eye')
+                    ->visible(fn ($record) => $record->hidden)
+                    ->action(fn ($record) => $record->update(['hidden' => false])),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -100,13 +107,6 @@ class ArticleCategoryResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array

@@ -3,22 +3,20 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ArticlesResource\Pages;
-use App\Filament\Resources\ArticlesResource\RelationManagers;
-use App\Models\Articles;
 use App\Models\HelpCenterArticle;
+use App\Models\HelpCenterCategoryTranslation;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\App;
 
 class ArticlesResource extends Resource
 {
     protected static ?string $model = HelpCenterArticle::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-gear';
 
     protected static ?string $navigationGroup = 'Help Center';
 
@@ -28,7 +26,71 @@ class ArticlesResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Select::make('category_id')
+                    ->label('Category')
+                    ->helperText('Make sure to select right category to let the users find it quickly')
+                    ->searchable()
+                    ->required()
+                    ->options(
+                        fn() => HelpCenterCategoryTranslation::query()
+                            ->where('locale', App::getLocale())
+                            ->pluck('name', 'translatable_id')
+                    ),
+
+                Forms\Components\Section::make('Article details')
+                    ->schema([
+                        Forms\Components\Tabs::make('Translation')
+                            ->columnSpanFull()
+                            ->tabs([
+                                Forms\Components\Tabs\Tab::make('En (Default)')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('title-en')
+                                            ->label('Title')
+                                            ->required(),
+
+                                        Forms\Components\RichEditor::make('content-en')
+                                            ->label('Content')
+                                            ->required(),
+
+                                        Forms\Components\TextInput::make('tags-en')
+                                            ->label('Tags')
+                                            ->required(),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('Fr')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('title-fr')
+                                            ->label('Titre'),
+
+                                        Forms\Components\RichEditor::make('content-fr')
+                                            ->label('Contenu'),
+
+                                        Forms\Components\TextInput::make('tags-fr')
+                                            ->label('Mots clés'),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('Es')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('title-es')
+                                            ->label('Nombre'),
+
+                                        Forms\Components\RichEditor::make('content-es')
+                                            ->label('Contenido'),
+
+                                        Forms\Components\TextInput::make('tags-es')
+                                            ->label('Palabras clave'),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('Ar')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('title-ar')
+                                            ->label('عنوان'),
+
+                                        Forms\Components\RichEditor::make('content-ar')
+                                            ->label('محتوى'),
+
+                                        Forms\Components\TextInput::make('tags-ar')
+                                            ->label('الكلمات الرئيسية'),
+                                    ]),
+                            ]),
+                    ])
             ]);
     }
 
@@ -49,13 +111,6 @@ class ArticlesResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array

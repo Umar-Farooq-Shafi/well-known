@@ -22,17 +22,19 @@ class CreateArticleCategory extends CreateRecord
         ]);
 
         foreach ($data as $name => $value) {
-            HelpCenterCategoryTranslation::create([
-                'translatable_id' => $helpCenterCategory->id,
-                'name' => $value,
-                'slug' => Str::slug($value),
-                'locale' => match ($name) {
-                    'name-es' => 'es',
-                    'name-fr' => 'fr',
-                    'name-ar' => 'ar',
-                    default => 'en'
-                }
-            ]);
+            if ($value && $name !== 'icon') {
+                HelpCenterCategoryTranslation::create([
+                    'translatable_id' => $helpCenterCategory->id,
+                    'name' => $value,
+                    'slug' => Str::slug($value),
+                    'locale' => match ($name) {
+                        'name-es' => 'es',
+                        'name-fr' => 'fr',
+                        'name-ar' => 'ar',
+                        default => 'en'
+                    }
+                ]);
+            }
         }
 
         return $helpCenterCategory;

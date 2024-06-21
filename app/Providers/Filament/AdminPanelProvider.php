@@ -58,7 +58,9 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->navigationGroups([
-                'Settings'
+                'Settings',
+                'Events',
+                'Blog'
             ])
             ->authMiddleware([
                 Authenticate::class,
