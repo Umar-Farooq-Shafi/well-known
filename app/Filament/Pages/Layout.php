@@ -248,8 +248,8 @@ class Layout extends Page implements HasForms
 
             Forms\Components\FileUpload::make('logo')
                 ->label('Logo')
-                ->disk('local')
-                ->directory('public/layout')
+                ->disk('public')
+                ->directory('layout')
                 ->visibility('public')
                 ->storeFileNamesIn('')
                 ->helperText('Please choose a 200x50 image size to ensure compatibility with the website design'),

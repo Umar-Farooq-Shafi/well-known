@@ -60,6 +60,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Settings',
                 'Events',
+                'Venues',
                 'Blog'
             ])
             ->authMiddleware([

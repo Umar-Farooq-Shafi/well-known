@@ -25,4 +25,12 @@ class BlogPostCategory extends Model
         return $this->hasMany(BlogPostCategoryTranslation::class, 'translatable_id');
     }
 
+    /**
+     * @return HasMany
+     */
+    public function blogPosts(): HasMany
+    {
+        return $this->hasMany(BlogPost::class, 'category_id');
+    }
+
 }

@@ -2,24 +2,25 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ArticleCategoryResource\Pages;
-use App\Models\HelpCenterCategory;
+use App\Filament\Resources\BlogPostCategoryResource\Pages;
+use App\Filament\Resources\BlogPostCategoryResource\RelationManagers;
+use App\Models\BlogPostCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Guava\FilamentIconPicker\Forms\IconPicker;
-use Guava\FilamentIconPicker\Tables\IconColumn;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\App;
 
-class ArticleCategoryResource extends Resource
+class BlogPostCategoryResource extends Resource
 {
-    protected static ?string $model = HelpCenterCategory::class;
+    protected static ?string $model = BlogPostCategory::class;
 
-    protected static ?string $navigationIcon = 'fas-gears';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Help Center';
+    protected static ?string $navigationGroup = 'Blog';
 
     protected static ?string $navigationLabel = 'Categories';
 
@@ -54,14 +55,6 @@ class ArticleCategoryResource extends Resource
                                     ->label('اسم')
                             ]),
                     ]),
-
-                Forms\Components\Grid::make()
-                    ->schema([
-                        IconPicker::make('icon')
-                            ->required()
-                            ->sets(['fontawesome-solid'])
-                            ->preload()
-                    ])
             ]);
     }
 
@@ -71,23 +64,19 @@ class ArticleCategoryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('Name')
-                    ->formatStateUsing(fn($record) => $record->helpCenterCategoryTranslations()->where('locale', App::getLocale())->first()?->name)
+                    ->formatStateUsing(fn($record) => $record->blogPostCategoryTranslations()->where('locale', App::getLocale())->first()?->name)
                     ->searchable(isIndividual: true)
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('help_center_articles_count')
-                    ->label('Articles Count')
-                    ->counts('helpCenterArticles')
-                    ->sortable(),
-
-                IconColumn::make('icon')
+                Tables\Columns\TextColumn::make('blog_posts_count')
+                    ->counts('blogPosts')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('hidden')
                     ->label('Status')
                     ->formatStateUsing(fn($state) => $state ? 'Hidden' : 'Visible')
                     ->color(fn($state) => $state ? 'danger' : 'primary')
-                    ->icon(fn($state) => $state ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->icon(fn ($state) => $state ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->badge(),
             ])
             ->actions([
@@ -96,10 +85,12 @@ class ArticleCategoryResource extends Resource
                     ->icon('heroicon-o-eye-slash')
                     ->hidden(fn ($record) => $record->hidden)
                     ->action(fn ($record) => $record->update(['hidden' => true])),
+
                 Tables\Actions\Action::make('Show')
                     ->icon('heroicon-o-eye')
                     ->visible(fn ($record) => $record->hidden)
                     ->action(fn ($record) => $record->update(['hidden' => false])),
+
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -112,9 +103,9 @@ class ArticleCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListArticleCategories::route('/'),
-            'create' => Pages\CreateArticleCategory::route('/create'),
-            'edit' => Pages\EditArticleCategory::route('/{record}/edit'),
+            'index' => Pages\ListBlogPostCategories::route('/'),
+            'create' => Pages\CreateBlogPostCategory::route('/create'),
+            'edit' => Pages\EditBlogPostCategory::route('/{record}/edit'),
         ];
     }
 }
