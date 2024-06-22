@@ -17,7 +17,7 @@ class PostResource extends Resource
 {
     protected static ?string $model = BlogPost::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-signs-post';
 
     protected static ?string $navigationGroup = 'Blog';
 
@@ -49,7 +49,7 @@ class PostResource extends Resource
                                             ->label('Name')
                                             ->required(),
 
-                                        Forms\Components\RichEditor::make('description-en')
+                                        Forms\Components\RichEditor::make('content-en')
                                             ->label('Description')
                                             ->required(),
 
@@ -63,7 +63,7 @@ class PostResource extends Resource
                                         Forms\Components\TextInput::make('name-fr')
                                             ->label('Nom'),
 
-                                        Forms\Components\RichEditor::make('description-fr')
+                                        Forms\Components\RichEditor::make('content-fr')
                                             ->label('Description'),
 
                                         Forms\Components\TextInput::make('tags-fr')
@@ -75,7 +75,7 @@ class PostResource extends Resource
                                         Forms\Components\TextInput::make('name-es')
                                             ->label('Nombre'),
 
-                                        Forms\Components\RichEditor::make('description-es')
+                                        Forms\Components\RichEditor::make('content-es')
                                             ->label('Descripción'),
 
                                         Forms\Components\TextInput::make('tags-es')
@@ -87,7 +87,7 @@ class PostResource extends Resource
                                         Forms\Components\TextInput::make('name-ar')
                                             ->label('اسم'),
 
-                                        Forms\Components\RichEditor::make('description-ar')
+                                        Forms\Components\RichEditor::make('content-ar')
                                             ->label('التفاصيل'),
 
                                         Forms\Components\TextInput::make('tags-ar')

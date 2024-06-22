@@ -13,7 +13,7 @@ class PaymentGatewayResource extends Resource
 {
     protected static ?string $model = PaymentGateway::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-money-bill';
 
     protected static ?string $navigationGroup = 'Settings';
 

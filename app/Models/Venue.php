@@ -91,4 +91,12 @@ class Venue extends Model
         return $this->belongsToMany(Amenity::class, 'eventic_venue_amenity');
     }
 
+    /**
+     * @return HasMany
+     */
+    public function venueImages(): HasMany
+    {
+        return $this->hasMany(VenueImage::class);
+    }
+
 }

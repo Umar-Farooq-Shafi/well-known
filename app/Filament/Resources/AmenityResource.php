@@ -10,6 +10,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Guava\FilamentIconPicker\Forms\IconPicker;
+use Guava\FilamentIconPicker\Tables\IconColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\App;
@@ -22,11 +24,45 @@ class AmenityResource extends Resource
 
     protected static ?string $navigationGroup = 'Venues';
 
+    protected static ?int $navigationSort = 3;
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Tabs::make('Translation')
+                    ->columnSpanFull()
+                    ->tabs([
+                        Forms\Components\Tabs\Tab::make('En (Default)')
+                            ->schema([
+                                Forms\Components\TextInput::make('name-en')
+                                    ->label('Name')
+                                    ->required()
+                            ]),
+                        Forms\Components\Tabs\Tab::make('Fr')
+                            ->schema([
+                                Forms\Components\TextInput::make('name-fr')
+                                    ->label('Nom')
+                            ]),
+                        Forms\Components\Tabs\Tab::make('Es')
+                            ->schema([
+                                Forms\Components\TextInput::make('name-es')
+                                    ->label('Nombre')
+                            ]),
+                        Forms\Components\Tabs\Tab::make('Ar')
+                            ->schema([
+                                Forms\Components\TextInput::make('name-ar')
+                                    ->label('اسم')
+                            ]),
+                    ]),
+
+                Forms\Components\Grid::make()
+                    ->schema([
+                        IconPicker::make('icon')
+                            ->required()
+                            ->sets(['fontawesome-solid'])
+                            ->preload()
+                    ])
             ]);
     }
 
@@ -42,7 +78,10 @@ class AmenityResource extends Resource
 
                 Tables\Columns\TextColumn::make('venues_count')
                     ->counts('venues')
-                    ->searchable(isIndividual: true)
+                    ->searchable()
+                    ->sortable(),
+
+                IconColumn::make('icon')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('hidden')
@@ -68,7 +107,20 @@ class AmenityResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('Hide')
+                        ->icon('heroicon-o-eye-slash')
+                        ->hidden(fn($record) => $record->hidden)
+                        ->action(fn($record) => $record->update(['hidden' => true])),
+
+                    Tables\Actions\Action::make('Show')
+                        ->icon('heroicon-o-eye')
+                        ->visible(fn($record) => $record->hidden)
+                        ->action(fn($record) => $record->update(['hidden' => false])),
+
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

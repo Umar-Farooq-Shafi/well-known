@@ -77,4 +77,12 @@ class Event extends Model
         return $this->hasMany(EventDate::class);
     }
 
+    /**
+     * @return HasMany
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
 }

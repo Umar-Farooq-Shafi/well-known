@@ -7,8 +7,11 @@ use App\Models\BlogPost;
 use App\Models\BlogPostTranslation;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\Drivers\Imagick\Driver;
+use Intervention\Image\ImageManager;
 
 class CreatePost extends CreateRecord
 {
@@ -17,15 +20,19 @@ class CreatePost extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         $size = Storage::disk('public')->size($data['image_name']);
+        $mimetype = File::mimeType(Storage::disk('public')->path($data['image_name']));
+
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read(Storage::disk('public')->path($data['image_name']));
 
         $blogPost = BlogPost::create([
             'category_id' => $data['category_id'],
             'readtime' => $data['readtime'],
             'image_name' => explode('/', $data['image_name'])[1],
             'image_size' => $size,
-            'image_mime_type',
+            'image_mime_type' => $mimetype,
             'image_original_name' => $data['image_original_name'],
-            'image_dimensions',
+            'image_dimensions' => $image->width() . "," . $image->height(),
             'hidden' => 0
         ]);
 
