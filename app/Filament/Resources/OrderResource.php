@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\OrderExporter;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use Filament\Forms\Form;
@@ -35,11 +36,24 @@ class OrderResource extends Resource
                     ->searchable(isIndividual: true)
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('organizer.name')
+                Tables\Columns\TextColumn::make('paymentGateway.organizer.name')
                     ->searchable(isIndividual: true)
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('eventDateTickets.name')
+                    ->label('Event')
+                    ->searchable(isIndividual: true)
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('user.fullName')
+                    ->label('Attendee / POS')
+                    ->icon('heroicon-o-user')
+                    ->searchable(isIndividual: true)
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Order Date')
+                    ->dateTime()
                     ->searchable(isIndividual: true)
                     ->sortable(),
 
@@ -63,7 +77,20 @@ class OrderResource extends Resource
                     })
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('paymentgateway_id')
+                    ->multiple()
+                    ->searchable()
+                    ->preload()
+                    ->relationship(
+                        'paymentGateway',
+                        'name',
+//                        fn ($query) => $query->select(['name', 'id'])->groupBy('name')
+                    ),
+            ])
+            ->headerActions([
+                Tables\Actions\ExportAction::make()
+                    ->exporter(OrderExporter::class)
+                    ->icon('heroicon-o-arrow-down-tray')
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

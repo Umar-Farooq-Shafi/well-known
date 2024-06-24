@@ -4,25 +4,18 @@ namespace App\Filament\Resources;
 
 use App\Filament\Actions\Impersonate;
 use App\Filament\Resources\UserResource\Pages;
+use App\Models\CountryTranslation;
 use App\Models\User;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\App;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
-
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
 
     /**
      * @throws \Exception
@@ -55,7 +48,12 @@ class UserResource extends Resource
                     ->label('Status'),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('enabled')
+                Tables\Filters\TernaryFilter::make('enabled'),
+
+                Tables\Filters\SelectFilter::make('country_id')
+                    ->options(fn () => CountryTranslation::all()
+                        ->where('locale', App::getLocale())
+                        ->pluck('name', 'id'))
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -99,13 +97,6 @@ class UserResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array

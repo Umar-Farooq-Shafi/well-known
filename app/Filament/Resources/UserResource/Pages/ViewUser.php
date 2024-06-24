@@ -40,7 +40,18 @@ class ViewUser extends ViewRecord
                                     0 => 'danger',
                                     default => 'info'
                                 };
-                            })
+                            }),
+
+                        Infolists\Components\TextEntry::make('firstname'),
+                        Infolists\Components\TextEntry::make('lastname'),
+                        Infolists\Components\TextEntry::make('username'),
+                        Infolists\Components\TextEntry::make('email'),
+                        Infolists\Components\TextEntry::make('created_at')
+                            ->label('Registration date'),
+                        Infolists\Components\TextEntry::make('updated_at')
+                            ->label('Updated date'),
+
+                        Infolists\Components\TextEntry::make('last_login')
                     ])
             ]);
     }

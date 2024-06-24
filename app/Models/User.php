@@ -7,6 +7,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -87,6 +88,11 @@ class User extends Authenticatable implements FilamentUser, HasName
         ];
     }
 
+    public function getFullNameAttribute()
+    {
+        return $this->firstname . " " . $this->lastname;
+    }
+
     /***
      * @param Panel $panel
      * @return bool
@@ -123,6 +129,14 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function cartElements(): HasMany
     {
         return $this->hasMany(CartElement::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function organizer(): BelongsTo
+    {
+        return $this->belongsTo(Organizer::class);
     }
 
 }
