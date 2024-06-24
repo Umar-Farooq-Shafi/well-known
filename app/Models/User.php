@@ -96,6 +96,11 @@ class User extends Authenticatable implements FilamentUser, HasName
         return true;
     }
 
+    public function canImpersonate(): bool
+    {
+        return true;
+    }
+
     /**
      * @return string
      */
@@ -110,6 +115,14 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function cartElements(): HasMany
+    {
+        return $this->hasMany(CartElement::class);
     }
 
 }

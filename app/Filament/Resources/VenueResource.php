@@ -3,7 +3,11 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VenueResource\Pages;
+use App\Models\AmenityTranslation;
+use App\Models\CountryTranslation;
 use App\Models\Venue;
+use App\Models\VenueTypeTranslation;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -25,7 +29,131 @@ class VenueResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Section::make('Translation')
+                    ->schema([
+                        Forms\Components\Tabs::make('Translation')
+                            ->columnSpanFull()
+                            ->tabs([
+                                Forms\Components\Tabs\Tab::make('En (Default)')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name-en')
+                                            ->label('Name')
+                                            ->required(),
+
+                                        Forms\Components\RichEditor::make('content-en')
+                                            ->label('Description')
+                                            ->required(),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('Fr')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name-fr')
+                                            ->label('Nom'),
+
+                                        Forms\Components\RichEditor::make('content-fr')
+                                            ->label('Description'),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('Es')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name-es')
+                                            ->label('Nombre'),
+
+                                        Forms\Components\RichEditor::make('content-es')
+                                            ->label('Descripción'),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('Ar')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name-ar')
+                                            ->label('اسم'),
+
+                                        Forms\Components\RichEditor::make('content-ar')
+                                            ->label('التفاصيل'),
+                                    ]),
+                            ]),
+                    ]),
+
+                Forms\Components\Select::make('type_id')
+                    ->label('Type')
+                    ->options(fn() => VenueTypeTranslation::pluck('name', 'id'))
+                    ->searchable()
+                    ->required(),
+
+                Forms\Components\Select::make('amenities')
+                    ->relationship(
+                        'amenities',
+                        'name',
+                    )
+                    ->getSearchResultsUsing(function ($search) {
+                        return AmenityTranslation::where('locale', App::getLocale())
+                            ->where('name', 'like', "%{$search}%")
+                            ->pluck('name', 'id');
+                    })
+                    ->multiple()
+                    ->options(fn() => AmenityTranslation::where('locale', App::getLocale())->pluck('name', 'id'))
+                    ->searchable(),
+
+                Forms\Components\TextInput::make('seatedguests')
+                    ->label('Seated guests number')
+                    ->integer(),
+
+                Forms\Components\TextInput::make('standingguests')
+                    ->label('Standing guests number')
+                    ->integer(),
+
+                Forms\Components\TextInput::make('neighborhoods'),
+
+                Forms\Components\Textarea::make('pricing'),
+
+                Forms\Components\Textarea::make('availibility'),
+
+                Forms\Components\Textarea::make('foodbeverage'),
+
+                Forms\Components\Radio::make('quoteform')
+                    ->label('Show the quote form on the venue page')
+                    ->required()
+                    ->boolean(),
+
+                Forms\Components\Textarea::make('contactemail')
+                    ->helperText('This email address will be used to receive the quote requests, make sure to mention it if you want to show the quote form'),
+
+                Forms\Components\TextInput::make('street')
+                    ->label('Street address')
+                    ->required(),
+
+                Forms\Components\TextInput::make('street2')
+                    ->label('Street address 2'),
+
+                Forms\Components\TextInput::make('city')
+                    ->label('City')
+                    ->required(),
+
+                Forms\Components\TextInput::make('postalcode')
+                    ->label('Zip / Postal code')
+                    ->required(),
+
+                Forms\Components\TextInput::make('state')->required(),
+
+                Forms\Components\Select::make('country_id')
+                    ->label('Country')
+                    ->options(fn () => CountryTranslation::pluck('name', 'id'))
+                    ->searchable()
+                    ->required(),
+
+                Forms\Components\Radio::make('showmap')
+                    ->label('Show the map along with the address on the venue page and event page')
+                    ->required()
+                    ->boolean(),
+
+                Forms\Components\Repeater::make('images')
+                    ->relationship('venueImages')
+                    ->columnSpanFull()
+                    ->schema([
+                        Forms\Components\FileUpload::make('image_name')
+                            ->image()
+                            ->disk('public')
+                            ->formatStateUsing(fn ($state) => $state ? ["venues/" . $state] : null)
+                            ->directory('venues')
+                            ->storeFileNamesIn('image_original_name')
+                    ])
             ]);
     }
 
@@ -88,8 +216,8 @@ class VenueResource extends Resource
                     ->label('Status')
                     ->formatStateUsing(function ($state): string {
                         return match ($state) {
-                            1 => 'Listed on the directory',
-                            0 => 'Not listed on the directory',
+                            true => 'Listed on the directory',
+                            false => 'Not listed on the directory',
                             default => $state
                         };
                     })
@@ -97,8 +225,8 @@ class VenueResource extends Resource
                     ->badge()
                     ->color(function ($state) {
                         return match ($state) {
-                            0 => 'danger',
-                            1 => 'success',
+                            false => 'danger',
+                            true => 'success',
                             default => 'info'
                         };
                     })

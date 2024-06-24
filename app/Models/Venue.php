@@ -39,6 +39,12 @@ class Venue extends Model
         'contactemail'
     ];
 
+    protected $casts = [
+        'listedondirectory' => 'boolean',
+        'quoteform' => 'boolean',
+        'showmap' => 'boolean'
+    ];
+
     /**
      * @return BelongsTo
      */

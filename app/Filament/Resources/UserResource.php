@@ -2,21 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\Impersonate;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     public static function form(Form $form): Form
     {
@@ -60,7 +58,41 @@ class UserResource extends Resource
                 Tables\Filters\TernaryFilter::make('enabled')
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\Action::make('organizer-profile')
+                        ->label('Organizer Profile')
+                        ->visible(function ($record) {
+                            $roles = ucwords(str_replace('ROLE_', '', implode(', ', unserialize($record->roles))));
+
+                            return str_contains($roles, 'ADMINISTRATOR');
+                        })
+                        ->icon('fas-id-card'),
+
+                    Tables\Actions\Action::make('empty-cart')
+                        ->label('Empty Cart')
+                        ->hidden(function ($record) {
+                            $roles = ucwords(str_replace('ROLE_', '', implode(', ', unserialize($record->roles))));
+
+                            return str_contains($roles, 'ADMINISTRATOR');
+                        })
+                        ->badge(fn ($record) => count($record->cartElements))
+                        ->icon('heroicon-o-shopping-cart'),
+
+                    Impersonate::make('Impersonate'),
+
+                    Tables\Actions\Action::make('Enable')
+                        ->icon('heroicon-o-eye-slash')
+                        ->hidden(fn($record) => $record->enabled)
+                        ->action(fn($record) => $record->update(['enabled' => true])),
+
+                    Tables\Actions\Action::make('Disable')
+                        ->icon('fas-user-alt-slash')
+                        ->visible(fn($record) => $record->enabled)
+                        ->action(fn($record) => $record->update(['enabled' => false])),
+
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -81,7 +113,7 @@ class UserResource extends Resource
         return [
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'view' => Pages\ViewUser::route('/{record}'),
         ];
     }
 }

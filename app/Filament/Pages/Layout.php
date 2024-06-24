@@ -250,11 +250,13 @@ class Layout extends Page implements HasForms
                 ->label('Logo')
                 ->disk('public')
                 ->directory('layout')
+                ->formatStateUsing(fn ($state) => ['layout/' . $state])
                 ->visibility('public')
                 ->storeFileNamesIn('')
                 ->helperText('Please choose a 200x50 image size to ensure compatibility with the website design'),
 
             Forms\Components\FileUpload::make('favicon')
+                ->formatStateUsing(fn ($state) => $state ? ['layout/' . $state] : null)
                 ->label('Favicon'),
 
             Forms\Components\Radio::make('show_terms_of_service_page')
