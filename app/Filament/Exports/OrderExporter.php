@@ -14,21 +14,48 @@ class OrderExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('id')
-                ->label('ID'),
-            ExportColumn::make('user.id'),
-            ExportColumn::make('paymentgateway.name'),
-            ExportColumn::make('payment_id'),
             ExportColumn::make('reference'),
-            ExportColumn::make('note'),
-            ExportColumn::make('status'),
-            ExportColumn::make('ticket_fee'),
-            ExportColumn::make('ticket_price_percentage_cut'),
-            ExportColumn::make('currency_ccy'),
-            ExportColumn::make('currency_symbol'),
-            ExportColumn::make('created_at'),
-            ExportColumn::make('updated_at'),
-            ExportColumn::make('deleted_at'),
+
+            ExportColumn::make('status')
+                ->formatStateUsing(function ($state): string {
+                    return match ($state) {
+                        1 => 'Paid',
+                        0 => 'Awaiting payment',
+                        -1 => 'Cancel',
+                        default => $state
+                    };
+                }),
+
+            ExportColumn::make('created_at')
+                ->label('Order Date'),
+
+            ExportColumn::make('paymentGateway.organizer.name'),
+
+            ExportColumn::make('eventDateTickets.name')
+                ->label('Event'),
+
+            ExportColumn::make('user.fullName')
+                ->label('Attendee / POS'),
+
+            ExportColumn::make('user.email'),
+
+            ExportColumn::make('orderElement.quantity'),
+
+            ExportColumn::make('orderElement.unitprice'),
+
+            ExportColumn::make('paymentGateway.name'),
+
+            ExportColumn::make('user.street'),
+
+            ExportColumn::make('user.street2'),
+
+            ExportColumn::make('user.city'),
+
+            ExportColumn::make('user.state'),
+
+            ExportColumn::make('user.postalcode'),
+
+            ExportColumn::make('user.country'),
         ];
     }
 

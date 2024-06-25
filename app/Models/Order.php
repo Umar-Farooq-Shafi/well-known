@@ -7,9 +7,55 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * 
+ *
+ * @property int $id
+ * @property int|null $user_id
+ * @property int|null $paymentgateway_id
+ * @property int|null $payment_id
+ * @property string $reference
+ * @property string|null $note
+ * @property int $status
+ * @property string $ticket_fee
+ * @property int $ticket_price_percentage_cut
+ * @property string $currency_ccy
+ * @property string $currency_symbol
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EventDateTicket> $eventDateTickets
+ * @property-read int|null $event_date_tickets_count
+ * @property-read \App\Models\OrderElement|null $orderElement
+ * @property-read \App\Models\Organizer|null $organizer
+ * @property-read \App\Models\PaymentGateway|null $paymentGateway
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereCurrencyCcy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereCurrencySymbol($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereNote($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order wherePaymentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order wherePaymentgatewayId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereReference($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereTicketFee($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereTicketPricePercentageCut($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Order extends Model
 {
     use HasFactory, SoftDeletes;
@@ -60,11 +106,11 @@ class Order extends Model
     }
 
     /**
-     * @return HasMany
+     * @return HasOne
      */
-    public function orderElements(): HasMany
+    public function orderElement(): HasOne
     {
-        return $this->hasMany(OrderElement::class);
+        return $this->hasOne(OrderElement::class);
     }
 
     /**

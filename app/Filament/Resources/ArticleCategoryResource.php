@@ -91,16 +91,18 @@ class ArticleCategoryResource extends Resource
                     ->badge(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('Hide')
-                    ->icon('heroicon-o-eye-slash')
-                    ->hidden(fn ($record) => $record->hidden)
-                    ->action(fn ($record) => $record->update(['hidden' => true])),
-                Tables\Actions\Action::make('Show')
-                    ->icon('heroicon-o-eye')
-                    ->visible(fn ($record) => $record->hidden)
-                    ->action(fn ($record) => $record->update(['hidden' => false])),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('Hide')
+                        ->icon('heroicon-o-eye-slash')
+                        ->hidden(fn ($record) => $record->hidden)
+                        ->action(fn ($record) => $record->update(['hidden' => true])),
+                    Tables\Actions\Action::make('Show')
+                        ->icon('heroicon-o-eye')
+                        ->visible(fn ($record) => $record->hidden)
+                        ->action(fn ($record) => $record->update(['hidden' => false])),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

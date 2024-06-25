@@ -13,6 +13,114 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * 
+ *
+ * @property int $id
+ * @property int|null $organizer_id
+ * @property int|null $scanner_id
+ * @property int|null $pointofsale_id
+ * @property int|null $isorganizeronhomepageslider_id
+ * @property int|null $country_id
+ * @property string $username
+ * @property string $username_canonical
+ * @property string $email
+ * @property string $email_canonical
+ * @property int $enabled
+ * @property string|null $salt
+ * @property mixed $password
+ * @property string|null $last_login
+ * @property string|null $confirmation_token
+ * @property string|null $password_requested_at
+ * @property string $roles (DC2Type:array)
+ * @property string|null $gender
+ * @property string|null $firstname
+ * @property string|null $lastname
+ * @property string $slug
+ * @property string|null $street
+ * @property string|null $street2
+ * @property string|null $city
+ * @property string|null $state
+ * @property string|null $postalcode
+ * @property string|null $phone
+ * @property string|null $birthdate
+ * @property string|null $avatar_name
+ * @property int|null $avatar_size
+ * @property string|null $avatar_mime_type
+ * @property string|null $avatar_original_name
+ * @property string|null $avatar_dimensions (DC2Type:simple_array)
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $facebook_id
+ * @property string|null $facebook_access_token
+ * @property string|null $google_id
+ * @property string|null $google_access_token
+ * @property string|null $api_key
+ * @property string|null $facebook_profile_picture
+ * @property string|null $membership_type
+ * @property string|null $remember_token
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CartElement> $cartElements
+ * @property-read int|null $cart_elements_count
+ * @property-read mixed $full_name
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
+ * @property-read \App\Models\Organizer|null $organizer
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Review> $reviews
+ * @property-read int|null $reviews_count
+ * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|User onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|User query()
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereApiKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatarDimensions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatarMimeType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatarName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatarOriginalName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatarSize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereBirthdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereCity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereConfirmationToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereCountryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailCanonical($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEnabled($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereFacebookAccessToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereFacebookId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereFacebookProfilePicture($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereFirstname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereGender($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereGoogleAccessToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereGoogleId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereIsorganizeronhomepagesliderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereLastLogin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereLastname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereMembershipType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereOrganizerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePasswordRequestedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePointofsaleId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePostalcode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereRoles($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereSalt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereScannerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereState($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereStreet($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereStreet2($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereUsername($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereUsernameCanonical($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|User withoutTrashed()
+ * @mixin \Eloquent
+ */
 class User extends Authenticatable implements FilamentUser, HasName
 {
     use HasFactory, Notifiable, SoftDeletes;

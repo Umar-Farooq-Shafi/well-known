@@ -6,6 +6,31 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * 
+ *
+ * @property int $id
+ * @property int|null $user_id
+ * @property int|null $eventticket_id
+ * @property int|null $quantity
+ * @property string|null $ticket_fee
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $chosen_event_date
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement query()
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereChosenEventDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereEventticketId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereTicketFee($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereUserId($value)
+ * @mixin \Eloquent
+ */
 class CartElement extends Model
 {
     use HasFactory;

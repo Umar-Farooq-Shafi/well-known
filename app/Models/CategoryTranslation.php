@@ -6,6 +6,25 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * 
+ *
+ * @property int $id
+ * @property int|null $translatable_id
+ * @property string $name
+ * @property string $slug
+ * @property string $locale
+ * @property-read \App\Models\Category|null $category
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryTranslation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryTranslation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryTranslation query()
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryTranslation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryTranslation whereLocale($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryTranslation whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryTranslation whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryTranslation whereTranslatableId($value)
+ * @mixin \Eloquent
+ */
 class CategoryTranslation extends Model
 {
     use HasFactory;

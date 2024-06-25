@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Filament\Exports\OrderExporter;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,14 +14,6 @@ class OrderResource extends Resource
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
-
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
 
     /**
      * @param Table $table
@@ -60,9 +51,9 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->formatStateUsing(function ($state): string {
                         return match ($state) {
-                            1 => 'paid',
-                            0 => 'awaiting',
-                            -1 => 'cancel',
+                            1 => 'Paid',
+                            0 => 'Awaiting payment',
+                            -1 => 'Cancel',
                             default => $state
                         };
                     })
@@ -84,7 +75,6 @@ class OrderResource extends Resource
                     ->relationship(
                         'paymentGateway',
                         'name',
-//                        fn ($query) => $query->select(['name', 'id'])->groupBy('name')
                     ),
             ])
             ->headerActions([
@@ -93,7 +83,24 @@ class OrderResource extends Resource
                     ->icon('heroicon-o-arrow-down-tray')
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('print-tickets')
+                        ->icon('heroicon-o-printer'),
+
+                    Tables\Actions\ViewAction::make()
+                        ->label('Detail'),
+
+                    Tables\Actions\Action::make('resend-confirmation-email')
+                        ->icon('heroicon-o-envelope'),
+
+                    Tables\Actions\Action::make('payment-details')
+                        ->icon('heroicon-o-clipboard-document-list'),
+
+                    Tables\Actions\Action::make('cancel')
+                        ->icon('heroicon-o-x-mark'),
+
+                    Tables\Actions\DeleteAction::make()
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -102,19 +109,13 @@ class OrderResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListOrders::route('/'),
             'create' => Pages\CreateOrder::route('/create'),
             'edit' => Pages\EditOrder::route('/{record}/edit'),
+            'view' => Pages\ViewOrder::route('/{record}'),
         ];
     }
 }
