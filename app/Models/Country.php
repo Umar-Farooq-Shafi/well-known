@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $code
@@ -47,4 +47,13 @@ class Country extends Model
     {
         return $this->hasMany(CountryTranslation::class, 'translatable_id');
     }
+
+    /**
+     * @return HasMany
+     */
+    public function venues(): HasMany
+    {
+        return $this->hasMany(Venue::class);
+    }
+
 }

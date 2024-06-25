@@ -57,7 +57,7 @@ class EditPost extends EditRecord
         $record->update([
             'category_id' => $data['category_id'],
             'readtime' => $data['readtime'],
-            'image_name' => explode('/', $data['image_name'])[1],
+            'image_name' => last(explode('/', $data['image_name'])),
             'image_size' => $size,
             'image_mime_type' => $mimetype,
             'image_original_name' => $data['image_original_name'],

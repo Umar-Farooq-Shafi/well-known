@@ -17,6 +17,7 @@
         "livewire/livewire": "^3.5",
         "owenvoke/blade-fontawesome": "^2.6",
         "stechstudio/filament-impersonate": "^3.9",
+        "stijnvanouplines/blade-country-flags": "^1.0",
         "symfony/dotenv": "^7.1"
     },
     "require-dev": {
