@@ -42,7 +42,7 @@ class PageResource extends Resource
                                 Forms\Components\TextInput::make('title-fr')
                                     ->label('Titre'),
 
-                                Forms\Components\RichEditor::make('content-en')
+                                Forms\Components\RichEditor::make('content-fr')
                                     ->label('Contenu')
                             ]),
                         Forms\Components\Tabs\Tab::make('Es')
@@ -50,7 +50,7 @@ class PageResource extends Resource
                                 Forms\Components\TextInput::make('title-es')
                                     ->label('Título'),
 
-                                Forms\Components\RichEditor::make('content-en')
+                                Forms\Components\RichEditor::make('content-es')
                                     ->label('Contenido')
                             ]),
                         Forms\Components\Tabs\Tab::make('Ar')
@@ -58,7 +58,7 @@ class PageResource extends Resource
                                 Forms\Components\TextInput::make('title-ar')
                                     ->label('عنوان'),
 
-                                Forms\Components\RichEditor::make('content-en')
+                                Forms\Components\RichEditor::make('content-ar')
                                     ->label('محتوى')
                             ]),
                     ]),

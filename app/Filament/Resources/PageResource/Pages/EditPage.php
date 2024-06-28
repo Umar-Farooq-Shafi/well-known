@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\PageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditPage extends EditRecord
 {
@@ -42,6 +43,11 @@ class EditPage extends EditRecord
         }
 
         return $data;
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        return $record;
     }
 
     protected function afterSave(): void

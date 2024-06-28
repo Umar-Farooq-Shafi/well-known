@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $translatable_id
@@ -32,6 +32,8 @@ class PageTranslation extends Model
     use HasFactory;
 
     protected $table = 'eventic_page_translation';
+
+    public $timestamps = false;
 
     protected $fillable = [
         'translatable_id',

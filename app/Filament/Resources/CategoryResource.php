@@ -67,6 +67,7 @@ class CategoryResource extends Resource
 
                 Forms\Components\FileUpload::make('image_name')
                     ->label('Logo')
+                    ->required()
                     ->disk('public')
                     ->directory('categories')
                     ->formatStateUsing(fn ($state) => $state ? ['categories/' . $state] : null)

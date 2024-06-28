@@ -57,6 +57,7 @@ class AudienceResource extends Resource
                     ->directory('audiences')
                     ->formatStateUsing(fn ($state) => $state ? ['audiences/' . $state] : null)
                     ->visibility('public')
+                    ->required()
                     ->storeFileNamesIn('image_original_name')
             ]);
     }

@@ -18,7 +18,8 @@
         "owenvoke/blade-fontawesome": "^2.6",
         "stechstudio/filament-impersonate": "^3.9",
         "stijnvanouplines/blade-country-flags": "^1.0",
-        "symfony/dotenv": "^7.1"
+        "symfony/dotenv": "^7.1",
+        "ysfkaya/filament-phone-input": "^2.3"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",

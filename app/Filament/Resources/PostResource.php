@@ -102,7 +102,7 @@ class PostResource extends Resource
                     ->disk('public')
                     ->directory('blog')
                     ->columnSpanFull()
-                    ->formatStateUsing(fn ($state) => ['blog/' . $state])
+                    ->formatStateUsing(fn ($state) => $state ? ['blog/' . $state] : null)
                     ->storeFileNamesIn('image_original_name')
                     ->visibility('public')
                     ->required(),

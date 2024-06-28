@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -25,6 +25,10 @@ class Page extends Model
     use HasFactory;
 
     protected $table = 'eventic_page';
+
+    public const CREATED_AT = null;
+
+    protected $fillable = [];
 
     /**
      * @return HasMany
