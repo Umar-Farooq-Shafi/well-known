@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -61,7 +61,8 @@ class PaymentGateway extends Model
     ];
 
     protected $casts = [
-        'membership_type' => 'array'
+        'membership_type' => 'array',
+        'config' => 'json'
     ];
 
     /**

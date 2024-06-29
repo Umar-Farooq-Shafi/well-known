@@ -30,12 +30,12 @@ enum Setting: string
 
     case MAILCHIMP_LIST_ID = 'mailchimp_list_id';
 
-    case HOMEPAGE_SHOW_SEARCH = 'home_page_show_search';
+    case HOMEPAGE_SHOW_SEARCH_BOX = 'homepage_show_search_box';
 
-    case HOMEPAGE_EVENTS_NUMBER = 'home_page_events_number';
+    case HOMEPAGE_EVENTS_NUMBER = 'homepage_events_number';
 
 
-    case HOMEPAGE_CATEGORIES_NUMBER = 'home_page_categories_number';
+    case HOMEPAGE_CATEGORIES_NUMBER = 'homepage_categories_number';
     case HOMEPAGE_BLOGPOSTS_NUMBER = 'homepage_blogposts_number';
     case HOMEPAGE_SHOW_CALL_TO_ACTION = 'homepage_show_call_to_action';
     case SHOW_TERMS_OF_SERVICE_PAGE = 'show_terms_of_service_page';

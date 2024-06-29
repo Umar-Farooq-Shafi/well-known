@@ -9,4 +9,11 @@ use Filament\Resources\Pages\CreateRecord;
 class CreatePaymentGateway extends CreateRecord
 {
     protected static string $resource = PaymentGatewayResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['gateway_logo_name'] = last(explode('/', $data['gateway_logo_name']));
+
+        return $data;
+    }
 }

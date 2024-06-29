@@ -32,6 +32,7 @@ class CreateCategory extends CreateRecord
             'image_name' => last(explode('/', $data['image_name'])),
             'image_size' => $size,
             'image_mime_type' => $mimetype,
+            'featured' => 1,
             'image_original_name' => $data['image_original_name'],
             'image_dimensions' => $image->width() . "," . $image->height(),
             'featuredorder' => $data['featuredorder']

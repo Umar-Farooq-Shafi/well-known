@@ -152,6 +152,7 @@ class VenueResource extends Resource
                             ->disk('public')
                             ->formatStateUsing(fn ($state) => $state ? ["venues/" . $state] : null)
                             ->directory('venues')
+                            ->required()
                             ->storeFileNamesIn('image_original_name')
                     ])
             ]);
