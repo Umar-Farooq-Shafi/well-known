@@ -11,6 +11,7 @@ use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
@@ -371,7 +372,11 @@ class Layout extends Page implements HasForms
 //            'logo_original_name' => $layout?->logo_original_name,
 //        ]
 
-        // SAVE THE SETTINGS HERE
+        Notification::make()
+            ->title('Saved')
+            ->success()
+            ->icon('heroicon-o-check-circle')
+            ->send();
     }
 
     /**
