@@ -73,7 +73,7 @@ class AdminPanelProvider extends PanelProvider
                     ->url(function () {
                         $filename = 'sitemap.xml';
                         $path = public_path($filename);
-                        
+
                         if (file_exists($path)) {
                             return asset($filename);
                         }
