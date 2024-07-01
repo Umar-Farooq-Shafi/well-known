@@ -71,15 +71,16 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Settings')
                     ->sort(13)
                     ->url(function () {
-                        $path = public_path('sitemap.xml');
-
-                        if (Storage::exists($path)) {
-                            return Storage::url($path);
+                        $filename = 'sitemap.xml';
+                        $path = public_path($filename);
+                        
+                        if (file_exists($path)) {
+                            return asset($filename);
                         }
 
                         SitemapGenerator::create(env('APP_URL'))->writeToFile($path);
 
-                        return Storage::url($path);
+                        return asset($filename);
                     }, true)
                     ->icon('fas-sitemap')
             ])
