@@ -7,6 +7,7 @@ use App\Filament\Pages\Profile;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -18,7 +19,9 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Spatie\Sitemap\SitemapGenerator;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -62,6 +65,23 @@ class AdminPanelProvider extends PanelProvider
                 'Events',
                 'Venues',
                 'Blog'
+            ])
+            ->navigationItems([
+                NavigationItem::make('Sitemap')
+                    ->group('Settings')
+                    ->sort(13)
+                    ->url(function () {
+                        $path = public_path('sitemap.xml');
+
+                        if (Storage::exists($path)) {
+                            return Storage::url($path);
+                        }
+
+                        SitemapGenerator::create(env('APP_URL'))->writeToFile($path);
+
+                        return Storage::url($path);
+                    }, true)
+                    ->icon('fas-sitemap')
             ])
             ->authMiddleware([
                 Authenticate::class,

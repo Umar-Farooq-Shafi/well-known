@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
         "owenvoke/blade-fontawesome": "^2.6",
+        "spatie/laravel-sitemap": "^7.2",
         "stechstudio/filament-impersonate": "^3.9",
         "stijnvanouplines/blade-country-flags": "^1.0",
         "symfony/dotenv": "^7.1",
