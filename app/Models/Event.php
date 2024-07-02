@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $category_id
@@ -90,6 +90,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Event whereYoutubeurl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Event withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Event withoutTrashed()
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Audience> $audiences
+ * @property-read int|null $audiences_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Language> $languages
+ * @property-read int|null $languages_count
  * @mixin \Eloquent
  */
 class Event extends Model

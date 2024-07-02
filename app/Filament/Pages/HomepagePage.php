@@ -2,30 +2,33 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\HomepageHeroSetting;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Forms;
 use Illuminate\Validation\ValidationException;
 
-class GoogleMapsPage extends Page
+class HomepagePage extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+    protected static ?string $navigationIcon = 'heroicon-o-home';
 
-    protected static string $view = 'filament.pages.google-maps-page';
+    protected static string $view = 'filament.pages.homepage-page';
 
     protected static ?string $navigationGroup = 'Settings';
 
-    protected static ?string $navigationLabel = 'Google Maps';
+    protected static ?string $navigationLabel = 'Homepage';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 2;
 
     public array $data = [];
 
     public function mount(): void
     {
+        $homepage = HomepageHeroSetting::query()->first();
+
         $this->form->fill([
-            'google_map_api_key' => env('GOOGLE_MAPS_API_KEY')
+            'content' => $homepage->content,
         ]);
     }
 
@@ -34,10 +37,15 @@ class GoogleMapsPage extends Page
         return $form
             ->statePath('data')
             ->schema([
-                Forms\Components\TextInput::make('google_map_api_key')
-                    ->label('Google Maps Api Key')
-                    ->helperText('Leave api key empty to disable google maps project wide')
-                    ->integer()
+                Forms\Components\Radio::make('content')
+                    ->label('What to show in the homepage hero?')
+                    ->inlineLabel()
+                    ->options([
+                        'none' => 'Hide slider',
+                        'events' => 'Events slider',
+                        'organizers' => 'Organizers slider',
+                        'custom' => 'Custom hero'
+                    ])
                     ->required(),
             ]);
     }
@@ -49,7 +57,6 @@ class GoogleMapsPage extends Page
     {
         $this->validate();
 
-        putenv('GOOGLE_MAPS_API_KEY=' . $this->data['google_map_api_key']);
 
         Notification::make()
             ->title('Saved')

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -82,6 +82,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Venue whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Venue withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Venue withoutTrashed()
+ * @property-read \App\Models\Country|null $country
  * @mixin \Eloquent
  */
 #[ObservedBy([VenueObserver::class])]

@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use Barryvdh\LaravelIdeHelper\Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  *
@@ -18,28 +22,30 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $image_original_name
  * @property string|null $image_dimensions (DC2Type:simple_array)
  * @property int $hidden
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AudienceTranslation> $audienceTranslations
+ * @property Carbon $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Collection<int, AudienceTranslation> $audienceTranslations
  * @property-read int|null $audience_translations_count
- * @method static \Illuminate\Database\Eloquent\Builder|Audience newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Audience newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Audience onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|Audience query()
- * @method static \Illuminate\Database\Eloquent\Builder|Audience whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Audience whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Audience whereHidden($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Audience whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Audience whereImageDimensions($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Audience whereImageMimeType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Audience whereImageName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Audience whereImageOriginalName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Audience whereImageSize($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Audience whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Audience withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|Audience withoutTrashed()
- * @mixin \Eloquent
+ * @method static Builder|Audience newModelQuery()
+ * @method static Builder|Audience newQuery()
+ * @method static Builder|Audience onlyTrashed()
+ * @method static Builder|Audience query()
+ * @method static Builder|Audience whereCreatedAt($value)
+ * @method static Builder|Audience whereDeletedAt($value)
+ * @method static Builder|Audience whereHidden($value)
+ * @method static Builder|Audience whereId($value)
+ * @method static Builder|Audience whereImageDimensions($value)
+ * @method static Builder|Audience whereImageMimeType($value)
+ * @method static Builder|Audience whereImageName($value)
+ * @method static Builder|Audience whereImageOriginalName($value)
+ * @method static Builder|Audience whereImageSize($value)
+ * @method static Builder|Audience whereUpdatedAt($value)
+ * @method static Builder|Audience withTrashed()
+ * @method static Builder|Audience withoutTrashed()
+ * @property-read Collection<int, Event> $events
+ * @property-read int|null $events_count
+ * @mixin Eloquent
  */
 class Audience extends Model
 {

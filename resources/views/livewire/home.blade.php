@@ -1,43 +1,28 @@
+@php use Illuminate\Support\Facades\Storage; @endphp
+
 <div>
     <livewire:side-panel/>
 
-    <main>
-        <section class="flex flex-col items-center py-6 justify-center w-full">
-            <h1 class="font-bold text-2xl text-blue-500">Welcome to Aafno Ticket</h1>
+    <main class="mx-16">
+        <section class="flex items-center gap-x-24 py-6 justify-center w-full">
+            @foreach($audiences as $audience)
+                <div class="flex items-center flex-col">
+                    <div class="border rounded-full border-gray-300 bg-white p-6">
+                        <img class="w-12 h-12 rounded" src="{{ Storage::url('audiences/' . $audience->image_name) }}"
+                             alt="icons"/>
+                    </div>
 
-            <h1 class="font-semibold text-4xl text-black mt-4">Your Home of Nepalese Event</h1>
+                    <p>{{ $audience->audienceTranslations->first()?->name }}</p>
+                </div>
+            @endforeach
+        </section>
 
-            <p class="w-1/2 flex justify-center text-xl mt-2">
-                Everything you need to get started.
-            </p>
+        <section class="flex gap-x-2 items-center">
+            <h1 class="text-xl">Brows events in</h1>
 
-            <p class="w-5/12 text-center text-xl">
-                Aafno Ticket Provides a powerfull platform to list, promote and sell your tickets worldwide. With our
-                powerful DIY tools, you will get access to all the features that are required to host any events
-                successfully.
-            </p>
+            <x-heroicon-o-chevron-down class="w-5 h-5 font-bold" />
 
-            <div class="flex gap-x-24 mt-8 items-end">
-                <section class="flex items-center flex-col">
-                    <x-fas-tv class="text-sky-700 w-32 h-32" />
-
-                   <p class="text-gray-500 text-lg font-medium">1.Register</p>
-                </section>
-
-                <section class="flex items-center flex-col">
-                    <x-fas-rectangle-list class="text-[#679436] w-28 h-28" />
-
-                    <p class="text-gray-500 text-lg font-medium">2.List</p>
-                </section>
-
-                <section class="flex items-center flex-col">
-                    <x-fas-ticket class="text-[#8e4162] w-28 h-28" />
-
-                    <p class="text-gray-500 text-lg font-medium">3.Sell</p>
-                </section>
-            </div>
-
-            <p class="mt-4 text-lg">You have to try to believe it!!</p>
+            <h1 class="text-lg font-semibold text-blue-400 underline">Indian Wells</h1>
         </section>
     </main>
 </div>
