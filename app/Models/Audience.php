@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property string|null $image_name
@@ -46,6 +46,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Event> $events
  * @property-read int|null $events_count
  * @mixin Eloquent
+ * @mixin \Eloquent
  */
 class Audience extends Model
 {
