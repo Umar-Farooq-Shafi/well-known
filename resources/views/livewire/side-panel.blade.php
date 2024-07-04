@@ -1,14 +1,18 @@
+@php use Illuminate\Support\Facades\Storage; @endphp
+
 <div>
     @push('styles')
         <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/>
     @endpush
-    <div class="swiper mySwiper">
+    <div class="swiper mySwiper mt-[70px]">
         <div class="swiper-wrapper">
-            <div class="swiper-slide">
-                <img class="object-cover w-full h-[90vh]"
-                     src="https://images.unsplash.com/photo-1719273659346-feb0ae0c38fc?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90b3MtZmVlZHwxMHx8fGVufDB8fHx8fA%3D%3D"
-                     alt="image"/>
-            </div>
+            @foreach($sliderContents as $sliderContent)
+                <div class="swiper-slide">
+                    <img class="object-fill w-full h-[85vh]"
+                         src="{{ Storage::url('events/' . $sliderContent->image_name) }}"
+                         alt="image"/>
+                </div>
+            @endforeach
         </div>
         <div class="swiper-button-next"></div>
         <div class="swiper-button-prev"></div>
