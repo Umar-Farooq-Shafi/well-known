@@ -24,7 +24,7 @@
             <div class="relative flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse" x-data="{ open: false }">
                 <button @click="open = !open" type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false">
                     <span class="sr-only">Open user menu</span>
-                    <img class="w-8 h-8 rounded-full" src="{{ Storage::url('users/' . auth()->user()->avatar_name) }}" alt="user photo">
+                    <img class="w-8 h-8 rounded-full" src="{{ auth()->user()->getFilamentAvatarUrl() }}" alt="user photo">
                 </button>
                 <!-- Dropdown menu -->
                 <div x-show="open" @click.outside="open = false" x-transition class="absolute top-0 right-0 mt-12 w-48 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 z-50">
