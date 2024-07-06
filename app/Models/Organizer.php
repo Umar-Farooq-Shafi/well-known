@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -154,4 +154,21 @@ class Organizer extends Model
     {
         return $this->hasMany(Venue::class);
     }
+
+    /**
+     * @return HasMany
+     */
+    public function scanners(): HasMany
+    {
+        return $this->hasMany(Scanner::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function pointOfSales(): HasMany
+    {
+        return $this->hasMany(PointsOfSale::class);
+    }
+
 }

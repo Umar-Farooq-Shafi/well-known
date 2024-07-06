@@ -6,6 +6,7 @@ use App\Filament\Resources\ArticleCategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class EditArticleCategory extends EditRecord
 {
@@ -39,21 +40,25 @@ class EditArticleCategory extends EditRecord
         foreach ($record->helpCenterCategoryTranslations as $translation) {
             if ($translation->locale === 'ar') {
                 $translation->name = $data['name-ar'];
+                $translation->slug = Str::slug($data['name-ar'] ?? '');
                 $translation->save();
             }
 
             if ($translation->locale === 'en') {
                 $translation->name = $data['name-en'];
+                $translation->slug = Str::slug($data['name-en'] ?? '');
                 $translation->save();
             }
 
             if ($translation->locale === 'fr') {
                 $translation->name = $data['name-fr'];
+                $translation->slug = Str::slug($data['name-fr'] ?? '');
                 $translation->save();
             }
 
             if ($translation->locale === 'es') {
                 $translation->name = $data['name-es'];
+                $translation->slug = Str::slug($data['name-es'] ?? '');
                 $translation->save();
             }
         }

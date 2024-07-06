@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $event_id
@@ -73,6 +75,39 @@ class EventDate extends Model
     public function venue(): BelongsTo
     {
         return $this->belongsTo(Venue::class);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function scanners(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Scanner::class,
+            'eventic_eventdate_scanner',
+            'eventdate_id',
+        );
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function pointOfSales(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            PointsOfSale::class,
+            'eventic_eventdate_pointofsale',
+            'eventdate_id',
+            'pointofsale_id',
+        );
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function eventDateTickets(): HasMany
+    {
+        return $this->hasMany(EventDateTicket::class, 'eventdate_id');
     }
 
 }

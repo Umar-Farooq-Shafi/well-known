@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $category_id
@@ -94,6 +94,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read int|null $audiences_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Language> $languages
  * @property-read int|null $languages_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EventImage> $eventImages
+ * @property-read int|null $event_images_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Language> $subtitles
+ * @property-read int|null $subtitles_count
  * @mixin \Eloquent
  */
 class Event extends Model
@@ -187,6 +191,22 @@ class Event extends Model
     public function languages(): BelongsToMany
     {
         return $this->belongsToMany(Language::class, 'eventic_event_language');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function subtitles(): BelongsToMany
+    {
+        return $this->belongsToMany(Language::class, 'eventic_event_subtitle');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function eventImages(): HasMany
+    {
+        return $this->hasMany(EventImage::class);
     }
 
 }

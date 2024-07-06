@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $eventdate_id
@@ -93,6 +93,14 @@ class EventDateTicket extends Model
     public function eventDate(): BelongsTo
     {
         return $this->belongsTo(EventDate::class, 'eventdate_id');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class, 'currency_code_id');
     }
 
 }

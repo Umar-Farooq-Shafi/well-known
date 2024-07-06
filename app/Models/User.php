@@ -265,4 +265,12 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
         return $this->belongsTo(Organizer::class);
     }
 
+    /**
+     * @return HasMany
+     */
+    public function scanners(): HasMany
+    {
+        return $this->hasMany(Scanner::class);
+    }
+
 }

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\LanguageResource\Pages;
 use App\Filament\Resources\LanguageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Str;
 
 class EditLanguage extends EditRecord
 {
@@ -38,21 +39,25 @@ class EditLanguage extends EditRecord
         foreach ($this->record->audienceTranslations as $translation) {
             if ($translation->locale === 'ar') {
                 $translation->name = $this->data['name-ar'];
+                $translation->slug = Str::slug($this->data['name-ar'] ?? '');
                 $translation->save();
             }
 
             if ($translation->locale === 'en') {
                 $translation->name = $this->data['name-en'];
+                $translation->slug = Str::slug($this->data['name-en'] ?? '');
                 $translation->save();
             }
 
             if ($translation->locale === 'fr') {
                 $translation->name = $this->data['name-fr'];
+                $translation->slug = Str::slug($this->data['name-fr'] ?? '');
                 $translation->save();
             }
 
             if ($translation->locale === 'es') {
                 $translation->name = $this->data['name-es'];
+                $translation->slug = Str::slug($this->data['name-es'] ?? '');
                 $translation->save();
             }
         }

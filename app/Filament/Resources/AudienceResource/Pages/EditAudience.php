@@ -8,6 +8,7 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Imagick\Driver;
 use Intervention\Image\ImageManager;
 
@@ -62,21 +63,25 @@ class EditAudience extends EditRecord
         foreach ($record->audienceTranslations as $translation) {
             if ($translation->locale === 'ar') {
                 $translation->name = $data['name-ar'];
+                $translation->slug = Str::slug($data['name-ar'] ?? '');
                 $translation->save();
             }
 
             if ($translation->locale === 'en') {
                 $translation->name = $data['name-en'];
+                $translation->slug = Str::slug($data['name-en'] ?? '');
                 $translation->save();
             }
 
             if ($translation->locale === 'fr') {
                 $translation->name = $data['name-fr'];
+                $translation->slug = Str::slug($data['name-fr'] ?? '');
                 $translation->save();
             }
 
             if ($translation->locale === 'es') {
                 $translation->name = $data['name-es'];
+                $translation->slug = Str::slug($data['name-es'] ?? '');
                 $translation->save();
             }
         }

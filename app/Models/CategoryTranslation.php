@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\TranslationSlugTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $translatable_id
@@ -27,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class CategoryTranslation extends Model
 {
-    use HasFactory;
+    use HasFactory, TranslationSlugTrait;
 
     public $timestamps = false;
 

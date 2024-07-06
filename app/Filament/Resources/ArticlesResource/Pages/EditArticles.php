@@ -6,6 +6,7 @@ use App\Filament\Resources\ArticlesResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class EditArticles extends EditRecord
 {
@@ -51,6 +52,7 @@ class EditArticles extends EditRecord
         foreach ($record->helpCenterTranslations as $translation) {
             if ($translation->locale === 'ar') {
                 $translation->title = $data['title-ar'];
+                $translation->slug = Str::slug($data['title-ar'] ?? '');
                 $translation->content = $data['content-ar'];
                 $translation->tags = $data['tags-ar'];
                 $translation->save();
@@ -58,6 +60,7 @@ class EditArticles extends EditRecord
 
             if ($translation->locale === 'en') {
                 $translation->title = $data['title-en'];
+                $translation->slug = Str::slug($data['title-en'] ?? '');
                 $translation->content = $data['content-en'];
                 $translation->tags = $data['tags-en'];
                 $translation->save();
@@ -65,6 +68,7 @@ class EditArticles extends EditRecord
 
             if ($translation->locale === 'fr') {
                 $translation->title = $data['title-fr'];
+                $translation->slug = Str::slug($data['title-fr'] ?? '');
                 $translation->content = $data['content-fr'];
                 $translation->tags = $data['tags-fr'];
                 $translation->save();
@@ -72,6 +76,7 @@ class EditArticles extends EditRecord
 
             if ($translation->locale === 'es') {
                 $translation->title = $data['title-es'];
+                $translation->slug = Str::slug($data['title-es'] ?? '');
                 $translation->content = $data['content-es'];
                 $translation->tags = $data['tags-es'];
                 $translation->save();
