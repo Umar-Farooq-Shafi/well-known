@@ -6,6 +6,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * 
+ *
+ * @property int $id
+ * @property int|null $organizer_id
+ * @property int|null $user_id
+ * @property string $name
+ * @property-read \App\Models\Organizer|null $organizer
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder|Scanner newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Scanner newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Scanner query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Scanner whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Scanner whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Scanner whereOrganizerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Scanner whereUserId($value)
+ * @mixin \Eloquent
+ */
 class Scanner extends Model
 {
     use HasFactory;

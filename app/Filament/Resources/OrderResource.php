@@ -18,6 +18,7 @@ class OrderResource extends Resource
     /**
      * @param Table $table
      * @return Table
+     * @throws \Exception
      */
     public static function table(Table $table): Table
     {
@@ -69,6 +70,7 @@ class OrderResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('paymentgateway_id')
+                    ->label('Payment Gateways')
                     ->multiple()
                     ->searchable()
                     ->preload()
@@ -76,11 +78,21 @@ class OrderResource extends Resource
                         'paymentGateway',
                         'name',
                     ),
+
+                Tables\Filters\SelectFilter::make('user_id')
+                    ->label('Attendees')
+                    ->searchable()
+                    ->preload()
+                    ->multiple()
+                    ->relationship(
+                        'user',
+                        'username'
+                    )
             ])
             ->headerActions([
                 Tables\Actions\ExportAction::make()
                     ->exporter(OrderExporter::class)
-                    ->icon('heroicon-o-arrow-down-tray')
+                    ->icon('heroicon-o-arrow-down-tray'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

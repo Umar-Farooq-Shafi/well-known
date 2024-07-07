@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $eventdate_id
@@ -50,6 +50,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereSalesstartdate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereTicketFee($value)
  * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereTicketsperattendee($value)
+ * @property-read \App\Models\Currency|null $currency
  * @mixin \Eloquent
  */
 class EventDateTicket extends Model

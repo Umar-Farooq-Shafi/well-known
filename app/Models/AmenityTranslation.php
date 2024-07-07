@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use function Laravel\Prompts\select;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $translatable_id

@@ -65,7 +65,9 @@ class HomepagePage extends Page
                             'eventTranslations' => function ($query) {
                                 $query->where('locale', App::getLocale());
                             }
-                        ])->get();
+                        ])
+                            ->where('completed', false)
+                            ->get();
 
                         $options = [];
 

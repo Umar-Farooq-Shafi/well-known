@@ -15,10 +15,12 @@ use App\Models\Venue;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\HtmlString;
 
 class EventResource extends Resource
 {
@@ -208,7 +210,7 @@ class EventResource extends Resource
                     ->required()
                     ->columnSpanFull()
                     ->disk('public')
-                    ->formatStateUsing(fn ($state) => $state ? ["events/" . $state] : null)
+                    ->formatStateUsing(fn($state) => $state ? ["events/" . $state] : null)
                     ->directory('events')
                     ->preserveFilenames('image_original_name'),
 
@@ -223,7 +225,7 @@ class EventResource extends Resource
                             ->required()
                             ->columnSpanFull()
                             ->disk('public')
-                            ->formatStateUsing(fn ($state) => $state ? ["events/" . $state] : null)
+                            ->formatStateUsing(fn($state) => $state ? ["events/" . $state] : null)
                             ->directory('events')
                             ->preserveFilenames('image_original_name'),
                     ]),
@@ -259,13 +261,13 @@ class EventResource extends Resource
                             ->label('Calendar Starts On')
                             ->required()
                             ->native(false)
-                            ->visible(fn (Forms\Get $get) => $get('recurrent')),
+                            ->visible(fn(Forms\Get $get) => $get('recurrent')),
 
-                         Forms\Components\DatePicker::make('recurrent_enddate')
-                             ->label('Calendar Ends On')
-                             ->required()
-                             ->native(false)
-                             ->visible(fn (Forms\Get $get) => $get('recurrent')),
+                        Forms\Components\DatePicker::make('recurrent_enddate')
+                            ->label('Calendar Ends On')
+                            ->required()
+                            ->native(false)
+                            ->visible(fn(Forms\Get $get) => $get('recurrent')),
 
                         Forms\Components\Radio::make('active')
                             ->label('Enable sales for this event date ?')
@@ -383,6 +385,13 @@ class EventResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('image_name')
+                    ->label('Image')
+                    ->extraImgAttributes(['loading' => 'lazy'])
+                    ->square()
+                    ->getStateUsing(fn($record) => $record->image_name ? ['events/' . $record->image_name] : null)
+                    ->disk('public'),
+
                 Tables\Columns\TextColumn::make('id')
                     ->label('Name')
                     ->formatStateUsing(fn($record) => $record->eventTranslations()->where('locale', App::getLocale())->first()?->name)
@@ -395,14 +404,168 @@ class EventResource extends Resource
 
                 Tables\Columns\TextColumn::make('is_featured')
                     ->label('Is Feathered')
-                    ->formatStateUsing(fn ($state) => $state ? 'Yes' : 'No')
+                    ->formatStateUsing(fn($state) => $state ? 'Yes' : 'No')
                     ->searchable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('statistic')
+                        ->label('Statistics')
+                        ->modalHeading(
+                            fn($record) => $record->eventTranslations()
+                                    ->where('locale', App::getLocale())->first()?->name . ' : Event dates'
+                        )
+                        ->modalSubmitActionLabel('View stats')
+                        ->modalContent(
+                            fn($record) => new HtmlString("<h1>" . $record->eventDates()->first()->startdate . "</h1>")
+                        )
+                        ->action(fn($record) => redirect()->route('filament.admin.resources.events.view-stats', ['record' => $record]))
+                        ->icon('heroicon-o-presentation-chart-bar'),
+
+                    Tables\Actions\Action::make('details')
+                        ->label('Details')
+                        ->requiresConfirmation()
+                        ->fillForm(function (Event $event) {
+                            $languages = [];
+                            $audiences = [];
+
+                            foreach ($event->languages as $language) {
+                                $languages[] = $language->languageTranslations()
+                                    ->where('locale', App::getLocale())
+                                    ->first()?->name;
+                            }
+
+                            foreach ($event->audiences as $audience) {
+                                $audiences[] = $audience->audienceTranslations()
+                                    ->where('locale', App::getLocale())
+                                    ->first()?->name;
+                            }
+
+                            return [
+                                'event' => $event,
+                                'image_name' => $event->image_name,
+                                'title' => $event->eventTranslations()
+                                    ->where('locale', App::getLocale())->first()?->name,
+                                'organizer' => $event->organizer->name,
+                                'reference' => $event->reference,
+                                'creation_date' => $event->created_at,
+                                'update_date' => $event->updated_at,
+                                'views' => $event->views,
+                                'added_to_favorites_by' => $event->favourites()->count(),
+                                'category' => $event->category->categoryTranslations()
+                                    ->where('locale', App::getLocale())->first()?->name,
+                                'language' => implode(', ', $languages),
+                                'audiences' => implode(', ', $audiences),
+                                'country' => $event->country->countryTranslations()
+                                    ->where('locale', App::getLocale())->first()?->name,
+                                'publicly_show_attendees' => $event->showattendees,
+                                'allow_attendees_to_leave_reviews' => $event->enablereviews,
+                            ];
+                        })
+                        ->form([
+                            Forms\Components\Section::make('Images')
+                                ->collapsible()
+                                ->columns(2)
+                                ->schema([
+                                    Forms\Components\FileUpload::make('image_name')
+                                        ->label('Main event image')
+                                        ->columnSpanFull()
+                                        ->disk('public')
+                                        ->formatStateUsing(fn($state) => $state ? ["events/" . $state] : null)
+                                        ->directory('events'),
+
+                                    Forms\Components\Repeater::make('Gallery')
+                                        ->relationship('eventImages')
+                                        ->schema([
+                                            Forms\Components\FileUpload::make('image_name')
+                                                ->label('Gallery image')
+                                                ->required()
+                                                ->disk('public')
+                                                ->formatStateUsing(fn($state) => $state ? ["events/" . $state] : null)
+                                                ->directory('events')
+                                        ])
+                                        ->addable(false)
+                                        ->deletable(false),
+                                ]),
+
+                            Forms\Components\Section::make('General Information')
+                                ->columns(2)
+                                ->collapsible()
+                                ->schema([
+                                    Forms\Components\TextInput::make('title'),
+                                    Forms\Components\TextInput::make('organizer'),
+                                    Forms\Components\TextInput::make('reference'),
+                                    Forms\Components\TextInput::make('creation_date'),
+                                    Forms\Components\TextInput::make('update_date'),
+                                    Forms\Components\TextInput::make('views'),
+                                    Forms\Components\TextInput::make('added_to_favorites_by'),
+                                    Forms\Components\TextInput::make('category'),
+                                    Forms\Components\TextInput::make('language'),
+                                    Forms\Components\TextInput::make('audiences'),
+                                    Forms\Components\TextInput::make('country'),
+                                    Forms\Components\TextInput::make('publicly_show_attendees')
+                                        ->formatStateUsing(fn($state) => $state ? "Yes" : "No"),
+                                    Forms\Components\TextInput::make('allow_attendees_to_leave_reviews')
+                                        ->formatStateUsing(fn($state) => $state ? "Yes" : "No"),
+                                ]),
+
+                            Forms\Components\Repeater::make('Event dates')
+                                ->relationship('eventDates')
+                                ->columns(2)
+                                ->addable(false)
+                                ->deletable(false)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('reference'),
+                                    Forms\Components\TextInput::make('venue')
+                                        ->formatStateUsing(
+                                            fn($record) => $record->venue?->venueTranslations()
+                                                ?->where('locale', App::getLocale())?->first()?->name
+                                        )
+                                ])
+                        ])
+                        ->modalWidth(MaxWidth::Full)
+                        ->modalHeading('')
+                        ->modalCancelActionLabel('Close')
+                        ->modalSubmitAction('')
+                        ->icon('heroicon-o-document-text'),
+
+                    Tables\Actions\Action::make('attendees')
+                        ->label('Attendees')
+                        ->url(
+                            fn($record) => route('filament.admin.resources.orders.index')
+                        )
+                        ->icon('heroicon-o-user-group'),
+
+                    Tables\Actions\Action::make('reviews')
+                        ->label('Reviews')
+                        ->url(
+                            fn($record) => route('filament.admin.resources.reviews.index')
+                        )
+                        ->icon('heroicon-o-star'),
+
+                    Tables\Actions\Action::make('Mark as featured')
+                        ->icon('heroicon-o-eye-slash')
+                        ->hidden(fn($record) => $record->featured)
+                        ->action(fn($record) => $record->update(['featured' => 1])),
+
+                    Tables\Actions\Action::make('Mark as not featured')
+                        ->icon('heroicon-o-eye')
+                        ->visible(fn($record) => $record->featured)
+                        ->action(fn($record) => $record->update(['featured' => false])),
+
+                    Tables\Actions\Action::make('completed')
+                        ->label('Completed')
+                        ->icon('heroicon-o-check')
+                        ->hidden(fn($record) => $record->completed)
+                        ->action(fn($record) => $record->update(['completed', true])),
+
+                    Tables\Actions\EditAction::make(),
+
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -417,6 +580,7 @@ class EventResource extends Resource
             'index' => Pages\ListEvents::route('/'),
             'create' => Pages\CreateEvent::route('/create'),
             'edit' => Pages\EditEvent::route('/{record}/edit'),
+            'view-stats' => Pages\ViewStatsPage::route('/{record}/stats'),
         ];
     }
 }

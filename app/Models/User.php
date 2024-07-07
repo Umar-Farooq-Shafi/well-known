@@ -17,7 +17,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -122,6 +122,8 @@ use Illuminate\Support\Facades\Storage;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUsernameCanonical($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|User withoutTrashed()
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Scanner> $scanners
+ * @property-read int|null $scanners_count
  * @mixin \Eloquent
  */
 class User extends Authenticatable implements FilamentUser, HasName, HasAvatar

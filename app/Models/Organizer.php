@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $user_id
@@ -90,6 +90,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Organizer whereYoutubeurl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Organizer withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Organizer withoutTrashed()
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PointsOfSale> $pointOfSales
+ * @property-read int|null $point_of_sales_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Scanner> $scanners
+ * @property-read int|null $scanners_count
  * @mixin \Eloquent
  */
 class Organizer extends Model

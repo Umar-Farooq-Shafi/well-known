@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $translatable_id

@@ -3,15 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReviewResource\Pages;
-use App\Filament\Resources\ReviewResource\RelationManagers;
+use App\Models\Event;
 use App\Models\Review;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ReviewResource extends Resource
 {
@@ -34,7 +31,29 @@ class ReviewResource extends Resource
                 //
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('event_id')
+                    ->label('Events')
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
+                    ->getSearchResultsUsing(
+                        function (string $query) {
+                            $options = [];
+
+                            $events = Event::with([
+                                'eventTranslations' => fn($builder) => $builder
+                                    ->where('name', 'LIKE', "%{$query}%")
+                            ])
+                                ->get();
+
+                            foreach ($events as $event) {
+                                $options[$event->id] = $event->eventTranslations()
+                                    ->first()?->name ?? '';
+                            }
+
+                            return $options;
+                        }
+                    )
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

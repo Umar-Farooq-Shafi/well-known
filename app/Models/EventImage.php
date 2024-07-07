@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\ImageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,7 +36,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class EventImage extends Model
 {
-    use HasFactory;
+    use HasFactory, ImageTrait;
 
     public const CREATED_AT = null;
 
@@ -50,6 +51,19 @@ class EventImage extends Model
         'image_dimensions',
         'position'
     ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        self::creating(function ($model) {
+            $this->saveImage($model, 'events');
+        });
+
+        self::updating(function ($model) {
+            $this->saveImage($model, 'events');
+        });
+    }
 
     /**
      * @return BelongsTo

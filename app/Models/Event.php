@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\ImageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $category_id
@@ -98,11 +99,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read int|null $event_images_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Language> $subtitles
  * @property-read int|null $subtitles_count
+ * @property int $completed
+ * @property-read \App\Models\Country|null $country
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $favourites
+ * @property-read int|null $favourites_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Event whereCompleted($value)
  * @mixin \Eloquent
  */
 class Event extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, ImageTrait;
 
     protected $table = 'eventic_event';
 
@@ -134,8 +140,22 @@ class Event extends Model
         'enablereviews',
         'showattendees',
         'is_featured',
-        'eventtimezone'
+        'eventtimezone',
+        'completed'
     ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        self::creating(function ($model) {
+            $this->saveImage($model, 'events');
+        });
+
+        self::updating(function ($model) {
+            $this->saveImage($model, 'events');
+        });
+    }
 
     /**
      * @return BelongsTo
@@ -207,6 +227,27 @@ class Event extends Model
     public function eventImages(): HasMany
     {
         return $this->hasMany(EventImage::class);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function favourites(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'eventic_favorites',
+            'Event_id',
+            'User_id'
+        );
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
     }
 
 }

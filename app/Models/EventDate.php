@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $event_id
@@ -38,6 +38,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereReference($value)
  * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereStartdate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereVenueId($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EventDateTicket> $eventDateTickets
+ * @property-read int|null $event_date_tickets_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PointsOfSale> $pointOfSales
+ * @property-read int|null $point_of_sales_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Scanner> $scanners
+ * @property-read int|null $scanners_count
  * @mixin \Eloquent
  */
 class EventDate extends Model
