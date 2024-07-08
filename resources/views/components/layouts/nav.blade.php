@@ -88,7 +88,7 @@
                 </li>
 
                 <li>
-                    <a href="#"
+                    <a href="{{ route('events') }}"
                        class="flex gap-x-1 my-2 py-2 px-3 text-gray-900 rounded hover:bg-transparent hover:text-blue-700 md:p-0">
                         <x-heroicon-o-calendar class="h-6 w-6"/>
                         Browse Events

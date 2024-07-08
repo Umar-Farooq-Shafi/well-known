@@ -4,6 +4,8 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\Login;
 use App\Filament\Pages\Profile;
+use App\Filament\Pages\Register;
+use App\Models\AppLayoutSetting;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -35,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
-            ->registration()
+            ->registration(Register::class)
             ->colors([
                 'primary' => Color::Sky,
             ])
@@ -60,6 +62,11 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            ->brandLogo(function () {
+                $layout = AppLayoutSetting::query()->first();
+
+                return $layout->logo_name ? Storage::disk('public')->url('layout/' . $layout->logo_name) : null;
+            })
             ->navigationGroups([
                 'Settings',
                 'Events',
