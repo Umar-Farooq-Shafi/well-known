@@ -233,6 +233,7 @@ class EventResource extends Resource
                 Forms\Components\Select::make('country_id')
                     ->label('Country')
                     ->helperText("Select the country that your event represents (ie: A movie's country of production)")
+                    ->live()
                     ->options(function () {
                         $countries = Country::all();
                         $options = [];
@@ -278,12 +279,19 @@ class EventResource extends Resource
                         Forms\Components\Radio::make('online')
                             ->label('Is this event date online ?')
                             ->required()
+                            ->live()
                             ->boolean(),
 
                         Forms\Components\Select::make('venue_id')
                             ->label('Venue')
-                            ->options(function () {
-                                $venues = Venue::all();
+                            ->hidden(fn(Forms\Get $get) => $get('online'))
+                            ->options(function (Forms\Get $get) {
+                                if ($get('../../country_id')) {
+                                    $venues = Venue::whereCountryId($get('../../country_id'))->get();
+                                } else {
+                                    $venues = Venue::all();
+                                }
+
                                 $options = [];
 
                                 foreach ($venues as $venue) {
@@ -298,13 +306,29 @@ class EventResource extends Resource
                             ->label('Scanners')
                             ->multiple()
                             ->relationship('scanners')
-                            ->options(Scanner::pluck('name', 'id')),
+                            ->getSearchResultsUsing(
+                                fn(string $query) => Scanner::whereOrganizerId(auth()->user()->organizer_id)
+                                    ->where('name', 'like', "%{$query}%")
+                                    ->pluck('name', 'id')
+                            )
+                            ->options(
+                                Scanner::whereOrganizerId(auth()->user()->organizer_id)
+                                    ->pluck('name', 'id')
+                            ),
 
                         Forms\Components\Select::make('pointOfSales')
                             ->label('Points of sale')
                             ->multiple()
                             ->relationship('pointOfSales')
-                            ->options(PointsOfSale::pluck('name', 'id')),
+                            ->getSearchResultsUsing(
+                                fn(string $query) => PointsOfSale::whereOrganizerId(auth()->user()->organizer_id)
+                                    ->where('name', 'like', "%{$query}%")
+                                    ->pluck('name', 'id')
+                            )
+                            ->options(
+                                PointsOfSale::whereOrganizerId(auth()->user()->organizer_id)
+                                    ->pluck('name', 'id')
+                            ),
 
                         Forms\Components\Repeater::make('eventDateTickets')
                             ->label('Event tickets')
@@ -333,6 +357,7 @@ class EventResource extends Resource
                                 Forms\Components\Select::make('currency_code_id')
                                     ->label('Currency')
                                     ->required()
+                                    ->live()
                                     ->options(Currency::pluck('ccy', 'id')),
 
                                 Forms\Components\Radio::make('currency_symbol_position')
@@ -347,17 +372,41 @@ class EventResource extends Resource
                                     ->required()
                                     ->integer()
                                     ->helperText('This fee will be added to the ticket sale price which are bought online, put 0 to disable additional fees for tickets which are bought online, does not apply for free tickets, will be applied to future orders')
-                                    ->prefix('RS'),
+                                    ->prefix(function (Forms\Get $get) {
+                                        $currencyCode = $get('currency_code_id');
+
+                                        if ($currencyCode) {
+                                            return Currency::find($currencyCode)->ccy;
+                                        }
+
+                                        return '';
+                                    }),
 
                                 Forms\Components\TextInput::make('price')
                                     ->integer()
-                                    ->prefix('RS'),
+                                    ->prefix(function (Forms\Get $get) {
+                                        $currencyCode = $get('currency_code_id');
+
+                                        if ($currencyCode) {
+                                            return Currency::find($currencyCode)->ccy;
+                                        }
+
+                                        return '';
+                                    }),
 
                                 Forms\Components\TextInput::make('promotionalprice')
                                     ->label('Promotional price')
                                     ->helperText('Set a price lesser than than the original price to indicate a promotion (this price will be the SALE price)')
                                     ->integer()
-                                    ->prefix('RS'),
+                                    ->prefix(function (Forms\Get $get) {
+                                        $currencyCode = $get('currency_code_id');
+
+                                        if ($currencyCode) {
+                                            return Currency::find($currencyCode)->ccy;
+                                        }
+
+                                        return '';
+                                    }),
 
                                 Forms\Components\TextInput::make('quantity')
                                     ->required()
@@ -549,11 +598,21 @@ class EventResource extends Resource
                     Tables\Actions\Action::make('Mark as featured')
                         ->icon('heroicon-o-eye-slash')
                         ->hidden(fn($record) => $record->featured)
+                        ->visible(function () {
+                            $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+                            return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
+                        })
                         ->action(fn($record) => $record->update(['featured' => 1])),
 
                     Tables\Actions\Action::make('Mark as not featured')
                         ->icon('heroicon-o-eye')
-                        ->visible(fn($record) => $record->featured)
+                        ->hidden(fn($record) => !$record->featured)
+                        ->visible(function () {
+                            $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+                            return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
+                        })
                         ->action(fn($record) => $record->update(['featured' => false])),
 
                     Tables\Actions\Action::make('completed')
