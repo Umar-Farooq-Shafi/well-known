@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use App\Models\Category;
 use App\Models\Event;
-use App\Models\HomepageHeroSetting;
 use App\Models\Setting;
 use Illuminate\Support\Facades\App;
 use Livewire\Attributes\Title;

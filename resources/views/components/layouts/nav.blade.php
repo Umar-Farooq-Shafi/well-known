@@ -14,7 +14,7 @@
     ];
 @endphp
 
-<nav class="fixed w-full z-20 top-0 start-0 border-b border-gray-200"
+<nav class="fixed w-full z-20 top-0 start-0 mb-24 border-b border-gray-200"
      style="background-image: linear-gradient(35deg, #535eb2, #009cde)">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <a href="{{ env('APP_URL') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
