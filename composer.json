@@ -14,6 +14,7 @@
         "guava/filament-icon-picker": "^2.2",
         "intervention/image": "^3.7",
         "laravel/framework": "^11.9",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
         "owenvoke/blade-fontawesome": "^2.6",
@@ -21,6 +22,8 @@
         "stechstudio/filament-impersonate": "^3.9",
         "stijnvanouplines/blade-country-flags": "^1.0",
         "symfony/dotenv": "^7.1",
+        "wireui/breadcrumbs": "^3.1",
+        "wireui/wireui": "^2.0",
         "ysfkaya/filament-phone-input": "^2.3"
     },
     "require-dev": {

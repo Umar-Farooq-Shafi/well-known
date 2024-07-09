@@ -1,44 +1,57 @@
 <div class="container mx-auto p-6 mt-20">
     <div class="flex flex-col lg:flex-row justify-between mb-4">
         <!-- Sidebar -->
-        <div class="w-full lg:w-1/4 mb-4 lg:mb-0 space-y-2">
-            <input type="text" placeholder="Keyword" class="border p-2 w-full mb-2">
-            <select class="border p-2 w-full mb-2">
-                <option>Select a category</option>
-                <!-- Add more categories here -->
-            </select>
-            <select class="border p-2 w-full mb-2">
-                <option>Select a location</option>
-                <!-- Add more locations here -->
-            </select>
-            <div class="mb-2">
-                <label class="inline-flex items-center">
-                    <input type="checkbox" class="form-checkbox">
-                    <span class="ml-2">Online events only</span>
-                </label>
+        <div class="w-full lg:w-1/4 mb-4 lg:mb-0 space-y-2 mx-4">
+            <x-input
+                label="Keyword"
+                placeholder="Enter keywords"
+            />
+
+            <x-select
+                label="Categories"
+                placeholder="Select an option"
+                option-label="name"
+                option-value="id"
+                :async-data="route('api.events.categories')"
+            />
+
+            <div class="flex flex-col gap-y-2 p-4 border">
+                <x-checkbox id="label" label="Online events only" md/>
+
+                <x-checkbox id="label" label="Local events only" md/>
+
+                <x-select
+                    label="Country"
+                    placeholder="Select a country"
+                    option-label="name"
+                    option-value="id"
+                    :async-data="route('api.events.country')"
+                />
             </div>
-            <div class="mb-2">
-                <label class="inline-flex items-center">
-                    <input type="checkbox" class="form-checkbox">
-                    <span class="ml-2">Local events only</span>
-                </label>
+
+            <div class="flex flex-col gap-y-2 p-4 border">
+                <x-radio id="day-today" wire:model="day" name="day" label="Today" value="today" md/>
+                <x-radio id="day-tomorrow" wire:model="day" name="day" label="Tomorrow" value="tomorrow" md/>
+                <x-radio id="day-this-weekend" wire:model="day" name="day" label="This Weekend" value="this-weekend"
+                         md/>
+                <x-radio id="day-this-week" wire:model="day" name="day" label="This Week" value="this-week" md/>
+                <x-radio id="day-next-week" wire:model="day" name="day" label="Next Week" value="next-week" md/>
+                <x-radio id="day-this-month" wire:model="day" name="day" label="This Month" value="this-month" md/>
+                <x-radio id="day-next-month" wire:model="day" name="day" label="Next Month" value="next-month" md/>
+                <x-radio id="day-pick-date" wire:model="day" name="day" label="Pick a date" value="pick-date" md/>
             </div>
-            <select class="border p-2 w-full mb-2">
-                <option>Select a country</option>
-                <!-- Add more countries here -->
-            </select>
-            <div class="mb-2">
-                <label class="inline-flex items-center">
-                    <input type="radio" name="date" class="form-radio">
-                    <span class="ml-2">Today</span>
-                </label>
-            </div>
-            <div class="mb-2">
-                <label class="inline-flex items-center">
-                    <input type="radio" name="date" class="form-radio">
-                    <span class="ml-2">Tomorrow</span>
-                </label>
-            </div>
+
+            @if($day === 'pick-date')
+                <div class="mt-2">
+                    <x-datetime-picker
+                        wire:model.live="customDate"
+                        label=""
+                        placeholder="Select date"
+                        without-time
+                    />
+                </div>
+            @endif
+
         </div>
         <!-- Event Cards -->
         <div class="w-full lg:w-3/4 grid grid-cols-1 md:grid-cols-2 gap-4">

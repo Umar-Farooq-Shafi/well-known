@@ -16,7 +16,7 @@
         }
     </style>
 
-    @filamentStyles
+    <wireui:scripts />
     @vite('resources/css/app.css')
     @livewireStyles
 </head>
@@ -27,7 +27,6 @@
 {{ $slot }}
 
 @livewireScriptConfig
-@filamentScripts
 @vite(['resources/js/app.js'])
 @stack('scripts')
 

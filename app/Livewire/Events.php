@@ -7,6 +7,8 @@ use Livewire\Component;
 
 class Events extends Component
 {
+    public $day;
+
     #[Title("Events | 'Aafno Ticket Nepal'")]
     public function render()
     {
