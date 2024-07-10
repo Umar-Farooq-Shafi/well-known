@@ -16,6 +16,13 @@ class OrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
+    public static function canViewAny(): bool
+    {
+        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+        return !str_contains($role, 'ATTENDEE');
+    }
+
     /**
      * @param Table $table
      * @return Table

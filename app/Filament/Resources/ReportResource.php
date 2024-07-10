@@ -18,6 +18,13 @@ class ReportResource extends Resource
 
     protected static ?string $navigationLabel = 'Reports';
 
+    public static function canViewAny(): bool
+    {
+        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+        return !str_contains($role, 'ATTENDEE');
+    }
+
     public static function table(Table $table): Table
     {
         return $table

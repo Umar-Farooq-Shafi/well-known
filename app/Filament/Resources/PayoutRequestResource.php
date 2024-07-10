@@ -23,6 +23,13 @@ class PayoutRequestResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function canViewAny(): bool
+    {
+        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+        return !str_contains($role, 'ATTENDEE');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
