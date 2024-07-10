@@ -22,6 +22,13 @@ class GoogleRecaptchaPage extends Page
 
     public array $data = [];
 
+    public static function canAccess(): bool
+    {
+        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+        return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
+    }
+
     public function mount(): void
     {
         $this->form->fill([

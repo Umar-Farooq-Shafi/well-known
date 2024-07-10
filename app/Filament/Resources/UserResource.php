@@ -17,6 +17,13 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
+    public static function canViewAny(): bool
+    {
+        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+        return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
+    }
+
     /**
      * @throws \Exception
      */
@@ -77,7 +84,7 @@ class UserResource extends Resource
                         ->badge(fn ($record) => count($record->cartElements))
                         ->icon('heroicon-o-shopping-cart'),
 
-                    Impersonate::make('Impersonate'),
+                    Impersonate::make('Impersonate')->redirectTo(route('filament.admin.pages.dashboard')),
 
                     Tables\Actions\Action::make('Enable')
                         ->icon('heroicon-o-eye-slash')

@@ -274,12 +274,11 @@ class VenueResource extends Resource
     {
         $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
 
-        if (str_contains($role, 'ORGANIZER')) {
-            return parent::getEloquentQuery()
-                ->where('organizer_id', auth()->user()->organizer_id);
-        }
-
-        return parent::getEloquentQuery();
+        return parent::getEloquentQuery()
+            ->when(
+                str_contains($role, 'ORGANIZER'),
+                fn ($query) => $query->where('organizer_id', auth()->user()->organizer_id)
+            );
     }
 
     public static function getPages(): array

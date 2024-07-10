@@ -23,6 +23,13 @@ class PostResource extends Resource
 
     protected static ?string $label = 'Posts';
 
+    public static function canViewAny(): bool
+    {
+        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+        return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
+    }
+
     public static function form(Form $form): Form
     {
         return $form

@@ -19,6 +19,13 @@ class PaymentRequestResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function canAccess(): bool
+    {
+        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+        return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
+    }
+
     public static function form(Form $form): Form
     {
         return $form

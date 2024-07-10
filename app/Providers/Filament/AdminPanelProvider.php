@@ -77,6 +77,11 @@ class AdminPanelProvider extends PanelProvider
                 NavigationItem::make('Sitemap')
                     ->group('Settings')
                     ->sort(13)
+                    ->visible(function (): bool {
+                        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+                        return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
+                    })
                     ->url(function () {
                         $filename = 'sitemap.xml';
                         $path = public_path($filename);
