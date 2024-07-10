@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Models\Setting;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -42,6 +44,12 @@ class AppServiceProvider extends ServiceProvider
                 file_get_contents(app()->environmentFilePath())
             ));
         }
+
+        Event::listen(
+            Login::class,
+
+        );
+
     }
 
 }

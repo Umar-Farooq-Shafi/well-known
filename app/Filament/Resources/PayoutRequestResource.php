@@ -17,7 +17,11 @@ class PayoutRequestResource extends Resource
 {
     protected static ?string $model = PayoutRequest::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-code-pull-request';
+
+    protected static ?string $navigationGroup = 'Payouts';
+
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {

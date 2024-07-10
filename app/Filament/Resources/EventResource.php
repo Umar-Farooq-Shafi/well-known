@@ -487,6 +487,22 @@ class EventResource extends Resource
                         ->action(fn($record) => redirect()->route('filament.admin.resources.events.view-stats', ['record' => $record]))
                         ->icon('heroicon-o-presentation-chart-bar'),
 
+                    Tables\Actions\Action::make('payout-request')
+                        ->label('Request payout')
+                        ->icon('fas-file-invoice-dollar')
+                        ->modalHeading(
+                            fn($record) => $record->eventTranslations()
+                                    ->where('locale', App::getLocale())->first()?->name . ' : Payout request'
+                        )
+                        ->modalContent(fn(Event $record) => view(
+                            'filament.resources.event-resource.payout-request',
+                            ['record' => $record],
+                        ))
+                        ->modalSubmitActionLabel('Request payout')
+                        ->visible(function () {
+                            return self::canCreate();
+                        }),
+
                     Tables\Actions\Action::make('details')
                         ->label('Details')
                         ->requiresConfirmation()
