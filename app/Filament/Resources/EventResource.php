@@ -18,6 +18,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\HtmlString;
@@ -276,6 +277,18 @@ class EventResource extends Resource
                             ->boolean()
                             ->helperText('Enabling sales for an event date does not affect the tickets individual sale status'),
 
+                        Forms\Components\DatePicker::make('startdate')
+                            ->label('Starts On')
+                            ->native(false)
+                            ->hidden(fn(Forms\Get $get) => $get('recurrent'))
+                            ->required(),
+
+                        Forms\Components\DatePicker::make('enddate')
+                            ->label('Ends On')
+                            ->native(false)
+                            ->hidden(fn(Forms\Get $get) => $get('recurrent'))
+                            ->required(),
+
                         Forms\Components\Radio::make('online')
                             ->label('Is this event date online ?')
                             ->required()
@@ -367,11 +380,8 @@ class EventResource extends Resource
                                         'right' => 'Right',
                                     ]),
 
-                                Forms\Components\TextInput::make('ticket_fee')
-                                    ->label('Ticket fee (Online)')
-                                    ->required()
+                                Forms\Components\TextInput::make('price')
                                     ->integer()
-                                    ->helperText('This fee will be added to the ticket sale price which are bought online, put 0 to disable additional fees for tickets which are bought online, does not apply for free tickets, will be applied to future orders')
                                     ->prefix(function (Forms\Get $get) {
                                         $currencyCode = $get('currency_code_id');
 
@@ -382,8 +392,11 @@ class EventResource extends Resource
                                         return '';
                                     }),
 
-                                Forms\Components\TextInput::make('price')
+                                Forms\Components\TextInput::make('ticket_fee')
+                                    ->label('Ticket fee (Online)')
+                                    ->required()
                                     ->integer()
+                                    ->helperText('This fee will be added to the ticket sale price which are bought online, put 0 to disable additional fees for tickets which are bought online, does not apply for free tickets, will be applied to future orders')
                                     ->prefix(function (Forms\Get $get) {
                                         $currencyCode = $get('currency_code_id');
 
@@ -619,7 +632,7 @@ class EventResource extends Resource
                         ->label('Completed')
                         ->icon('heroicon-o-check')
                         ->hidden(fn($record) => $record->completed)
-                        ->action(fn($record) => $record->update(['completed', true])),
+                        ->action(fn($record) => $record->update(['completed' => 1])),
 
                     Tables\Actions\EditAction::make(),
 
@@ -631,6 +644,18 @@ class EventResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+        if (str_contains($role, 'ORGANIZER')) {
+            return parent::getEloquentQuery()
+                ->where('organizer_id', auth()->user()->organizer_id);
+        }
+
+        return parent::getEloquentQuery();
     }
 
     public static function getPages(): array

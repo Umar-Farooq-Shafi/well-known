@@ -1,5 +1,6 @@
 @php
     use App\Models\AppLayoutSetting;
+    use Illuminate\Support\Facades\Request;
     use Illuminate\Support\Facades\Storage;
 
     $layout = AppLayoutSetting::query()->first();
@@ -80,7 +81,7 @@
             <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:dark:bg-gray-900 dark:border-gray-700">
                 <li>
                     <a href="{{ env('APP_URL') }}"
-                       class="flex gap-x-1 my-2 py-4 px-3 text-white rounded md:bg-transparent md:p-0 md:dark:text-blue-500"
+                       class="flex gap-x-1 my-2 py-4 px-3 {{ Request::url() === env('APP_URL') ? 'text-white' : 'text-gray-900' }} rounded md:bg-transparent md:p-0 md:dark:text-blue-500"
                        aria-current="page">
                         <x-heroicon-o-home class="h-6 w-6"/>
                         Home
@@ -89,7 +90,7 @@
 
                 <li>
                     <a href="{{ route('events') }}"
-                       class="flex gap-x-1 my-2 py-2 px-3 text-gray-900 rounded hover:bg-transparent hover:text-blue-700 md:p-0">
+                       class="flex gap-x-1 my-2 py-2 px-3 {{ Request::url() === route('events') ? 'text-white' : 'text-gray-900' }} rounded hover:bg-transparent hover:text-blue-700 md:p-0">
                         <x-heroicon-o-calendar class="h-6 w-6"/>
                         Browse Events
                     </a>

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $category_id
@@ -149,11 +149,11 @@ class Event extends Model
         parent::boot();
 
         self::creating(function ($model) {
-            $this->saveImage($model, 'events');
+            self::saveImage($model, 'events');
         });
 
         self::updating(function ($model) {
-            $this->saveImage($model, 'events');
+            self::saveImage($model, 'events');
         });
     }
 

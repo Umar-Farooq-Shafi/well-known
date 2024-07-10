@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $event_id
@@ -57,11 +57,11 @@ class EventImage extends Model
         parent::boot();
 
         self::creating(function ($model) {
-            $this->saveImage($model, 'events');
+            self::saveImage($model, 'events');
         });
 
         self::updating(function ($model) {
-            $this->saveImage($model, 'events');
+            self::saveImage($model, 'events');
         });
     }
 
