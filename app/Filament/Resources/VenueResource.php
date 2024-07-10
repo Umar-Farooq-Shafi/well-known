@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
 
@@ -267,6 +268,18 @@ class VenueResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+        if (str_contains($role, 'ORGANIZER')) {
+            return parent::getEloquentQuery()
+                ->where('organizer_id', auth()->user()->organizer_id);
+        }
+
+        return parent::getEloquentQuery();
     }
 
     public static function getPages(): array

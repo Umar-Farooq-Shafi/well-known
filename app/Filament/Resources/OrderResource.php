@@ -8,6 +8,7 @@ use App\Models\Order;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class OrderResource extends Resource
 {
@@ -119,6 +120,17 @@ class OrderResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+        return parent::getEloquentQuery()
+            ->when(
+                str_contains($role, 'ORGANIZER'),
+                fn(Builder $query): Builder => $query->where('user_id', auth()->id())
+            );
     }
 
     public static function getPages(): array
