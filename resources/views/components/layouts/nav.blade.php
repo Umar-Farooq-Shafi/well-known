@@ -7,11 +7,11 @@
     $logo = $layout->logo_name ? Storage::disk('public')->url('layout/' . $layout->logo_name) : null;
 
     $options = [
-        'concert-music' => ['name' => 'Concert / Music', 'icon' => 'fas-music'],
-        'tour-and-adventure' => ['name' => 'Tour and Adventure', 'icon' => 'fas-campground'],
-        'movies' => ['name' => 'Movies', 'icon' => 'fas-film'],
-        'workshop-training' => ['name' => 'Workshop / Training', 'icon' => 'fas-chalkboard-teacher'],
-        'all-categories' => ['name' => 'All Categories', 'icon' => 'fas-folder-open']
+        'concert-music' => ['name' => 'Concert / Music', 'icon' => 'fas-music', 'route' => route('concert-music')],
+        'tour-and-adventure' => ['name' => 'Tour and Adventure', 'icon' => 'fas-campground', 'route' => '#'],
+        'movies' => ['name' => 'Movies', 'icon' => 'fas-film', 'route' => '#'],
+        'workshop-training' => ['name' => 'Workshop / Training', 'icon' => 'fas-chalkboard-teacher', 'route' => '#'],
+        'all-categories' => ['name' => 'All Categories', 'icon' => 'fas-folder-open', 'route' => '#'],
     ];
 @endphp
 
@@ -138,8 +138,8 @@
                                  role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                                 <div class="py-1" role="none">
                                     @foreach($options as $key => $option)
-                                        <a href="#" x-on:click="close($refs.button)"
-                                           class="flex gap-x-1 items-center text-gray-800 hover:bg-transparent hover:text-blue-700 font-medium no-underline px-4 py-2 text-sm"
+                                        <a href="{{ $option['route'] }}" x-on:click="close($refs.button)"
+                                           class="flex gap-x-1 items-center {{ Request::url() === $option['route'] ? 'text-blue-400' : 'text-gray-900' }} hover:bg-transparent hover:text-blue-700 font-medium no-underline px-4 py-2 text-sm"
                                            role="menuitem" tabindex="-1" id="menu-item-{{$key}}">
                                             <x-dynamic-component :component="$option['icon']" class="h-6 w-6"/>
                                             {{ $option['name'] }}

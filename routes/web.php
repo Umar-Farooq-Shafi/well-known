@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\ConcertMusic;
 use App\Livewire\Event;
 use App\Livewire\Events;
 use App\Livewire\Home;
@@ -13,3 +14,5 @@ Route::get('/event/{slug}', Event::class)->name('event');
 Route::get('/events', Events::class)->name('events');
 
 Route::get('/organizer/{slug}', OrganizerProfile::class)->name('organizer-profile');
+
+Route::get('/events/concert-music', ConcertMusic::class)->name('concert-music');
