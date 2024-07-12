@@ -17,6 +17,11 @@ class Index extends Component
 
     public $category = '';
 
+    public function mount(?int $category = null)
+    {
+        $this->category = $category;
+    }
+
     public function search()
     {
         $this->resetPage();
@@ -25,20 +30,17 @@ class Index extends Component
     public function render()
     {
         return view('livewire.components.events.index', [
-            'events' => Event::with([
-                'eventTranslations' => function ($query) {
-                    $query->where('name', 'LIKE', '%' . $this->query . '%')
-                        ->where('locale', App::getLocale());
-                },
-                'category' => function ($query) {
-                    $query->with([
-                        'categoryTranslations' => function ($query) {
-                            $query->where('name', 'LIKE', '%' . $this->category . '%')
-                                ->where('locale', App::getLocale());
-                        }
-                    ]);
-                }
-            ])->paginate(16),
+            'events' => Event::whereHas('category', function ($query) {
+                $query->when($this->category, function ($query) {
+                    $query->where('id', $this->category);
+                });
+            })
+                ->with([
+                    'category.categoryTranslations' => function ($query) {
+                        $query->where('locale', App::getLocale());
+                    }
+                ])
+                ->paginate(16),
         ]);
     }
 }

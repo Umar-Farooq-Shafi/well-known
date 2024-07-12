@@ -10,6 +10,8 @@ class ConcertMusic extends Component
     #[Title("Concert/Music | 'Aafno Ticket Nepal'")]
     public function render()
     {
+
+
         return view('livewire.concert-music');
     }
 }
