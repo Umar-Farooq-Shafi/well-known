@@ -22,3 +22,9 @@ Breadcrumbs::for('workshop-training')
 Breadcrumbs::for('all-categories')
     ->push('Events', route('events'))
     ->push('Concerts');
+
+Breadcrumbs::for('about-us')
+    ->push('About Us');
+
+Breadcrumbs::for('blog')
+    ->push('Blog');

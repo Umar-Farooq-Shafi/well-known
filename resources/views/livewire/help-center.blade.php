@@ -72,7 +72,7 @@
         </div>
     </div>
 
-    <div class="container mx-auto my-8 px-4">
+    <div class="container mx-auto mt-8 px-4">
         <div class="bg-white p-6 rounded-lg shadow-lg text-center flex flex-col items-center">
             <div class="text-blue-500 mb-4">
                 <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20"><path d="M13 7h-1V4a3 3 0 10-6 0v3H5a2 2 0 00-2 2v6a2 2 0 002 2h8a2 2 0 002-2v-6a2 2 0 00-2-2zm-2 0H9V4a1 1 0 112 0v3z"></path></svg>

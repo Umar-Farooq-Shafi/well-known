@@ -4,9 +4,9 @@
             <div>
                 <h4 class="font-semibold mb-4">Useful Links</h4>
                 <ul>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">About us</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">Help center</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">Blog</a></li>
+                    <li><a href="{{ route('about-us') }}" class="text-gray-600 hover:text-gray-800">About us</a></li>
+                    <li><a href="{{ route('help-center') }}" class="text-gray-600 hover:text-gray-800">Help center</a></li>
+                    <li><a href="{{ route('blog') }}" class="text-gray-600 hover:text-gray-800">Blog</a></li>
                     <li><a href="#" class="text-gray-600 hover:text-gray-800">Venues</a></li>
                     <li><a href="#" class="text-gray-600 hover:text-gray-800">Send us an email</a></li>
                 </ul>
@@ -34,7 +34,9 @@
             <div>
                 <h4 class="font-semibold mb-4">Contact Us</h4>
                 <p class="text-gray-600">Phone: +977 985-1104277</p>
-                <a href="#" class="text-blue-600 hover:text-blue-800"><i class="fab fa-facebook"></i></a>
+                <a href="https://www.facebook.com/aafnoticketnp/" target="_blank" class="text-blue-600 hover:text-blue-800">
+                    <x-fab-facebook class="h-8 w-8" />
+                </a>
             </div>
         </div>
         <div class="border-t border-gray-300 mt-8 pt-4 text-center">

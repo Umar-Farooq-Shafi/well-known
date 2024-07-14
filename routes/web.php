@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\AllCategories;
+use App\Livewire\Blog;
 use App\Livewire\ConcertMusic;
 use App\Livewire\Event;
 use App\Livewire\Events;
@@ -31,3 +32,9 @@ Route::get('/events/workshop-training', WorkshopTraining::class)->name('workshop
 Route::get('/events/categories', AllCategories::class)->name('all-categories');
 
 Route::get('/help-center', HelpCenter::class)->name('help-center');
+
+Route::prefix('page')->group(function () {
+    Route::get('/about-us', App\Livewire\Pages\AboutUs::class)->name('about-us');
+});
+
+Route::get('/blog', Blog::class)->name('blog');
