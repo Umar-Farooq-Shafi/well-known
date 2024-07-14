@@ -4,6 +4,7 @@ use App\Livewire\AllCategories;
 use App\Livewire\ConcertMusic;
 use App\Livewire\Event;
 use App\Livewire\Events;
+use App\Livewire\HelpCenter;
 use App\Livewire\Home;
 use App\Livewire\Movies;
 use App\Livewire\OrganizerProfile;
@@ -28,3 +29,5 @@ Route::get('/events/movies', Movies::class)->name('movies');
 Route::get('/events/workshop-training', WorkshopTraining::class)->name('workshop-training');
 
 Route::get('/events/categories', AllCategories::class)->name('all-categories');
+
+Route::get('/help-center', HelpCenter::class)->name('help-center');

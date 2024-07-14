@@ -22,6 +22,8 @@
 
 {{ $slot }}
 
+@include('components.layouts.footer')
+
 @livewireScriptConfig
 @vite(['resources/js/app.js'])
 @stack('scripts')
