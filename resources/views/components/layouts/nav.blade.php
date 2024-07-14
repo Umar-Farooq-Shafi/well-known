@@ -8,10 +8,10 @@
 
     $options = [
         'concert-music' => ['name' => 'Concert / Music', 'icon' => 'fas-music', 'route' => route('concert-music')],
-        'tour-and-adventure' => ['name' => 'Tour and Adventure', 'icon' => 'fas-campground', 'route' => '#'],
-        'movies' => ['name' => 'Movies', 'icon' => 'fas-film', 'route' => '#'],
-        'workshop-training' => ['name' => 'Workshop / Training', 'icon' => 'fas-chalkboard-teacher', 'route' => '#'],
-        'all-categories' => ['name' => 'All Categories', 'icon' => 'fas-folder-open', 'route' => '#'],
+        'tour-and-adventure' => ['name' => 'Tour and Adventure', 'icon' => 'fas-campground', 'route' => route('tours-and-adventure')],
+        'movies' => ['name' => 'Movies', 'icon' => 'fas-film', 'route' => route('movies')],
+        'workshop-training' => ['name' => 'Workshop / Training', 'icon' => 'fas-chalkboard-teacher', 'route' => route('workshop-training')],
+        'all-categories' => ['name' => 'All Categories', 'icon' => 'fas-folder-open', 'route' => route('all-categories')],
     ];
 @endphp
 

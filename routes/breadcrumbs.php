@@ -10,3 +10,15 @@ Breadcrumbs::for('events')
 Breadcrumbs::for('concert-music')
     ->push('Events', route('events'))
     ->push('Concerts');
+
+Breadcrumbs::for('tours-and-adventure')
+    ->push('Events', route('events'))
+    ->push('Concerts');
+
+Breadcrumbs::for('workshop-training')
+    ->push('Events', route('events'))
+    ->push('Concerts');
+
+Breadcrumbs::for('all-categories')
+    ->push('Events', route('events'))
+    ->push('Concerts');

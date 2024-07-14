@@ -1,10 +1,14 @@
 <?php
 
+use App\Livewire\AllCategories;
 use App\Livewire\ConcertMusic;
 use App\Livewire\Event;
 use App\Livewire\Events;
 use App\Livewire\Home;
+use App\Livewire\Movies;
 use App\Livewire\OrganizerProfile;
+use App\Livewire\ToursAndAdventure;
+use App\Livewire\WorkshopTraining;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
@@ -16,3 +20,11 @@ Route::get('/events', Events::class)->name('events');
 Route::get('/organizer/{slug}', OrganizerProfile::class)->name('organizer-profile');
 
 Route::get('/events/concert-music', ConcertMusic::class)->name('concert-music');
+
+Route::get('/events/tours-and-adventures', ToursAndAdventure::class)->name('tours-and-adventure');
+
+Route::get('/events/movies', Movies::class)->name('movies');
+
+Route::get('/events/workshop-training', WorkshopTraining::class)->name('workshop-training');
+
+Route::get('/events/categories', AllCategories::class)->name('all-categories');
