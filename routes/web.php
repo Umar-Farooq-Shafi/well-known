@@ -2,6 +2,7 @@
 
 use App\Livewire\AllCategories;
 use App\Livewire\Blog;
+use App\Livewire\BlogArticle;
 use App\Livewire\ConcertMusic;
 use App\Livewire\Event;
 use App\Livewire\Events;
@@ -38,3 +39,5 @@ Route::prefix('page')->group(function () {
 });
 
 Route::get('/blog', Blog::class)->name('blog');
+
+Route::get('/blog-article/{slug}', BlogArticle::class)->name('blog-article');

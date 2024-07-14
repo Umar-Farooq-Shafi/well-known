@@ -28,3 +28,7 @@ Breadcrumbs::for('about-us')
 
 Breadcrumbs::for('blog')
     ->push('Blog');
+
+Breadcrumbs::for('blog-article')
+    ->push('Blog', route('blog'))
+    ->push('Blog Article');

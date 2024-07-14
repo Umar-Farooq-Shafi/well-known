@@ -35,23 +35,25 @@
                          ->first();
                 @endphp
 
-                <div class="flex flex-col gap-2">
-                    <div>
-                        <img src="{{ Storage::url('blog/' . $blog->blogPost->image_name) }}"
-                             alt="Bungy and Canyoning Day Trip" class="w-96 h-96 rounded-lg">
+                <a href="{{ route('blog-article', ['slug' => $blog->slug]) }}">
+                    <div class="flex flex-col gap-2">
+                        <div>
+                            <img src="{{ Storage::url('blog/' . $blog->blogPost->image_name) }}"
+                                 alt="Bungy and Canyoning Day Trip" class="w-96 h-96 rounded-lg">
 
-                        <div class="px-2 pt-1 text-sm flex flex-row gap-x-5">
-                            <p class="flex items-center gap-x-1">
-                                <x-fas-sitemap class="w-3 h-3" />
-                                {{ $blogCategory?->name }}
-                            </p>
+                            <div class="px-2 pt-1 text-sm flex flex-row gap-x-5">
+                                <p class="flex items-center gap-x-1">
+                                    <x-fas-sitemap class="w-3 h-3" />
+                                    {{ $blogCategory?->name }}
+                                </p>
 
-                            <p>{{ \Carbon\Carbon::make($blog->blogPost->created_at)->diffForHumans() }}</p>
+                                <p>{{ \Carbon\Carbon::make($blog->blogPost->created_at)->diffForHumans() }}</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <p class="font-semibold w-3/4 text-xl break-words">{{ $blog->name }}</p>
-                </div>
+                        <p class="font-semibold w-3/4 text-xl break-words">{{ $blog->name }}</p>
+                    </div>
+                </a>
             @endforeach
         </div>
     </div>
