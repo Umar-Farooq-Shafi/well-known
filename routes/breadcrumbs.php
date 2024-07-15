@@ -7,6 +7,10 @@ use WireUi\Breadcrumbs\Trail;
 Breadcrumbs::for('events')
     ->push('Events');
 
+Breadcrumbs::for('event')
+    ->push('Events', route('events'))
+    ->push('Event Detail');
+
 Breadcrumbs::for('concert-music')
     ->push('Events', route('events'))
     ->push('Concerts');
