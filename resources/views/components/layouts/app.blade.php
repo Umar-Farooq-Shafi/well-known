@@ -17,6 +17,7 @@
     @stack('styles')
 </head>
 <body class="bg-sky-50">
+<x-notifications />
 
 @include('components.layouts.nav')
 
@@ -25,6 +26,7 @@
 @include('components.layouts.footer')
 
 @livewireScriptConfig
+@livewire('slide-over-panel')
 @vite(['resources/js/app.js'])
 @stack('scripts')
 

@@ -16,6 +16,7 @@
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "laravelcm/livewire-slide-overs": "^1.0",
         "livewire/livewire": "^3.5",
         "owenvoke/blade-fontawesome": "^2.6",
         "spatie/laravel-sitemap": "^7.2",

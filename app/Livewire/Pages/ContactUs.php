@@ -5,9 +5,11 @@ namespace App\Livewire\Pages;
 use Illuminate\Support\Facades\Http;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use WireUi\Traits\WireUiActions;
 
 class ContactUs extends Component
 {
+    use WireUiActions;
 
     #[Validate('required|min:3')]
     public $name;
@@ -31,7 +33,11 @@ class ContactUs extends Component
         if (!$this->captcha > .3) {
             $this->submit();
         } else {
-            session()->flash('success', 'Google thinks you are a bot, please refresh and try again');
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error!',
+                'description' => 'Google thinks you are a bot, please refresh and try again',
+            ]);
         }
     }
 
