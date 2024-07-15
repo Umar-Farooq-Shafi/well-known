@@ -8,16 +8,16 @@
                     <li><a href="{{ route('help-center') }}" class="text-gray-600 hover:text-gray-800">Help center</a></li>
                     <li><a href="{{ route('blog') }}" class="text-gray-600 hover:text-gray-800">Blog</a></li>
                     <li><a href="#" class="text-gray-600 hover:text-gray-800">Venues</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">Send us an email</a></li>
+                    <li><a href="{{ route('contact-us') }}" class="text-gray-600 hover:text-gray-800">Send us an email</a></li>
                 </ul>
             </div>
             <div>
                 <h4 class="font-semibold mb-4">My Account</h4>
                 <ul>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">Create an account</a></li>
+                    <li><a href="{{ route('filament.admin.auth.register') }}" class="text-gray-600 hover:text-gray-800">Create an account</a></li>
                     <li><a href="#" class="text-gray-600 hover:text-gray-800">Sell tickets online</a></li>
                     <li><a href="#" class="text-gray-600 hover:text-gray-800">My tickets</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">Forgot your password?</a></li>
+                    <li><a href="{{ route('filament.admin.auth.password-reset.request') }}" class="text-gray-600 hover:text-gray-800">Forgot your password?</a></li>
                     <li><a href="#" class="text-gray-600 hover:text-gray-800">Payment, delivery and return</a></li>
                 </ul>
             </div>
@@ -25,10 +25,10 @@
                 <h4 class="font-semibold mb-4">Event Categories</h4>
                 <ul>
                     <li><a href="#" class="text-gray-600 hover:text-gray-800">Party</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">Concert / Music</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">Tours and Adventure</a></li>
+                    <li><a href="{{ route('concert-music') }}" class="text-gray-600 hover:text-gray-800">Concert / Music</a></li>
+                    <li><a href="{{ route('tours-and-adventure') }}" class="text-gray-600 hover:text-gray-800">Tours and Adventure</a></li>
                     <li><a href="#" class="text-gray-600 hover:text-gray-800">Sport / Fitness</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">All categories</a></li>
+                    <li><a href="{{ route('all-categories') }}" class="text-gray-600 hover:text-gray-800">All categories</a></li>
                 </ul>
             </div>
             <div>

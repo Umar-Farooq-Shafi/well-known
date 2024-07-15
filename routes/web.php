@@ -10,6 +10,7 @@ use App\Livewire\HelpCenter;
 use App\Livewire\Home;
 use App\Livewire\Movies;
 use App\Livewire\OrganizerProfile;
+use App\Livewire\Pages;
 use App\Livewire\ToursAndAdventure;
 use App\Livewire\WorkshopTraining;
 use Illuminate\Support\Facades\Route;
@@ -35,7 +36,9 @@ Route::get('/events/categories', AllCategories::class)->name('all-categories');
 Route::get('/help-center', HelpCenter::class)->name('help-center');
 
 Route::prefix('page')->group(function () {
-    Route::get('/about-us', App\Livewire\Pages\AboutUs::class)->name('about-us');
+    Route::get('/about-us', Pages\AboutUs::class)->name('about-us');
+
+    Route::get('/contact-us', Pages\ContactUs::class)->name('contact-us');
 });
 
 Route::get('/blog', Blog::class)->name('blog');

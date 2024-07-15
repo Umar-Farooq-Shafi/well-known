@@ -32,3 +32,6 @@ Breadcrumbs::for('blog')
 Breadcrumbs::for('blog-article')
     ->push('Blog', route('blog'))
     ->push('Blog Article');
+
+Breadcrumbs::for('contact-us')
+    ->push('Contact Us');
