@@ -10,9 +10,9 @@ use Intervention\Image\ImageManager;
 
 trait ImageTrait
 {
-    protected static function saveImage(Model $model, string $dir): void
+    protected static function saveImage(Model $model, string $dir, bool $isCreate = false): void
     {
-        if ($model->isDirty('image_name')) {
+        if ($model->isDirty('image_name') || $isCreate) {
             $img = last(explode('/', $model->image_name));
 
             $size = Storage::disk('public')->size("$dir/" . $img);
@@ -21,12 +21,10 @@ trait ImageTrait
             $manager = new ImageManager(new Driver());
             $image = $manager->read(Storage::disk('public')->path("$dir/" . $img));
 
-            $model->update([
-                'image_name' => $img,
-                'image_size' => $size,
-                'image_mime_type' => $mimetype,
-                'image_dimensions' => $image->width() . "," . $image->height(),
-            ]);
+            $model->image_name = $img;
+            $model->image_size = $size;
+            $image->image_mime_type = $mimetype;
+            $model->image_dimensions = $image->width() . "," . $image->height();
         }
     }
 

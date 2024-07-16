@@ -56,22 +56,5 @@ class CreateVenue extends CreateRecord
                 'locale' => 'fr',
             ]);
         }
-
-        foreach ($this->record->venueImages as $venueImage) {
-            $img = last(explode('/', $venueImage->image_name));
-
-            $size = Storage::disk('public')->size("venues/" . $img);
-            $mimetype = File::mimeType(Storage::disk('public')->path("venues/" . $img));
-
-            $manager = new ImageManager(new Driver());
-            $image = $manager->read(Storage::disk('public')->path("venues/" . $img));
-
-            $venueImage->update([
-                'image_name' => $img,
-                'image_size' => $size,
-                'image_mime_type' => $mimetype,
-                'image_dimensions' => $image->width() . "," . $image->height(),
-            ]);
-        }
     }
 }

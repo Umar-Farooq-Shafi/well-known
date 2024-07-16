@@ -149,7 +149,7 @@ class Event extends Model
         parent::boot();
 
         self::creating(function ($model) {
-            self::saveImage($model, 'events');
+            self::saveImage($model, 'events', true);
         });
 
         self::updating(function ($model) {

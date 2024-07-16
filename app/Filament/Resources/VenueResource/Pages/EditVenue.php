@@ -5,10 +5,6 @@ namespace App\Filament\Resources\VenueResource\Pages;
 use App\Filament\Resources\VenueResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Drivers\Imagick\Driver;
-use Intervention\Image\ImageManager;
 
 class EditVenue extends EditRecord
 {
@@ -69,23 +65,6 @@ class EditVenue extends EditRecord
                 $translation->description = $data['content-es'];
                 $translation->save();
             }
-        }
-
-        foreach ($this->record->venueImages as $venueImage) {
-            $img = last(explode('/', $venueImage->image_name));
-
-            $size = Storage::disk('public')->size("venues/" . $img);
-            $mimetype = File::mimeType(Storage::disk('public')->path("venues/" . $img));
-
-            $manager = new ImageManager(new Driver());
-            $image = $manager->read(Storage::disk('public')->path("venues/" . $img));
-
-            $venueImage->update([
-                'image_name' => $img,
-                'image_size' => $size,
-                'image_mime_type' => $mimetype,
-                'image_dimensions' => $image->width() . "," . $image->height(),
-            ]);
         }
     }
 

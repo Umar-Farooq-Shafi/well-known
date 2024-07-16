@@ -8,11 +8,16 @@ use App\Models\CountryTranslation;
 use App\Models\Venue;
 use App\Models\VenueTypeTranslation;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
 
@@ -81,7 +86,10 @@ class VenueResource extends Resource
 
                 Forms\Components\Select::make('type_id')
                     ->label('Type')
-                    ->options(fn() => VenueTypeTranslation::pluck('name', 'id'))
+                    ->options(
+                        fn() => VenueTypeTranslation::whereLocale(\app()->getLocale())
+                            ->pluck('name', 'translatable_id')
+                    )
                     ->searchable()
                     ->required(),
 
@@ -90,13 +98,41 @@ class VenueResource extends Resource
                         'amenities',
                         'name',
                     )
-                    ->getSearchResultsUsing(function ($search) {
-                        return AmenityTranslation::where('locale', App::getLocale())
+                    ->saveRelationshipsUsing(
+                        static function (Select $component, Model $record, $state) {
+                            $relationship = $component->getRelationship();
+
+                            if (! $relationship instanceof BelongsToMany) {
+                                $relationship->associate($state);
+                                $record->wasRecentlyCreated && $record->save();
+
+                                return;
+                            }
+
+                            $pivotData = $component->getPivotData();
+                            $relationship->detach();
+
+                            if ($pivotData === []) {
+                                $relationship->sync($state ?? []);
+
+                                return;
+                            }
+
+                            $relationship->syncWithPivotValues($state ?? [], $pivotData);
+                        }
+                    )
+                    ->getSearchResultsUsing(
+                        fn ($search) => AmenityTranslation::whereLocale(App::getLocale())
                             ->where('name', 'like', "%{$search}%")
-                            ->pluck('name', 'id');
-                    })
+                            ->limit(5)
+                            ->pluck('name', 'translatable_id')
+                    )
                     ->multiple()
-                    ->options(fn() => AmenityTranslation::where('locale', App::getLocale())->pluck('name', 'id'))
+                    ->options(
+                        fn() => AmenityTranslation::whereLocale(App::getLocale())
+                            ->limit(20)
+                            ->pluck('name', 'translatable_id')
+                    )
                     ->searchable(),
 
                 Forms\Components\TextInput::make('seatedguests')
@@ -142,7 +178,21 @@ class VenueResource extends Resource
 
                 Forms\Components\Select::make('country_id')
                     ->label('Country')
-                    ->options(fn () => CountryTranslation::pluck('name', 'id'))
+                    ->options(
+                        fn ($state) => CountryTranslation::whereLocale(App::getLocale())
+                            ->limit(20)
+                            ->when(
+                                $state && is_numeric($state),
+                                fn ($query) => $query->where('id', $state)
+                            )
+                            ->pluck('name', 'translatable_id')
+                    )
+                    ->getSearchResultsUsing(
+                        fn ($search) => CountryTranslation::whereLocale(App::getLocale())
+                            ->where('name', 'like', "%{$search}%")
+                            ->limit(5)
+                            ->pluck('name', 'translatable_id')
+                    )
                     ->searchable()
                     ->required(),
 

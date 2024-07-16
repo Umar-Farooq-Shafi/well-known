@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\ImageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $venue_id
@@ -35,7 +36,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class VenueImage extends Model
 {
-    use HasFactory;
+    use HasFactory, ImageTrait;
 
     public const CREATED_AT = null;
 
@@ -50,6 +51,19 @@ class VenueImage extends Model
         'image_dimensions',
         'position',
     ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        self::creating(function ($model) {
+            self::saveImage($model, 'venues', true);
+        });
+
+        self::updating(function ($model) {
+            self::saveImage($model, 'venues');
+        });
+    }
 
     /**
      * @return BelongsTo

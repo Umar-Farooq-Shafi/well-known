@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $user_id
@@ -95,6 +95,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read int|null $point_of_sales_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Scanner> $scanners
  * @property-read int|null $scanners_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
+ * @property-read int|null $categories_count
  * @mixin \Eloquent
  */
 class Organizer extends Model

@@ -44,7 +44,6 @@ class GoogleMapsPage extends Page
                 Forms\Components\TextInput::make('google_map_api_key')
                     ->label('Google Maps Api Key')
                     ->helperText('Leave api key empty to disable google maps project wide')
-                    ->integer()
                     ->required(),
             ]);
     }
