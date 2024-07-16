@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -32,6 +33,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderElement whereUnitprice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderElement withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderElement withoutTrashed()
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderTicket> $orderTickets
+ * @property-read int|null $order_tickets_count
  * @mixin \Eloquent
  */
 class OrderElement extends Model
@@ -65,4 +68,10 @@ class OrderElement extends Model
     {
         return $this->belongsTo(EventDateTicket::class, 'eventticket_id');
     }
+
+    public function orderTickets(): HasMany
+    {
+        return $this->hasMany(OrderTicket::class, 'orderelement_id');
+    }
+
 }
