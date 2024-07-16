@@ -21,7 +21,13 @@ class ListPaymentGateways extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\Action::make('manage-currency')
+                ->label('MANAGE CURRENCIES')
+                ->icon('fas-coins')
+                ->url(PaymentGatewayResource\Pages\Currency\CurrencyListPage::getUrl()),
+
+            Actions\CreateAction::make()
+                ->icon('fas-plus')
         ];
     }
 }

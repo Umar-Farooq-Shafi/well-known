@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class PaymentGatewayResource extends Resource
 {
@@ -118,6 +119,18 @@ class PaymentGatewayResource extends Resource
                     ->searchable()
                     ->sortable(),
 
+                Tables\Columns\ImageColumn::make('gateway_logo_name')
+                    ->label('Image')
+                    ->extraImgAttributes(['loading' => 'lazy'])
+                    ->square()
+                    ->getStateUsing(fn($record) => $record->gateway_logo_name ? ['payment/gateways/' . $record->gateway_logo_name] : null)
+                    ->disk('public'),
+
+                Tables\Columns\TextColumn::make('number')
+                    ->label('Order of appearance')
+                    ->searchable()
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('enabled')
                     ->label('Status')
                     ->formatStateUsing(fn($state) => $state ? 'Hidden' : 'Visible')
@@ -170,12 +183,30 @@ class PaymentGatewayResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+
+        return parent::getEloquentQuery()
+            ->when(
+                str_contains($role, 'ORGANIZER'),
+                fn ($query) => $query->where('organizer_id', auth()->user()->organizer_id)
+            )
+            ->when(
+                str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR'),
+                fn (Builder $query) => $query->whereNull('organizer_id')
+            );
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListPaymentGateways::route('/'),
             'create' => Pages\CreatePaymentGateway::route('/create'),
             'edit' => Pages\EditPaymentGateway::route('/{record}/edit'),
+            'currency' => Pages\Currency\CurrencyListPage::route('/currencies'),
+            'currency-create' => Pages\Currency\CreateCurrencyPage::route('/currency/create'),
+            'currency-edit' => Pages\Currency\EditCurrencyPage::route('/currency/{record}/edit'),
         ];
     }
 }

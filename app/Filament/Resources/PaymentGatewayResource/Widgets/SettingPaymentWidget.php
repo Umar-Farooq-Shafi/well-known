@@ -40,8 +40,9 @@ class SettingPaymentWidget extends Widget implements HasForms
             ->schema([
                 Forms\Components\Select::make('currency_ccy')
                     ->label('Currency')
-                    ->options(Currency::query()->pluck('ccy'))
+                    ->options(Currency::query()->pluck('ccy', 'ccy'))
                     ->searchable()
+                    ->live()
                     ->required(),
 
                 Forms\Components\Radio::make('currency_position')
@@ -65,7 +66,7 @@ class SettingPaymentWidget extends Widget implements HasForms
                 Forms\Components\TextInput::make('ticket_fee_online')
                     ->label('by')
                     ->helperText('This fee will be added to the ticket sale price which are bought online, put 0 to disable additional fees for tickets which are bought online, does not apply for free tickets, will be applied to future orders')
-                    ->prefix('Rs')
+                    ->prefix(fn (Forms\Get $get) => $get('currency_ccy'))
                     ->integer()
                     ->required(),
 
