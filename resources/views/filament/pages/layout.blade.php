@@ -1,9 +1,11 @@
 <x-filament-panels::page>
-    <form wire:submit.prevent="submit">
-        {{ $this->form }}
+    <x-filament::section>
+        <form wire:submit="submit">
+            {{ $this->form }}
 
-        <div class="pt-4">
-            {{ $this->getFormAction() }}
-        </div>
-    </form>
+            <x-filament::button type="submit" class="mt-3">
+                {{ __('Save') }}
+            </x-filament::button>
+        </form>
+    </x-filament::section>
 </x-filament-panels::page>

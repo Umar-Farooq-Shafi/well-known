@@ -49,6 +49,7 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\EventsOverview::class,
                 Widgets\EventsTableOverview::class,
                 Widgets\OrdersOverview::class,
+                Widgets\TicketsOverview::class,
                 Widgets\OrdersTableOverview::class,
                 Widgets\UsersOverview::class,
                 Widgets\UsersTableOverview::class,

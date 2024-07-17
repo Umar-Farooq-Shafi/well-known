@@ -6,6 +6,8 @@ use App\Models\Event;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 
 class EventsTableOverview extends BaseWidget
@@ -17,6 +19,7 @@ class EventsTableOverview extends BaseWidget
     {
         return $table
             ->query(Event::query())
+            ->modifyQueryUsing(fn () => $this->getTableQuery())
             ->columns([
                 Tables\Columns\ImageColumn::make('image_name')
                     ->label('Image')
@@ -40,5 +43,12 @@ class EventsTableOverview extends BaseWidget
                     ->formatStateUsing(fn($state) => $state ? 'Yes' : 'No')
                     ->searchable(),
             ]);
+    }
+
+    protected function getTableQuery(): Builder|Relation|null
+    {
+        return Event::query()
+            ->latest('created_at')
+            ->limit(3);
     }
 }
