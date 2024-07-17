@@ -98,7 +98,7 @@ class CategoryResource extends Resource
                     ->sortable(),
 
                 IconColumn::make('icon')
-                    ->sortable(),
+                    ->view('filament.pages.icon'),
 
                 Tables\Columns\ImageColumn::make('image_name')
                     ->label('Image')

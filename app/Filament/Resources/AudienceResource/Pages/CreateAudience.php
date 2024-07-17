@@ -57,4 +57,9 @@ class CreateAudience extends CreateRecord
 
         return $audience;
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
