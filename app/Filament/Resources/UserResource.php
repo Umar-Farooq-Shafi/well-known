@@ -60,7 +60,17 @@ class UserResource extends Resource
                 Tables\Filters\SelectFilter::make('country_id')
                     ->options(fn () => CountryTranslation::all()
                         ->where('locale', App::getLocale())
-                        ->pluck('name', 'id'))
+                        ->pluck('name', 'id')),
+
+                Tables\Filters\SelectFilter::make('roles')
+                    ->multiple()
+                    ->options([
+                        'a:2:{i:0;s:16:"ROLE_SUPER_ADMIN";i:1;s:18:"ROLE_ADMINISTRATOR";}' => 'Administrator',
+                        'a:1:{i:0;s:14:"ROLE_ORGANIZER";}' => 'Organizer',
+                        'a:1:{i:0;s:13:"ROLE_ATTENDEE";}' => 'Attendee',
+                        'a:1:{i:0;s:16:"ROLE_POINTOFSALE";}' => 'Point of Sale',
+                        'a:1:{i:0;s:12:"ROLE_SCANNER";}' => 'Scanner',
+                    ])
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

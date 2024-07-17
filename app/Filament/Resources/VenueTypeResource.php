@@ -41,17 +41,14 @@ class VenueTypeResource extends Resource
                         Forms\Components\Tabs\Tab::make('Fr')
                             ->schema([
                                 Forms\Components\TextInput::make('name-fr')
-                                    ->required()
                             ]),
                         Forms\Components\Tabs\Tab::make('Es')
                             ->schema([
                                 Forms\Components\TextInput::make('name-es')
-                                    ->required()
                             ]),
                         Forms\Components\Tabs\Tab::make('Ar')
                             ->schema([
                                 Forms\Components\TextInput::make('name-ar')
-                                    ->required()
                             ]),
                     ])
             ]);

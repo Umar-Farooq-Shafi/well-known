@@ -3,28 +3,32 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Pages\ViewRecord;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Pages\EditRecord;
 
-class ViewUser extends ViewRecord
+class ViewUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
-    public function infolist(Infolist $infolist): Infolist
+    public function form(Form $form): Form
     {
-        return $infolist
+        return $form
             ->schema([
-                Infolists\Components\Section::make('User Information')
+                Forms\Components\Section::make('User Information')
                     ->columns(2)
                     ->schema([
-                        Infolists\Components\TextEntry::make('roles')
+                        Forms\Components\TextInput::make('roles')
+                            ->readOnly()
+                            ->dehydrated(false)
                             ->formatStateUsing(function ($state) {
                                 return ucwords(str_replace('ROLE_', '', implode(', ', unserialize($state))));
                             }),
 
-                        Infolists\Components\TextEntry::make('enabled')
+                        Forms\Components\TextInput::make('enabled')
                             ->label('Status')
+                            ->readOnly()
+                            ->dehydrated(false)
                             ->formatStateUsing(function ($state): string {
                                 return match ($state) {
                                     1 => 'Enabled',
@@ -32,9 +36,8 @@ class ViewUser extends ViewRecord
                                     default => $state
                                 };
                             })
-                            ->icon(fn($state) => $state ? 'heroicon-o-eye' : 'heroicon-o-eye-slash')
-                            ->badge()
-                            ->color(function ($state) {
+                            ->prefixIcon(fn($state) => $state ? 'heroicon-o-eye' : 'heroicon-o-eye-slash')
+                            ->prefixIconColor(function ($state) {
                                 return match ($state) {
                                     1 => 'success',
                                     0 => 'danger',
@@ -42,17 +45,49 @@ class ViewUser extends ViewRecord
                                 };
                             }),
 
-                        Infolists\Components\TextEntry::make('firstname'),
-                        Infolists\Components\TextEntry::make('lastname'),
-                        Infolists\Components\TextEntry::make('username'),
-                        Infolists\Components\TextEntry::make('email'),
-                        Infolists\Components\TextEntry::make('created_at')
+                        Forms\Components\TextInput::make('firstname')
+                            ->dehydrated(false)
+                            ->readOnly(),
+
+                        Forms\Components\TextInput::make('lastname')
+                            ->dehydrated(false)
+                            ->readOnly(),
+
+                        Forms\Components\TextInput::make('username')
+                            ->dehydrated(false)
+                            ->readOnly(),
+
+                        Forms\Components\TextInput::make('email')
+                            ->dehydrated(false)
+                            ->readOnly(),
+
+                        Forms\Components\TextInput::make('created_at')
+                            ->readOnly()
+                            ->dehydrated(false)
                             ->label('Registration date'),
-                        Infolists\Components\TextEntry::make('updated_at')
+
+                        Forms\Components\TextInput::make('updated_at')
+                            ->readOnly()
+                            ->dehydrated(false)
                             ->label('Updated date'),
 
-                        Infolists\Components\TextEntry::make('last_login')
+                        Forms\Components\TextInput::make('last_login')
+                            ->dehydrated(false)
+                            ->readOnly(),
+
+                        Forms\Components\Select::make('membership_type')
+                            ->visible(function ($record) {
+                                $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize($record->roles))));
+
+                                return str_contains($role, 'ORGANIZER');
+                            })
+                            ->options([
+                                'Comission based' => 'Comission based',
+                                'Membership' => 'Membership',
+                                'free' => 'Free'
+                            ])
                     ])
             ]);
     }
+
 }

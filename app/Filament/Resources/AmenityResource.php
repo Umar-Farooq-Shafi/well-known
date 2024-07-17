@@ -87,7 +87,7 @@ class AmenityResource extends Resource
                     ->sortable(),
 
                 IconColumn::make('icon')
-                    ->sortable(),
+                    ->view('filament.pages.icon'),
 
                 Tables\Columns\TextColumn::make('hidden')
                     ->label('Status')
