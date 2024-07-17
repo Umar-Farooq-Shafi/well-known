@@ -90,7 +90,7 @@ class BlogSettingsPage extends Page
         ]);
 
         Setting::where('key', 'disqus_subdomain')->update([
-            'disqus_subdomain' => $this->data['facebook_app_id']
+            'value' => $this->data['disqus_subdomain']
         ]);
 
         Notification::make()

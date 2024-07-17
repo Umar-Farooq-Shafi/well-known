@@ -35,8 +35,8 @@ class ViewStatsPage extends Page implements HasForms
 
         $this->form->fill([
             'reference' => $this->record->reference,
-            'venue' => $venue->venueTranslations()->first()?->name,
-            'address' => $venue->street . " " . $venue->street2 . " " . $venue->city . " " . $venue->state,
+            'venue' => $venue ? $venue->venueTranslations()->first()?->name : '',
+            'address' => $venue?->street . " " . $venue?->street2 . " " . $venue?->city . " " . $venue?->state,
             'start_date' => $this->record->eventDates()->first()->startdate,
             'end_date' => $this->record->eventDates()->first()->enddate,
             'scanners' => implode(', ', $scanners)
@@ -50,17 +50,17 @@ class ViewStatsPage extends Page implements HasForms
             ->schema([
                 Forms\Components\Section::make('Details')
                     ->schema([
-                        Forms\Components\TextInput::make('reference'),
+                        Forms\Components\TextInput::make('reference')->readOnly(),
 
-                        Forms\Components\TextInput::make('venue'),
+                        Forms\Components\TextInput::make('venue')->readOnly(),
 
-                        Forms\Components\TextInput::make('address'),
+                        Forms\Components\TextInput::make('address')->readOnly(),
 
-                        Forms\Components\TextInput::make('start_date'),
+                        Forms\Components\TextInput::make('start_date')->readOnly(),
 
-                        Forms\Components\TextInput::make('end_date'),
+                        Forms\Components\TextInput::make('end_date')->readOnly(),
 
-                        Forms\Components\TextInput::make('scanners'),
+                        Forms\Components\TextInput::make('scanners')->readOnly(),
                     ])
                     ->collapsible()
                     ->collapsed()

@@ -5,7 +5,7 @@
     $eventTranslation = $event->eventTranslations()->where('locale', App::getLocale())->first();
     $eventDate = $event->eventDates()->first();
     $venue = $eventDate->venue;
-    $countryTrans = $venue->country->countryTranslations()->where('locale', App::getLocale())->first();
+    $countryTrans = $venue ? $venue->country->countryTranslations()->where('locale', App::getLocale())->first() : null;
 @endphp
 
 <x-filament-panels::page>
@@ -25,9 +25,12 @@
         <div class="mt-2 font-medium">
             <p>When: {{ $eventDate->startdate }}</p>
             <p>
-                Where: {{ $venue->street }} {{ $venue->street2 }} {{ $venue->city }} {{ $venue->state }} {{ $countryTrans?->name }}</p>
+                Where: {{ $venue?->street }} {{ $venue?->street2 }} {{ $venue?->city }} {{ $venue?->state }} {{ $countryTrans?->name }}</p>
         </div>
     </section>
 
     {{ $this->form }}
+
+    @livewire(\App\Filament\Resources\EventResource\Widgets\StatsOverview::class, ['event' => $event])
+
 </x-filament-panels::page>
