@@ -32,21 +32,21 @@ class AppServiceProvider extends ServiceProvider
             $key = Setting::query()->where('key', 'google_recaptcha_site_key')->first()?->value;
             $secret = Setting::query()->where('key', 'google_recaptcha_secret_key')->first()?->value;
 
-            if (empty(env('NOCAPTCHA_SECRET'))) {
-                file_put_contents(app()->environmentFilePath(), str_replace(
-                    'NOCAPTCHA_SECRET=' . env('NOCAPTCHA_SECRET'),
-                    'NOCAPTCHA_SECRET=' . $secret,
-                    file_get_contents(app()->environmentFilePath())
-                ));
-            }
-
-            if (empty(env('NOCAPTCHA_SITEKEY'))) {
-                file_put_contents(app()->environmentFilePath(), str_replace(
-                    'NOCAPTCHA_SITEKEY=' . env('NOCAPTCHA_SITEKEY'),
-                    'NOCAPTCHA_SITEKEY=' . $key,
-                    file_get_contents(app()->environmentFilePath())
-                ));
-            }
+//            if (empty(env('NOCAPTCHA_SECRET'))) {
+//                file_put_contents(app()->environmentFilePath(), str_replace(
+//                    'NOCAPTCHA_SECRET=' . env('NOCAPTCHA_SECRET'),
+//                    'NOCAPTCHA_SECRET=' . $secret,
+//                    file_get_contents(app()->environmentFilePath())
+//                ));
+//            }
+//
+//            if (empty(env('NOCAPTCHA_SITEKEY'))) {
+//                file_put_contents(app()->environmentFilePath(), str_replace(
+//                    'NOCAPTCHA_SITEKEY=' . env('NOCAPTCHA_SITEKEY'),
+//                    'NOCAPTCHA_SITEKEY=' . $key,
+//                    file_get_contents(app()->environmentFilePath())
+//                ));
+//            }
         }
 
         Event::listen(

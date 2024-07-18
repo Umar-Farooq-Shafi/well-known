@@ -655,7 +655,18 @@ class EventResource extends Resource
                         ->label('Completed')
                         ->icon('heroicon-o-check')
                         ->hidden(fn($record) => $record->completed)
-                        ->action(fn($record) => $record->update(['completed' => 1])),
+                        ->action(fn($record) => $record->update([
+                            'completed' => 1,
+                            'is_featured' => false
+                        ])),
+
+                    Tables\Actions\Action::make('not-completed')
+                        ->label('Not Completed')
+                        ->icon('heroicon-o-x-mark')
+                        ->visible(fn($record) => $record->completed)
+                        ->action(fn($record) => $record->update([
+                            'completed' => false
+                        ])),
 
                     Tables\Actions\EditAction::make(),
 

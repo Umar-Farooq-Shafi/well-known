@@ -31,6 +31,7 @@ class Home extends Component
                 $query->where('locale', App::getLocale());
             }
         ])
+            ->where('completed', false)
             ->take($homepage_events_number)
             ->get();
 
