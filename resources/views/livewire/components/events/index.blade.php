@@ -26,7 +26,7 @@
                 <x-select
                     label="Categories"
                     placeholder="Select an option"
-                    wire:model="category"
+                    wire:model.defer="category"
                     option-label="name"
                     option-value="id"
                     :async-data="route('api.events.categories')"
