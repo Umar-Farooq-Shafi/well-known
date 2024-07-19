@@ -15,7 +15,6 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Storage;
 
 class Layout extends Page implements HasForms
 {
@@ -187,17 +186,14 @@ class Layout extends Page implements HasForms
                     Forms\Components\Tabs\Tab::make('Description du site Web')
                         ->schema([
                             Forms\Components\TextInput::make('web_description_fr')
-                                ->required()
                         ]),
                     Forms\Components\Tabs\Tab::make('Descripcion del Sitio Web')
                         ->schema([
                             Forms\Components\TextInput::make('web_description_es')
-                                ->required()
                         ]),
                     Forms\Components\Tabs\Tab::make('وصف الموقع')
                         ->schema([
                             Forms\Components\TextInput::make('web_description_ar')
-                                ->required()
                         ]),
                 ]),
 
@@ -329,6 +325,9 @@ class Layout extends Page implements HasForms
     {
         $this->validate();
 
+        putenv('APP_NAME=' . $this->data['website_name']);
+        putenv('APP_URL=' . $this->data['website_url']);
+        
         putenv('APP_ENV=' . $this->data['app_env']);
         Setting::query()->where('key', ESetting::APP_ENVIRONMENT)->update(['value' => $this->data['app_env']]);
 
