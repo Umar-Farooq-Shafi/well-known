@@ -15,6 +15,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Validation\ValidationException;
 
 class Layout extends Page implements HasForms
 {
@@ -321,13 +322,16 @@ class Layout extends Page implements HasForms
         ];
     }
 
-    public function submit()
+    /**
+     * @throws ValidationException
+     */
+    public function submit(): void
     {
         $this->validate();
 
         putenv('APP_NAME=' . $this->data['website_name']);
         putenv('APP_URL=' . $this->data['website_url']);
-        
+
         putenv('APP_ENV=' . $this->data['app_env']);
         Setting::query()->where('key', ESetting::APP_ENVIRONMENT)->update(['value' => $this->data['app_env']]);
 
@@ -383,15 +387,6 @@ class Layout extends Page implements HasForms
             ->success()
             ->icon('heroicon-o-check-circle')
             ->send();
-    }
-
-    /**
-     * @return CreateAction
-     */
-    public function getFormAction()
-    {
-        return CreateAction::make()
-            ->label('Submit');
     }
 
 }

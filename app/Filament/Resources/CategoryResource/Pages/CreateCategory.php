@@ -5,6 +5,7 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource;
 use App\Models\Category;
 use App\Models\CategoryTranslation;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -16,6 +17,8 @@ use Intervention\Image\ImageManager;
 
 class CreateCategory extends CreateRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = CategoryResource::class;
 
     protected function handleRecordCreation(array $data): Model

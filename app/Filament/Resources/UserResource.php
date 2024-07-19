@@ -53,6 +53,8 @@ class UserResource extends Resource
                 Tables\Columns\IconColumn::make('enabled')
                     ->boolean()
                     ->label('Status'),
+                Tables\Columns\TextColumn::make('membership_type')
+                    ->expandableLimitedList()
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('enabled'),

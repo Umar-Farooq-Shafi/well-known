@@ -5,12 +5,15 @@ namespace App\Filament\Resources\BlogPostCategoryResource\Pages;
 use App\Filament\Resources\BlogPostCategoryResource;
 use App\Models\BlogPostCategory;
 use App\Models\BlogPostCategoryTranslation;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class CreateBlogPostCategory extends CreateRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = BlogPostCategoryResource::class;
 
     protected function handleRecordCreation(array $data): Model
@@ -36,11 +39,6 @@ class CreateBlogPostCategory extends CreateRecord
         }
 
         return $helpCenterCategory;
-    }
-
-    protected function getRedirectUrl(): string
-    {
-        return $this->previousUrl ?? $this->getResource()::getUrl('index');
     }
 
 }

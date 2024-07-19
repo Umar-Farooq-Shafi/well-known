@@ -3,12 +3,15 @@
 namespace App\Filament\Resources\VenueTypeResource\Pages;
 
 use App\Filament\Resources\VenueTypeResource;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
 class EditVenueType extends EditRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = VenueTypeResource::class;
 
     protected function mutateFormDataBeforeFill(array $data): array

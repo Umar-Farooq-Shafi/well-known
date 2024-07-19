@@ -7,6 +7,7 @@ use App\Models\Venue;
 use App\Models\VenueTranslation;
 use App\Models\VenueType;
 use App\Models\VenueTypeTranslation;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -14,8 +15,9 @@ use Illuminate\Support\Str;
 
 class CreateVenueType extends CreateRecord
 {
-    protected static string $resource = VenueTypeResource::class;
+    use FilamentNavigationTrait;
 
+    protected static string $resource = VenueTypeResource::class;
 
     protected function handleRecordCreation(array $data): Model
     {

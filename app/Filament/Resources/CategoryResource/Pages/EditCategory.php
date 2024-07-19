@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,8 @@ use Intervention\Image\ImageManager;
 
 class EditCategory extends EditRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = CategoryResource::class;
 
     protected function mutateFormDataBeforeFill(array $data): array

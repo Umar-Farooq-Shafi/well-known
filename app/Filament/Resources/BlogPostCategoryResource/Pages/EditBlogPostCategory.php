@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BlogPostCategoryResource\Pages;
 
 use App\Filament\Resources\BlogPostCategoryResource;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,8 @@ use Illuminate\Support\Str;
 
 class EditBlogPostCategory extends EditRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = BlogPostCategoryResource::class;
 
     protected function mutateFormDataBeforeFill(array $data): array

@@ -7,6 +7,7 @@ use App\Filament\Resources\PaymentGatewayResource\Widgets;
 use App\Models\PaymentGateway;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -60,6 +61,7 @@ class PaymentGatewayResource extends Resource
                 Forms\Components\Radio::make('enabled')
                     ->label('Status')
                     ->boolean()
+                    ->inlineLabel()
                     ->required(),
 
                 Forms\Components\TextInput::make('number')
@@ -79,12 +81,13 @@ class PaymentGatewayResource extends Resource
                     ->required(),
 
                 Forms\Components\TextInput::make('config.password')
-                    ->label('Username')
+                    ->label('Password')
+                    ->password()
                     ->visible(fn (Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
                     ->required(),
 
                 Forms\Components\TextInput::make('config.signature')
-                    ->label('Username')
+                    ->label('Signature')
                     ->visible(fn (Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
                     ->required(),
 
@@ -145,11 +148,17 @@ class PaymentGatewayResource extends Resource
 
                         if ($state) {
                             $membershipType[] = 'free';
-                        } elseif (array_key_exists('free', $membershipType)) {
-                            unset($membershipType['free']);
+                        } else {
+                            $membershipType = array_filter($membershipType, fn($value) => $value !== 'free');
                         }
 
                         $record->update(['membership_type' => array_unique($membershipType)]);
+
+                        Notification::make()
+                            ->title('Saved')
+                            ->success()
+                            ->icon('heroicon-o-check-circle')
+                            ->send();
                     })
                     ->updateStateUsing(fn($record) => $record)
                     ->state(fn($record) => in_array('free', $record->membership_type ?? [])),
@@ -161,11 +170,17 @@ class PaymentGatewayResource extends Resource
 
                         if ($state) {
                             $membershipType[] = 'comission';
-                        } elseif (array_key_exists('comission', $membershipType)) {
-                            unset($membershipType['comission']);
+                        } else {
+                            $membershipType = array_filter($membershipType, fn($value) => $value !== 'comission');
                         }
 
                         $record->update(['membership_type' => array_unique($membershipType)]);
+
+                        Notification::make()
+                            ->title('Saved')
+                            ->success()
+                            ->icon('heroicon-o-check-circle')
+                            ->send();
                     })
                     ->updateStateUsing(fn($record) => $record)
                     ->state(fn($record) => in_array('comission', $record->membership_type ?? [])),

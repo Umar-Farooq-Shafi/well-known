@@ -5,6 +5,7 @@ namespace App\Filament\Resources\AudienceResource\Pages;
 use App\Filament\Resources\AudienceResource;
 use App\Models\Audience;
 use App\Models\AudienceTranslation;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -16,6 +17,8 @@ use Intervention\Image\ImageManager;
 
 class CreateAudience extends CreateRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = AudienceResource::class;
 
     protected function handleRecordCreation(array $data): Model
@@ -58,8 +61,4 @@ class CreateAudience extends CreateRecord
         return $audience;
     }
 
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
-    }
 }
