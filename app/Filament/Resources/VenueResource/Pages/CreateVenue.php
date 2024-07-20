@@ -4,7 +4,10 @@ namespace App\Filament\Resources\VenueResource\Pages;
 
 use App\Filament\Resources\VenueResource;
 use App\Models\VenueTranslation;
+use App\Traits\DuplicateNameValidationTrait;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Support\Exceptions\Halt;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,9 +16,19 @@ use Intervention\Image\ImageManager;
 
 class CreateVenue extends CreateRecord
 {
+    use DuplicateNameValidationTrait;
+
     protected static string $resource = VenueResource::class;
 
-    public function afterCreate()
+    /**
+     * @throws Halt
+     */
+    public function beforeCreate(): void
+    {
+        $this->checkName();
+    }
+
+    public function afterCreate(): void
     {
         $data = $this->data;
 
@@ -27,31 +40,31 @@ class CreateVenue extends CreateRecord
             'locale' => 'en',
         ]);
 
-        if (data_get($data, 'name-fr')) {
+        if ($nameFR = data_get($data, 'name-fr')) {
             VenueTranslation::create([
                 'translatable_id' => $this->record->id,
-                'name' => data_get($data, 'name-fr'),
-                'slug' => Str::slug(data_get($data, 'name-fr')),
+                'name' => $nameFR,
+                'slug' => Str::slug($nameFR),
                 'description' => data_get($data, 'content-fr'),
                 'locale' => 'fr',
             ]);
         }
 
-        if (data_get($data, 'name-es')) {
+        if ($nameES = data_get($data, 'name-es')) {
             VenueTranslation::create([
                 'translatable_id' => $this->record->id,
-                'name' => data_get($data, 'name-es'),
-                'slug' => Str::slug(data_get($data, 'name-es')),
+                'name' => $nameES,
+                'slug' => Str::slug($nameES),
                 'description' => data_get($data, 'content-es'),
                 'locale' => 'es',
             ]);
         }
 
-        if (data_get($data, 'name-ar')) {
+        if ($nameAR = data_get($data, 'name-ar')) {
             VenueTranslation::create([
                 'translatable_id' => $this->record->id,
-                'name' => data_get($data, 'name-ar'),
-                'slug' => Str::slug(data_get($data, 'name-ar')),
+                'name' => $nameAR,
+                'slug' => Str::slug($nameAR),
                 'description' => data_get($data, 'content-ar'),
                 'locale' => 'fr',
             ]);

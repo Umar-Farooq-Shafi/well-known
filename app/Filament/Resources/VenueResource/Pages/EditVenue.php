@@ -3,11 +3,17 @@
 namespace App\Filament\Resources\VenueResource\Pages;
 
 use App\Filament\Resources\VenueResource;
+use App\Models\VenueTranslation;
+use App\Traits\DuplicateNameValidationTrait;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Exceptions\Halt;
 
 class EditVenue extends EditRecord
 {
+    use DuplicateNameValidationTrait;
+
     protected static string $resource = VenueResource::class;
 
     protected function mutateFormDataBeforeFill(array $data): array
@@ -35,6 +41,14 @@ class EditVenue extends EditRecord
         }
 
         return $data;
+    }
+
+    /**
+     * @throws Halt
+     */
+    public function beforeCreate(): void
+    {
+        $this->checkName();
     }
 
     public function afterSave()

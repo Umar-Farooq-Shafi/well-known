@@ -26,17 +26,19 @@ class CreateVenueType extends CreateRecord
         ]);
 
         foreach ($data as $name => $value) {
-            VenueTypeTranslation::create([
-                'translatable_id' => $venue->id,
-                'name' => $value,
-                'slug' => Str::slug($value),
-                'locale' => match ($name) {
-                    'name-es' => 'es',
-                    'name-fr' => 'fr',
-                    'name-ar' => 'ar',
-                    default => 'en'
-                }
-            ]);
+            if ($value !== null) {
+                VenueTypeTranslation::create([
+                    'translatable_id' => $venue->id,
+                    'name' => $value,
+                    'slug' => Str::slug($value),
+                    'locale' => match ($name) {
+                        'name-es' => 'es',
+                        'name-fr' => 'fr',
+                        'name-ar' => 'ar',
+                        default => 'en'
+                    }
+                ]);
+            }
         }
 
         return $venue;
