@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PrintTicket;
 use App\Livewire\AllCategories;
 use App\Livewire\Blog;
 use App\Livewire\BlogArticle;
@@ -44,3 +45,5 @@ Route::prefix('page')->group(function () {
 Route::get('/blog', Blog::class)->name('blog');
 
 Route::get('/blog-article/{slug}', BlogArticle::class)->name('blog-article');
+
+Route::get('/order/print-ticket/{record}', PrintTicket::class)->name('print-ticket');

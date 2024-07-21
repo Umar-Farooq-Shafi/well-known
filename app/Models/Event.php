@@ -104,6 +104,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $favourites
  * @property-read int|null $favourites_count
  * @method static \Illuminate\Database\Eloquent\Builder|Event whereCompleted($value)
+ * @property-read mixed $name
  * @mixin \Eloquent
  */
 class Event extends Model
@@ -155,6 +156,13 @@ class Event extends Model
         self::updating(function ($model) {
             self::saveImage($model, 'events');
         });
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->eventTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->name;
     }
 
     /**

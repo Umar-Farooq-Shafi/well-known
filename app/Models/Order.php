@@ -54,6 +54,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Order withoutTrashed()
+ * @property-read \App\Models\Payment|null $payment
  * @mixin \Eloquent
  */
 class Order extends Model
@@ -103,6 +104,14 @@ class Order extends Model
             'id',
             'paymentgateway_id',
         );
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function payment(): BelongsTo
+    {
+        return $this->belongsTo(Payment::class);
     }
 
     /**
