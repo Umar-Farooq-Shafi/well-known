@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -89,7 +89,7 @@ class Order extends Model
      */
     public function paymentGateway(): BelongsTo
     {
-        return $this->belongsTo(PaymentGateway::class, 'paymentgateway_id', 'id');
+        return $this->belongsTo(PaymentGateway::class, 'paymentgateway_id');
     }
 
     /**

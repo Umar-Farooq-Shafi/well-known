@@ -1,0 +1,178 @@
+{
+  "entrypoints": {
+    "app": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/vendors~app~app.ar~app.es~app.fr~event~events~installer~organizerprofile.js",
+        "/assets/vendors~app~event~events~installer~organizerprofile.js",
+        "/assets/vendors~app~events~installer~organizerprofile.js",
+        "/assets/vendors~app~events~organizerprofile.js",
+        "/assets/vendors~app~installer.js",
+        "/assets/vendors~app.js",
+        "/assets/app.js"
+      ],
+      "css": [
+        "/assets/vendors~app.css",
+        "/assets/app.css"
+      ]
+    },
+    "app.orange": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/app.orange.js"
+      ],
+      "css": [
+        "/assets/app.orange.css"
+      ]
+    },
+    "app.lightblue": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/app.lightblue.js"
+      ],
+      "css": [
+        "/assets/app.lightblue.css"
+      ]
+    },
+    "app.darkblue": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/app.darkblue.js"
+      ],
+      "css": [
+        "/assets/app.darkblue.css"
+      ]
+    },
+    "app.yellow": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/app.yellow.js"
+      ],
+      "css": [
+        "/assets/app.yellow.css"
+      ]
+    },
+    "app.purple": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/app.purple.js"
+      ],
+      "css": [
+        "/assets/app.purple.css"
+      ]
+    },
+    "app.pink": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/app.pink.js"
+      ],
+      "css": [
+        "/assets/app.pink.css"
+      ]
+    },
+    "app.red": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/app.red.js"
+      ],
+      "css": [
+        "/assets/app.red.css"
+      ]
+    },
+    "app.green": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/app.green.js"
+      ],
+      "css": [
+        "/assets/app.green.css"
+      ]
+    },
+    "app.dark": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/app.dark.js"
+      ],
+      "css": [
+        "/assets/app.dark.css"
+      ]
+    },
+    "app.fr": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/vendors~app~app.ar~app.es~app.fr~event~events~installer~organizerprofile.js",
+        "/assets/app.fr.js"
+      ],
+      "css": [
+        "/assets/app.fr.css"
+      ]
+    },
+    "app.es": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/vendors~app~app.ar~app.es~app.fr~event~events~installer~organizerprofile.js",
+        "/assets/app.es.js"
+      ],
+      "css": [
+        "/assets/app.es.css"
+      ]
+    },
+    "app.ar": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/vendors~app~app.ar~app.es~app.fr~event~events~installer~organizerprofile.js",
+        "/assets/app.ar.js"
+      ],
+      "css": [
+        "/assets/app.ar.css"
+      ]
+    },
+    "events": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/vendors~app~app.ar~app.es~app.fr~event~events~installer~organizerprofile.js",
+        "/assets/vendors~app~event~events~installer~organizerprofile.js",
+        "/assets/vendors~app~events~installer~organizerprofile.js",
+        "/assets/vendors~app~events~organizerprofile.js",
+        "/assets/vendors~events~organizerprofile.js",
+        "/assets/vendors~events.js",
+        "/assets/events.js"
+      ],
+      "css": [
+        "/assets/vendors~events.css"
+      ]
+    },
+    "event": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/vendors~app~app.ar~app.es~app.fr~event~events~installer~organizerprofile.js",
+        "/assets/vendors~app~event~events~installer~organizerprofile.js",
+        "/assets/event.js"
+      ]
+    },
+    "organizerprofile": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/vendors~app~app.ar~app.es~app.fr~event~events~installer~organizerprofile.js",
+        "/assets/vendors~app~event~events~installer~organizerprofile.js",
+        "/assets/vendors~app~events~installer~organizerprofile.js",
+        "/assets/vendors~app~events~organizerprofile.js",
+        "/assets/vendors~events~organizerprofile.js",
+        "/assets/organizerprofile.js"
+      ]
+    },
+    "installer": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/vendors~app~app.ar~app.es~app.fr~event~events~installer~organizerprofile.js",
+        "/assets/vendors~app~event~events~installer~organizerprofile.js",
+        "/assets/vendors~app~events~installer~organizerprofile.js",
+        "/assets/vendors~app~installer.js",
+        "/assets/installer.js"
+      ],
+      "css": [
+        "/assets/installer.css"
+      ]
+    }
+  }
+}

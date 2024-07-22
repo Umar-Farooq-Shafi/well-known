@@ -45,7 +45,7 @@
         <p><strong>Order ID:</strong> {{ $order_id }}</p>
     </div>
     <div class="qr-code">
-        <img src="{{ $qr_code_url }}" alt="QR Code">
+        {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::generate($order_id) !!}
     </div>
     <div class="footer">
         <p>{{ $website }}</p>

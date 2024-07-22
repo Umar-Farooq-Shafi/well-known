@@ -1,0 +1,10 @@
+.custom-file-input ~ .custom-file-label::after {
+  content: "Parcourir"; }
+
+@media (min-width: 1301px) {
+  .navbar-expand-lg .navbar-nav .nav-link {
+    padding-right: 2rem;
+    padding-left: 2rem; } }
+
+
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vYXBwLmZyLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDSSxvQkFBb0I7O0FBR3hCO0VBQ0k7SUFDSSxtQkFBbUI7SUFDbkIsa0JBQWtCLElBQ3JCIiwiZmlsZSI6ImFwcC5mci5jc3MiLCJzb3VyY2VzQ29udGVudCI6WyIuY3VzdG9tLWZpbGUtaW5wdXQgfiAuY3VzdG9tLWZpbGUtbGFiZWw6OmFmdGVyIHtcclxuICAgIGNvbnRlbnQ6IFwiUGFyY291cmlyXCI7XHJcbn1cclxuXHJcbkBtZWRpYSAobWluLXdpZHRoOiAxMzAxcHgpIHtcclxuICAgIC5uYXZiYXItZXhwYW5kLWxnIC5uYXZiYXItbmF2IC5uYXYtbGluayB7XHJcbiAgICAgICAgcGFkZGluZy1yaWdodDogMnJlbTtcclxuICAgICAgICBwYWRkaW5nLWxlZnQ6IDJyZW07XHJcbiAgICB9XHJcbn0iXSwic291cmNlUm9vdCI6IiJ9*/

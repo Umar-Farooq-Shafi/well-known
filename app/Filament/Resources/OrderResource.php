@@ -9,6 +9,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class OrderResource extends Resource
 {
@@ -137,7 +138,10 @@ class OrderResource extends Resource
             ->when(
                 str_contains($role, 'ORGANIZER'),
                 fn(Builder $query): Builder => $query->where('user_id', auth()->id())
-            );
+            )
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 
     public static function getPages(): array

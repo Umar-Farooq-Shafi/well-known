@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -70,7 +70,7 @@ class PaymentGateway extends Model
      */
     public function organizer(): BelongsTo
     {
-        return $this->belongsTo(Organizer::class);
+        return $this->belongsTo(Organizer::class, 'organizer_id');
     }
 
 }

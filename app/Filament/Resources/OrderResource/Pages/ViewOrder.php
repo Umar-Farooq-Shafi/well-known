@@ -5,6 +5,8 @@ namespace App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use Filament\Infolists;
 use Filament\Forms;
 use Filament\Infolists\Infolist;
@@ -81,6 +83,11 @@ class ViewOrder extends ViewRecord
             Action::make('paid')
                 ->visible($this->record->status === 0)
                 ->requiresConfirmation()
+                ->action(function () {
+                    $this->record->update(['status' => 1]);
+
+
+                })
                 ->modalDescription('You are about to change order status to PAID (this action cannot be undone)'),
 
             Action::make('resend-confirmation-email')
@@ -111,6 +118,10 @@ class ViewOrder extends ViewRecord
             Action::make('cancel')
                 ->action(fn () => $this->record->update(['status' => -1]))
                 ->icon('heroicon-o-x-mark'),
+
+            ForceDeleteAction::make(),
+
+            RestoreAction::make(),
 
             DeleteAction::make()
                 ->icon('heroicon-o-trash'),
