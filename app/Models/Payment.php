@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $order_id
@@ -89,6 +89,13 @@ class Payment extends Model
         'details' => 'array'
     ];
 
+    /**
+     * @return string
+     */
+    public function getStringifyAddressAttribute(): string
+    {
+        return $this->street . " " . $this->street2 . ", " . $this->city . " " . $this->state . " " . $this->postalcode;
+    }
 
     /**
      * @return BelongsTo

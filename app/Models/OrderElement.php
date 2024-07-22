@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $order_id
@@ -52,6 +52,11 @@ class OrderElement extends Model
         'quantity',
         'chosen_event_date',
     ];
+
+    public function getSubTotalAttribute()
+    {
+        return $this->quantity * $this->unitprice;
+    }
 
     /**
      * @return BelongsTo

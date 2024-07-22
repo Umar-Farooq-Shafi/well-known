@@ -39,9 +39,9 @@ class OrderExporter extends Exporter
 
             ExportColumn::make('user.email'),
 
-            ExportColumn::make('orderElement.quantity'),
+            ExportColumn::make('orderElements.quantity'),
 
-            ExportColumn::make('orderElement.unitprice'),
+            ExportColumn::make('orderElements.unitprice'),
 
             ExportColumn::make('paymentGateway.name'),
 

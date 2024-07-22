@@ -18,6 +18,34 @@ class ViewOrder extends ViewRecord
 
     public function infolist(Infolist $infolist): Infolist
     {
+        $orderElements = [];
+
+        foreach ($this->record->orderElements as $orderElement) {
+            $orderElements[] = Infolists\Components\Section::make('Event / Ticket')
+                ->columns()
+                ->schema([
+                    Infolists\Components\TextEntry::make('chosen_event_date')
+                        ->state($orderElement->chosen_event_date)
+                        ->label('Captured'),
+
+                    Infolists\Components\TextEntry::make('name')
+                        ->state($orderElement->eventDateTicket->eventDate->event->name)
+                        ->label('Name'),
+
+                    Infolists\Components\TextEntry::make('quantity')
+                        ->state($orderElement->quantity)
+                        ->label('Quantity'),
+
+                    Infolists\Components\TextEntry::make('unitprice')
+                        ->state($orderElement->unitprice)
+                        ->label('Price'),
+
+                    Infolists\Components\TextEntry::make('sub_total')
+                        ->state($orderElement->unitprice * $orderElement->quantity)
+                        ->label('Subtotal')
+                ]);
+        }
+
         return $infolist
             ->schema([
                 Infolists\Components\Section::make(function () {
@@ -31,7 +59,7 @@ class ViewOrder extends ViewRecord
                     };
                 })
                     ->description(function () {
-                        $eventDate = $this->record?->orderElement?->eventDateTicket;
+                        $eventDate = $this->record?->orderElements()?->first()->eventDateTicket;
 
 
                         return "Order #" . $this->record->reference . " placed on " . $eventDate?->sakesstartdate;
@@ -39,9 +67,6 @@ class ViewOrder extends ViewRecord
                     ->schema([
                         Infolists\Components\Section::make('Payment')
                             ->schema([
-                                Infolists\Components\TextEntry::make('orderElement.chosen_event_date')
-                                    ->label('Captured'),
-
                                 Infolists\Components\Section::make('Attendee / Point of Sale')
                                     ->columns()
                                     ->schema([
@@ -52,24 +77,7 @@ class ViewOrder extends ViewRecord
                                             ->label('Email'),
                                     ]),
 
-                                Infolists\Components\Section::make('Event / Ticket')
-                                    ->columns()
-                                    ->schema([
-                                        Infolists\Components\TextEntry::make('orderElement.eventDateTicket.eventDate.event.name')
-                                            ->label('Name'),
-
-                                        Infolists\Components\TextEntry::make('orderElement.quantity')
-                                            ->label('Quantity'),
-
-                                        Infolists\Components\TextEntry::make('orderElement.unitprice')
-                                            ->label('Price'),
-
-                                        Infolists\Components\TextEntry::make('orderElement.id')
-                                            ->label('Subtotal')
-                                            ->formatStateUsing(
-                                                fn ($record) => $record->orderElement->quantity * $record->orderElement->unitprice
-                                            )
-                                    ])
+                                ...$orderElements
                             ])
                             ->columns(2)
                     ])

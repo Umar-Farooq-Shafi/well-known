@@ -115,11 +115,11 @@ class Order extends Model
     }
 
     /**
-     * @return HasOne
+     * @return HasMany
      */
-    public function orderElement(): HasOne
+    public function orderElements(): HasMany
     {
-        return $this->hasOne(OrderElement::class);
+        return $this->hasMany(OrderElement::class);
     }
 
     /**

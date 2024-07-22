@@ -143,7 +143,7 @@
                                     <td class="content-block"
                                         style="vertical-align: top; margin: 0; padding: 0 0 20px; text-align: center;"
                                         valign="top">
-                                        <img src="{{ $logo }}" />
+                                        <img src="{{ $logo }}"/>
                                     </td>
                                 </tr>
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
@@ -151,11 +151,11 @@
                                         style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
                                         <h2>
-                                            @if($order->status === 0)
-                                                {{ __("Order Awaiting Payment") }}
-                                            @else
-                                                {{ __("Order confirmation") }}
-                                            @endif
+                                        @if($order->status === 0)
+                                            {{ __("Order Awaiting Payment") }}
+                                        @else
+                                            {{ __("Order confirmation") }}
+                                        @endif
                                     </td>
                                 </tr>
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
@@ -181,56 +181,61 @@
                                     <td class="content-block"
                                         style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-                                        {{ "This email is sent as a confirmation of your order"|trans }} <a
-                                            href="{{ absolute_url(path('dashboard_attendee_order_details', { reference: order.reference })) }}"
-                                            target="_blank">#{{ order.reference }}</a> {{ "placed on"|trans }} {{ order.payment.details["TIMESTAMP"] is defined ? order.payment.details["TIMESTAMP"]|localizeddate('none', 'none', app.request.locale, date_timezone, date_format) : order.updatedAt|localizeddate('none', 'none', app.request.locale, date_timezone, date_format) }}
+                                        {{ __("This email is sent as a confirmation of your order") }} <a
+                                            href="#"
+                                            target="_blank">#{{ $order->reference }}</a> {{ __("placed on") }}
+                                        @if($timestamp = data_get($order->payment->details, 'TIMESTAMP'))
+                                            {{ $timestamp }}
+                                        @else
+                                            {{ $order->updated_at }}
+                                        @endif
                                     </td>
                                 </tr>
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                     <td class="content-block"
                                         style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-                                        <h4>{{ "Payment"|trans }}</h4>
+                                        <h4>{{ __("Payment") }}</h4>
                                     </td>
                                 </tr>
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                     <td class="content-block"
                                         style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-                                        {% if order.payment.details["DESC"] is defined %}
-                                        <p>{{ "Description"|trans }}: {{ order.payment.details["DESC"] }}</p>
-                                        {% endif %}
-                                        {% if order.payment.details["AMT"] is defined %}
-                                        <p>{{ "Order total"|trans }}: {{ order.payment.details["AMT"] }}</p>
-                                        {% endif %}
-                                        {% if order.payment.details["CURRENCYCODE"] is defined %}
-                                        <p>{{ "Currency"|trans }}: {{ order.payment.details["CURRENCYCODE"] }}</p>
-                                        {% endif %}
-                                        <p>{{ "Payment method"|trans }}: {{ order.paymentgateway.name }}</p>
+                                        @if($desc = data_get($order->payment->details, 'DESC'))
+                                            <p>{{ __("Description") }}: {{ $desc }}</p>
+                                        @endif
+                                        @if($amt = data_get($order->payment->details, 'AMT'))
+                                            <p>{{ __("Order total") }}: {{ $amt }}</p>
+                                        @endif
+                                        @if($cur = data_get($order->payment->details, 'CURRENCYCODE'))
+                                            <p>{{ __("Currency") }}: {{ $cur }}</p>
+                                        @endif
+                                        <p>{{ __("Payment method") }}: {{ $order->paymentGateway?->name }}</p>
                                     </td>
                                 </tr>
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                     <td class="content-block"
                                         style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-                                        <h4>{{ "Billing information"|trans }}</h4>
+                                        <h4>{{ __("Billing information") }}</h4>
                                     </td>
                                 </tr>
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                     <td class="content-block"
                                         style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-                                        <p>{{ "Full name"|trans }}
-                                            : {{ order.payment.firstname ~ " " ~ order.payment.lastname }}</p>
-                                        <p>{{ "Email"|trans }}: {{ order.payment.clientEmail }}</p>
-                                        <p>{{ "Address"|trans }}: {{ order.payment.stringifyAddress }}</p>
+                                        <p>{{ __("Full name") }}
+                                            : {{ $order->payment->firstname . " " . $order->payment->lastname }}</p>
+                                        <p>{{ __("Email") }}: {{ $order->payment->clientEmail }}</p>
+                                        <p>{{ __("Address") }}: {{ $order->payment->stringifyAddress }}</p>
                                     </td>
                                 </tr>
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                     <td class="content-block"
                                         style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-                                        <h4>{{ "Tickets"|trans }}</h4>
+                                        <h4>{{ __("Tickets") }}</h4>
                                     </td>
                                 </tr>
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
@@ -238,36 +243,39 @@
                                         style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
                                         <table width="100%">
-                                            {% for orderElement in order.orderelements %}
-                                            <tr width="100%" valign="top">
-                                                <td width="70%">
-                                                    <p style="margin-top: 0;">{{ orderElement.eventticket.eventdate.event.name }}</p>
-                                                    {% if orderElement.chosenEventDate is not null%}
-                                                    <p>{{ "Date"|trans }}
-                                                        : {{ orderElement.chosenEventDate|date('D j M Y')}} {{ orderElement.eventticket.eventdate.startdate|date('g:i A')|upper }}</p>
-                                                    {% else %}
-                                                    <p>{{ "Date"|trans }}
-                                                        : {{ orderElement.eventticket.eventdate.startdate|localizeddate('none', 'none', app.request.locale, date_timezone, date_format) }}</p>
-                                                    {% endif %}
-                                                    {% if orderElement.eventticket.eventdate.venue %}
-                                                    <p>{{ "Venue"|trans }}
-                                                        : {{ orderElement.eventticket.eventdate.venue.name }}
-                                                        : {{ orderElement.eventticket.eventdate.venue.stringifyAddress }}</p>
-                                                    {% else %}
-                                                    <p>{{ "Where"|trans ~ ": " ~ "Online"|trans }}</p>
-                                                    {% endif %}
-                                                </td>
-                                                <td width="15%">x {{ orderElement.quantity }}</td>
-                                                <td width="15%">{{ orderElement.eventticket.free ? "Free"|trans : ((services.getSetting('currency_position') == 'left' ? orderElement.eventticket.currencyCode.symbol : '') ~ orderElement.getPrice() ~ (services.getSetting('currency_position') == 'right' ? orderElement.eventticket.currencyCode.symbol : '')) }}</td>
-                                            </tr>
-                                            {% if not loop.last %}
-                                            <tr width="100%" valign="top">
-                                                <td colspan="3" width="100%">
-                                                    <hr style="border-top: 1px solid rgba(0, 0, 0, 0.1);"/>
-                                                </td>
-                                            </tr>
-                                            {% endif %}
-                                            {% endfor %}
+                                            @foreach($order->orderElements as $orderElement)
+                                                <tr width="100%" valign="top">
+                                                    <td width="70%">
+                                                        <p style="margin-top: 0;">{{ $orderElement?->eventticket?->eventdate?->event?->name }}</p>
+
+                                                        @if($orderElement->chosen_event_date)
+                                                            <p>{{ __("Date") }}
+                                                                : {{ $orderElement->chosen_event_date }} {{ $orderElement->eventticket->eventdate->startdate }}</p>
+                                                        @else
+                                                            <p>{{ __("Date") }}
+                                                                : {{ $orderElement->eventticket->eventdate->startdate }}</p>
+                                                        @endif
+
+                                                        @if($orderElement->eventticket->eventdate->venue)
+
+                                                            <p>{{ __("Venue") }}
+                                                                : {{ $orderElement->eventticket->eventdate->venue->name }}
+                                                                : {{ $orderElement->eventticket->eventdate->venue->stringifyAddress }}</p>
+                                                        @else
+                                                            <p>{{ __("Where") . ": " . __("Online") }}</p>
+                                                        @endif
+                                                    </td>
+                                                    <td width="15%">x {{ $orderElement->quantity }}</td>
+                                                    <td width="15%">{{ $orderElement->eventticket->free ? __("Free") : "" }}</td>
+                                                </tr>
+                                                @if(!$loop->last)
+                                                    <tr width="100%" valign="top">
+                                                        <td colspan="3" width="100%">
+                                                            <hr style="border-top: 1px solid rgba(0, 0, 0, 0.1);"/>
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                            @endforeach
                                         </table>
                                     </td>
                                 </tr>
@@ -275,7 +283,7 @@
                                     <td class="content-block"
                                         style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-                                        &mdash; {{ 'Best regards, the %website_name% team'|trans({'%website_name%': services.getSetting("website_name")}) }}
+                                        &mdash; {{ __('Best regards, the ' . env('APP_NAME') . ' team') }}
                                     </td>
                                 </tr>
                             </table>
@@ -289,9 +297,9 @@
                         <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                             <td class="aligncenter content-block"
                                 style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; vertical-align: top; color: #999; text-align: center; margin: 0; padding: 0 0 20px;"
-                                align="center" valign="top"><a href="{{ services.getSetting("website_url") }}"
-                                                               style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; color: #999; text-decoration: underline; margin: 0;">{{ services.getSetting("website_name") }}</a>
-                                � {{ "now"|date('Y') }}</td>
+                                align="center" valign="top"><a href="{{ env('APP_URL') }}"
+                                                               style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; color: #999; text-decoration: underline; margin: 0;">{{ env('APP_NAME') }}</a>
+                                � {{ now()->format('Y') }}</td>
                         </tr>
                     </table>
                 </div>
@@ -303,4 +311,3 @@
 </table>
 </body>
 </html>
-{% endblock %}
