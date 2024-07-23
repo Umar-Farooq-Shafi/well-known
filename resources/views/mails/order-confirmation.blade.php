@@ -18,21 +18,19 @@
         @if($order->status === 0)
             {{ __("Your Order is awaiting Payment") }}
         @else
-            {{ __("Your tickets bought from") }}
+            {{ __("Your tickets bought from") }} {{ env('APP_NAME') }}
         @endif
-
-        {{ env('APP_URL') }}
     </title>
 
-    <style type="text/css">
+{{--    <style type="text/css">--}}
 
-        .body-wrap * {
-            direction: rtl !important;
-            text-align: right !important;
-            font-family: 'Cairo', sans-serif !important;
-        }
+{{--        .body-wrap * {--}}
+{{--            direction: rtl !important;--}}
+{{--            text-align: right !important;--}}
+{{--            font-family: 'Cairo', sans-serif !important;--}}
+{{--        }--}}
 
-    </style>
+{{--    </style>--}}
 
     <style type="text/css">
         img {
@@ -227,7 +225,7 @@
                                         valign="top">
                                         <p>{{ __("Full name") }}
                                             : {{ $order->payment->firstname . " " . $order->payment->lastname }}</p>
-                                        <p>{{ __("Email") }}: {{ $order->payment->clientEmail }}</p>
+                                        <p>{{ __("Email") }}: {{ $order->payment->client_email }}</p>
                                         <p>{{ __("Address") }}: {{ $order->payment->stringifyAddress }}</p>
                                     </td>
                                 </tr>
@@ -246,27 +244,27 @@
                                             @foreach($order->orderElements as $orderElement)
                                                 <tr width="100%" valign="top">
                                                     <td width="70%">
-                                                        <p style="margin-top: 0;">{{ $orderElement?->eventticket?->eventdate?->event?->name }}</p>
+                                                        <p style="margin-top: 0;">{{ $orderElement?->eventDateTicket?->eventDate?->event?->name }}</p>
 
                                                         @if($orderElement->chosen_event_date)
                                                             <p>{{ __("Date") }}
-                                                                : {{ $orderElement->chosen_event_date }} {{ $orderElement->eventticket->eventdate->startdate }}</p>
+                                                                : {{ $orderElement->chosen_event_date }} {{ $orderElement->eventDateTicket->eventDate->startdate }}</p>
                                                         @else
                                                             <p>{{ __("Date") }}
-                                                                : {{ $orderElement->eventticket->eventdate->startdate }}</p>
+                                                                : {{ $orderElement->eventDateTicket->eventDate->startdate }}</p>
                                                         @endif
 
-                                                        @if($orderElement->eventticket->eventdate->venue)
+                                                        @if($orderElement->eventDateTicket->eventDate->venue)
 
                                                             <p>{{ __("Venue") }}
-                                                                : {{ $orderElement->eventticket->eventdate->venue->name }}
-                                                                : {{ $orderElement->eventticket->eventdate->venue->stringifyAddress }}</p>
+                                                                : {{ $orderElement->eventDateTicket->eventDate->venue->name }}
+                                                                : {{ $orderElement->eventDateTicket->eventDate->venue->stringifyAddress }}</p>
                                                         @else
                                                             <p>{{ __("Where") . ": " . __("Online") }}</p>
                                                         @endif
                                                     </td>
                                                     <td width="15%">x {{ $orderElement->quantity }}</td>
-                                                    <td width="15%">{{ $orderElement->eventticket->free ? __("Free") : "" }}</td>
+                                                    <td width="15%">{{ $orderElement->eventDateTicket->free ? __("Free") : "" }}</td>
                                                 </tr>
                                                 @if(!$loop->last)
                                                     <tr width="100%" valign="top">

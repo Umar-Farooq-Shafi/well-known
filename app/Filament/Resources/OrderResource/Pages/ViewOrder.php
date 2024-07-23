@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Filament\Resources\OrderResource;
+use App\Mail\OrderConfirmation;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
@@ -10,7 +11,9 @@ use Filament\Actions\RestoreAction;
 use Filament\Infolists;
 use Filament\Forms;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Facades\Mail;
 
 class ViewOrder extends ViewRecord
 {
@@ -106,6 +109,14 @@ class ViewOrder extends ViewRecord
                     Forms\Components\TextInput::make('email')
                         ->formatStateUsing(fn () => $this->record->user?->email)
                 ])
+                ->action(function ($data) {
+                    Mail::to($data['email'])->send(new OrderConfirmation($this->record));
+
+                    Notification::make()
+                        ->title("The confirmation email has been resent to " . $data['email'])
+                        ->success()
+                        ->send();
+                })
                 ->icon('heroicon-o-envelope'),
 
             Action::make('payment-details')

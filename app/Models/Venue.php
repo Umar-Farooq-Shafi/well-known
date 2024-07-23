@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -121,6 +121,14 @@ class Venue extends Model
         'quoteform' => 'boolean',
         'showmap' => 'boolean'
     ];
+
+    /**
+     * @return string
+     */
+    public function getStringifyAddressAttribute(): string
+    {
+        return $this->street . " " . $this->street2 . ", " . $this->city . " " . $this->state . " " . $this->postalcode;
+    }
 
     /**
      * @return BelongsTo
