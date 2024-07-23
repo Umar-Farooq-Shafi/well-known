@@ -4,12 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Exports\OrderExporter;
 use App\Filament\Resources\OrderResource\Pages;
+use App\Mail\OrderConfirmation;
 use App\Models\Order;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Mail;
 
 class OrderResource extends Resource
 {
@@ -115,21 +119,50 @@ class OrderResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('print-tickets')
+                        ->visible(fn($record) => $record->status === 1)
+                        ->url(fn($record) => route('print-ticket', ['record' => $record->id]), true)
                         ->icon('heroicon-o-printer'),
 
                     Tables\Actions\ViewAction::make()
                         ->label('Detail'),
 
                     Tables\Actions\Action::make('resend-confirmation-email')
+                        ->visible(fn($record) => $record->status === 1)
+                        ->requiresConfirmation()
+                        ->modalDescription('If you need to send the confirmation email to a different email address, you can change it before submitting')
+                        ->form([
+                            Forms\Components\TextInput::make('email')
+                                ->formatStateUsing(fn($record) => $record->user?->email)
+                        ])
+                        ->action(function ($data, $record) {
+                            Mail::to($data['email'])->send(new OrderConfirmation($record));
+
+                            Notification::make()
+                                ->title("The confirmation email has been resent to " . $data['email'])
+                                ->success()
+                                ->send();
+                        })
                         ->icon('heroicon-o-envelope'),
 
                     Tables\Actions\Action::make('payment-details')
+                        ->visible(fn($record) => $record->status === 1)
+                        ->modalHeading(fn ($record) => "Order payment details - " . $record->reference)
+                        ->modalContent(
+                            fn ($record) => view('filament.resources.order-resource.payment-detail', [
+                                'payment' => $record->payment,
+                            ])
+                        )
+                        ->modalSubmitAction('')
+                        ->modalCancelActionLabel('Close')
                         ->icon('heroicon-o-clipboard-document-list'),
 
                     Tables\Actions\Action::make('cancel')
+                        ->action(fn($record) => $record->update(['status' => -1]))
                         ->icon('heroicon-o-x-mark'),
 
-                    Tables\Actions\DeleteAction::make()
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\RestoreAction::make(),
+                    Tables\Actions\ForceDeleteAction::make(),
                 ])
             ])
             ->bulkActions([
