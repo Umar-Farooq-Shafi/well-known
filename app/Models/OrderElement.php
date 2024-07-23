@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $order_id
@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderElement withoutTrashed()
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderTicket> $orderTickets
  * @property-read int|null $order_tickets_count
+ * @property-read mixed $sub_total
  * @mixin \Eloquent
  */
 class OrderElement extends Model
@@ -77,6 +78,23 @@ class OrderElement extends Model
     public function orderTickets(): HasMany
     {
         return $this->hasMany(OrderTicket::class, 'orderelement_id');
+    }
+
+    /**
+     * @param $slug
+     * @return bool
+     */
+    public function belongsToOrganizer($slug): bool
+    {
+        return $this->eventDateTicket->eventDate->event->organizer->slug == $slug;
+    }
+
+    /**
+     * @return float
+     */
+    public function displayUnitPrice(): float
+    {
+        return (float) $this->unitprice;
     }
 
 }

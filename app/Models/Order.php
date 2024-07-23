@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $user_id
@@ -55,6 +55,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Order withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Order withoutTrashed()
  * @property-read \App\Models\Payment|null $payment
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderElement> $orderElements
+ * @property-read int|null $order_elements_count
  * @mixin \Eloquent
  */
 class Order extends Model

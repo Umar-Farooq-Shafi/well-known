@@ -22,15 +22,15 @@
         @endif
     </title>
 
-{{--    <style type="text/css">--}}
-
-{{--        .body-wrap * {--}}
-{{--            direction: rtl !important;--}}
-{{--            text-align: right !important;--}}
-{{--            font-family: 'Cairo', sans-serif !important;--}}
-{{--        }--}}
-
-{{--    </style>--}}
+    @if(app()->getLocale() === 'ar')
+        <style type="text/css">
+            .body-wrap * {
+                direction: rtl !important;
+                text-align: right !important;
+                font-family: 'Cairo', sans-serif !important;
+            }
+        </style>
+    @endif
 
     <style type="text/css">
         img {

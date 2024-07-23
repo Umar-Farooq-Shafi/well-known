@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -83,6 +83,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Venue withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Venue withoutTrashed()
  * @property-read \App\Models\Country|null $country
+ * @property-read mixed $name
+ * @property-read string $stringify_address
  * @mixin \Eloquent
  */
 #[ObservedBy([VenueObserver::class])]
@@ -128,6 +130,13 @@ class Venue extends Model
     public function getStringifyAddressAttribute(): string
     {
         return $this->street . " " . $this->street2 . ", " . $this->city . " " . $this->state . " " . $this->postalcode;
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->venueTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->name;
     }
 
     /**

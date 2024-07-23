@@ -11,13 +11,14 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -124,6 +125,8 @@ use Illuminate\Support\Facades\Storage;
  * @method static \Illuminate\Database\Eloquent\Builder|User withoutTrashed()
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Scanner> $scanners
  * @property-read int|null $scanners_count
+ * @property-read \App\Models\PointsOfSale|null $pointOfSale
+ * @property-read \App\Models\Scanner|null $scanner
  * @mixin \Eloquent
  */
 class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
@@ -229,7 +232,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
         $name = str(Filament::getNameForDefaultAvatar($this))
             ->trim()
             ->explode(' ')
-            ->map(fn (string $segment): string => filled($segment) ? mb_substr($segment, 0, 1) : '')
+            ->map(fn(string $segment): string => filled($segment) ? mb_substr($segment, 0, 1) : '')
             ->join(' ');
 
         return 'https://ui-avatars.com/api/?name=' . $name . '&color=FFFFFF&background=09090b';
@@ -241,6 +244,58 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
     public function getFilamentName(): string
     {
         return "{$this->username}";
+    }
+
+    /**
+     * @param $role
+     * @return bool
+     */
+    public function hasRole($role): bool
+    {
+        $roles = unserialize($this->roles);
+
+        return in_array($role, $roles);
+    }
+
+    /**
+     * @param array $roles
+     * @return bool
+     */
+    public function hasAnyRole(array $roles)
+    {
+        $userRoles = unserialize($this->roles);
+
+        foreach ($roles as $role) {
+            if (in_array($role, $userRoles)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCrossRoleName(): string
+    {
+        if ($this->hasRole("ROLE_ATTENDEE")) {
+            return $this->getFilamentName();
+        }
+
+        if ($this->hasRole("ROLE_ORGANIZER") && $this->organizer) {
+            return $this->organizer->name;
+        }
+
+        if ($this->hasRole("ROLE_POINTOFSALE") && $this->pointOfSale) {
+            return $this->pointOfSale->name;
+        }
+
+        if ($this->hasRole("ROLE_SCANNER") && $this->scanner) {
+            return $this->scanner->name;
+        }
+
+        return "N/A";
     }
 
     /**
@@ -268,11 +323,19 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
     }
 
     /**
-     * @return HasMany
+     * @return HasOne
      */
-    public function scanners(): HasMany
+    public function scanner(): HasOne
     {
-        return $this->hasMany(Scanner::class);
+        return $this->hasOne(Scanner::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function pointOfSale(): BelongsTo
+    {
+        return $this->belongsTo(PointsOfSale::class, 'pointofsale_id');
     }
 
 }

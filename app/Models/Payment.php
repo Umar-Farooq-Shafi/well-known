@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $order_id
@@ -58,6 +58,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment withoutTrashed()
+ * @property-read string $stringify_address
  * @mixin \Eloquent
  */
 class Payment extends Model

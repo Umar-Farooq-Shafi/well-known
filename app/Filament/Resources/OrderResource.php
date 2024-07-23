@@ -37,11 +37,20 @@ class OrderResource extends Resource
                     ->searchable(isIndividual: true)
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('paymentGateway.organizer.name')
+                Tables\Columns\TextColumn::make('orderElements.eventDateTicket.eventDate.event.organizer.name')
                     ->searchable(isIndividual: true)
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('eventDateTickets.name')
+                Tables\Columns\TextColumn::make('orderElements.eventDateTicket.eventDate.event.name')
+                    ->state(function ($record) {
+                        $state = '';
+
+                        foreach ($record->orderElements as $orderElement) {
+                            $state .= $orderElement?->eventDateTicket?->eventDate?->event?->name ?? '';
+                        }
+
+                        return $state;
+                    })
                     ->label('Event')
                     ->searchable(isIndividual: true)
                     ->sortable(),
