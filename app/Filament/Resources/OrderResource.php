@@ -159,6 +159,7 @@ class OrderResource extends Resource
                         ->icon('heroicon-o-clipboard-document-list'),
 
                     Tables\Actions\Action::make('cancel')
+                        ->visible(fn($record) => $record->status !== -2)
                         ->action(fn($record) => $record->update(['status' => -1]))
                         ->icon('heroicon-o-x-mark'),
 

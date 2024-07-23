@@ -58,6 +58,7 @@ class ViewOrder extends ViewRecord
                         1 => 'Paid',
                         0 => 'Awaiting payment',
                         -1 => 'Cancel',
+                        -2 => 'Failed',
                         default => $state
                     };
                 })
