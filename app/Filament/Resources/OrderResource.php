@@ -77,6 +77,7 @@ class OrderResource extends Resource
                             1 => 'Paid',
                             0 => 'Awaiting payment',
                             -1 => 'Cancel',
+                            -2 => 'Failed',
                             default => $state
                         };
                     })
@@ -84,8 +85,9 @@ class OrderResource extends Resource
                     ->color(function ($state) {
                         return match ($state) {
                             1 => 'success',
-                            0 => 'warning',
-                            -1 => 'danger',
+                            0 => 'gray',
+                            -1 => 'warning',
+                            -2 => 'danger',
                             default => 'info'
                         };
                     })
