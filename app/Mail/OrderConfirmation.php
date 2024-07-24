@@ -2,14 +2,15 @@
 
 namespace App\Mail;
 
-use App\Models\Order;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class OrderConfirmation extends Mailable
 {
@@ -53,6 +54,18 @@ class OrderConfirmation extends Mailable
      */
     public function attachments(): array
     {
-        return [];
+        Pdf::view('pdfs.print-ticket', [
+            'order' => $this->order,
+            'eventDateTicketReference' => 'all',
+            'eventtimezone' => 'Asia/Karachi',
+            'eventdateFormat' => "ccc, d MMM Y hh:mm aaa"
+        ])
+            ->format('a4')
+            ->disk('public')
+            ->save("pdf/" . $this->order->reference . ".pdf");
+
+        return [
+            Attachment::fromPath(Storage::disk('public')->path("pdf/" . $this->order->reference . ".pdf"))
+        ];
     }
 }
