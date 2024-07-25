@@ -135,7 +135,7 @@
                 @foreach($events as $event)
                     <a href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
                         <div class="border p-4 rounded-lg flex items-center space-x-4">
-                            <img src="{{ Storage::url('events/' . $event->image_name) }}"
+                            <img src="{{ Storage::url('events/' . $event->image_name) }}" loading="lazy"
                                  alt="Bungy and Canyoning Day Trip" class="w-24 h-24 rounded-lg">
 
                             <div>

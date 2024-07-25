@@ -91,7 +91,7 @@
                                 <div
                                     class="w-72 h-72 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
                                 >
-                                    <img class="w-full h-40" src="{{ Storage::url('events/' . $event->image_name) }}"
+                                    <img class="w-full h-40" src="{{ Storage::url('events/' . $event->image_name) }}" loading="lazy"
                                          alt="{{ $event->eventTranslations->first()->name }}"/>
 
                                     <p class="p-2 font-medium text-lg">{{ $event->eventTranslations->first()->name }}</p>
@@ -126,7 +126,7 @@
                                         {{ $event->category->categoryTranslations->first()?->name ?? '' }}
                                     </span>
 
-                                        <img class="w-full h-40"
+                                        <img class="w-full h-40" loading="lazy"
                                              src="{{ Storage::url('events/' . $event->image_name) }}"
                                              alt="{{ $event->eventTranslations->first()->name }}"/>
 

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>{{ $title ?? 'Aafno Ticket' }}</title>
+    @stack('metas')
 
     @stack('styles')
     <link rel="preconnect" href="https://fonts.bunny.net">

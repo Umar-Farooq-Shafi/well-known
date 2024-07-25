@@ -141,7 +141,7 @@
                                     <td class="content-block"
                                         style="vertical-align: top; margin: 0; padding: 0 0 20px; text-align: center;"
                                         valign="top">
-                                        <img src="{{ $logo }}"/>
+                                        <img src="{{ $logo }}" loading="lazy" alt=""/>
                                     </td>
                                 </tr>
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
@@ -172,7 +172,7 @@
                                     <td class="content-block"
                                         style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px; text-align: center;"
                                         valign="top">
-                                        <img src="{{ asset('assets/img/illustrations/order-confirmation.png') }}"/>
+                                        <img src="{{ asset('assets/img/illustrations/order-confirmation.png') }}" loading="lazy" alt=""/>
                                     </td>
                                 </tr>
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">

@@ -16,7 +16,7 @@
     </div>
 
     <div class="w-full">
-        <img src="{{ Storage::url('events/' . $eventTranslation->event->image_name) }}" alt="Canyon Swing"
+        <img src="{{ Storage::url('events/' . $eventTranslation->event->image_name) }}" alt="Canyon Swing" loading="lazy"
              class="object-contain z-10 w-full relative opacity-100 p-8 h-1/2">
 
         <div class="absolute top-[13rem] opacity-75 bg-gradient-to-b blur-xl bg-cover h-2/3 bg-no-repeat w-full"

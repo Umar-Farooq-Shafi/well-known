@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $hidden
@@ -41,6 +41,13 @@ class BlogPostCategory extends Model
     protected $fillable = [
         'hidden'
     ];
+
+    public function getSlugAttribute()
+    {
+        return $this->blogPostCategoryTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->slug;
+    }
 
     /**
      * @return HasMany

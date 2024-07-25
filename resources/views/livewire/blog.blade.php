@@ -38,7 +38,7 @@
                 <a href="{{ route('blog-article', ['slug' => $blog->slug]) }}">
                     <div class="flex flex-col gap-2">
                         <div>
-                            <img src="{{ Storage::url('blog/' . $blog->blogPost->image_name) }}"
+                            <img src="{{ Storage::url('blog/' . $blog->blogPost->image_name) }}" loading="lazy"
                                  alt="Bungy and Canyoning Day Trip" class="w-96 h-96 rounded-lg">
 
                             <div class="px-2 pt-1 text-sm flex flex-row gap-x-5">

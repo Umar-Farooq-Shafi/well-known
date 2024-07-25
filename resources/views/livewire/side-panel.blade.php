@@ -8,7 +8,7 @@
         <div class="swiper-wrapper">
             @foreach($sliderContents as $sliderContent)
                 <div class="swiper-slide">
-                    <img class="object-fill w-full h-[85vh]"
+                    <img class="object-fill w-full h-[85vh]" loading="lazy"
                          src="{{ Storage::url('events/' . $sliderContent->image_name) }}"
                          alt="image"/>
                 </div>
