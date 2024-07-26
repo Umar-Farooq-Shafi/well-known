@@ -71,16 +71,17 @@
                     </template>
                 </article>
 
-                <article id="blog-post-open" x-data="{ blogPostCategories: true }">
-                    <header class="p-3 bg-gray-200 cursor-pointer rounded" @click="blogPostCategories = ! blogPostCategories">
+                <article id="blog-post-open" x-data="{ blogPostCatOpen: true }">
+                    <header class="p-3 bg-gray-200 cursor-pointer rounded"
+                            @click="blogPostCatOpen = ! blogPostCatOpen">
                         <div class="flex items-center justify-between">
                             <h6 class="text-gray-700">{{ __('Categories') }}</h6>
 
-                            <template x-if="blogPostCategories">
+                            <template x-if="blogPostCatOpen">
                                 <x-fas-chevron-down class="w-4 h-4"/>
                             </template>
 
-                            <template x-if="!blogPostCategories">
+                            <template x-if="!blogPostCatOpen">
                                 <x-fas-chevron-up class="w-4 h-4"/>
                             </template>
                         </div>
@@ -95,7 +96,7 @@
                             x-transition:leave="transition ease-in duration-300"
                             x-transition:leave-start="opacity-100 scale-100"
                             x-transition:leave-end="opacity-0 scale-90"
-                            x-show="blogPostCategories">
+                            x-show="blogPostCatOpen">
                             <ul class="list-none">
                                 @foreach($blogPostCategories as $category)
                                     @php
@@ -130,7 +131,7 @@
                                 <x-fas-chevron-down class="w-4 h-4"/>
                             </template>
 
-                            <template x-if="!blogPostCategories">
+                            <template x-if="!popularBlogPostCategories">
                                 <x-fas-chevron-up class="w-4 h-4"/>
                             </template>
                         </div>
@@ -153,7 +154,7 @@
 
                                 <article class="flex items-center mb-3">
                                     <div class="w-1/3 pr-2">
-                                        <a href="#">
+                                        <a href="{{ route('blog-article', ['slug' => $currBlogPost->slug]) }}">
                                             <img
                                                 src="{{ $popular->image_name ? $popular->getImagePath() : $popular->getImagePlaceholder() }}"
                                                 class="img-lazy-load img-fluid h-16 w-16"
@@ -167,7 +168,7 @@
                                         <small class="text-gray-500">{{ $popular->blogPostCategory->name }}</small>
 
                                         <h6 class="mb-0">
-                                            <a href="#"
+                                            <a href="{{ route('blog-article', ['slug' => $currBlogPost->slug]) }}"
                                                class="text-gray-700 text-truncate">{{ $currBlogPost->name }}</a>
                                         </h6>
                                     </div>
@@ -229,23 +230,26 @@
                         </header>
 
                         <p class="mb-4 flex items-center gap-x-4">
-                            <small class="text-gray-500">
-                                <a class="flex items-center gap-x-2" href="{{ route('blog', ['category' => $blogPost->blogPostCategory->slug]) }}">
+                            <small class="text-gray-500 text-base">
+                                <a class="flex items-center gap-x-2"
+                                   href="{{ route('blog', ['category' => $blogPost->blogPostCategory->slug]) }}">
                                     <x-fas-sitemap class="w-5 h-5"/>
 
                                     {{ $blogPost->blogPostCategory->name }}
                                 </a>
                             </small>
 
-                            <small class="text-gray-500 flex items-center gap-x-2">
+                            <small class="text-gray-500 text-base flex items-center gap-x-2">
                                 <x-fas-clock class="w-5 h-5"/>
 
                                 {{ $blogPost->created_at->diffForHumans() }}
                             </small>
 
                             @if($blogPost->readtime)
-                                <small class="text-gray-500"><i
-                                        class="fas fa-book-reader"></i> {{ $blogPost->readtime }} {{ __('min read') }}
+                                <small class="text-gray-500">
+                                    <x-fas-book-reader class="w-4 h-4"/>
+
+                                    {{ $blogPost->readtime }} {{ __('min read') }}
                                 </small>
                             @endif
                         </p>
@@ -254,7 +258,7 @@
                             {!! $blogPostTranslation->content !!}
                         </article>
 
-                        <hr class="my-12 h-0.5 border-t-0 bg-neutral-200 dark:bg-white/10" />
+                        <hr class="my-12 h-0.5 border-t-0 bg-neutral-200 dark:bg-white/10"/>
 
                         <div class="flex flex-wrap">
                             @if($blogPost->tags)
@@ -266,8 +270,32 @@
                                 </div>
                             @endif
 
-                            <div class="w-full lg:w-1/2 text-center lg:text-right sharer mt-3">
-                                <!-- Social media share buttons can be added here -->
+                            <div class="w-full text-center">
+                                <div class="flex flex-row gap-x-2 justify-center">
+                                    <a
+                                        target="_blank"
+                                        href="https://www.facebook.com/sharer/sharer.php?kid_directed_site=0&sdk=joey&u=https%3A%2F%2Fwww.dev.aafnoticket.com%2Fen%2Fblog-article%2Fmonali-thakur-live-in-nepal&display=popup&ref=plugin&src=share_button"
+                                        class="bg-blue-500 flex gap-x-1 py-0.5 px-1 rounded items-center">
+                                        <x-fab-facebook class="w-4 h-4 text-white"/>
+
+                                        <small>Share 0</small>
+                                    </a>
+
+                                    <a
+                                        target="_blank"
+                                        href="https://twitter.com/share"
+                                        class="bg-[#1DA1F2] flex gap-x-1 py-0.5 px-1 rounded items-center">
+                                        <x-fab-x-twitter class="w-4 h-4 text-white"/>
+
+                                        <small>Twitter</small>
+                                    </a>
+
+                                    <div class="bg-[#0077B5] flex gap-x-1 py-0.5 px-1 rounded items-center">
+                                        <x-fab-linkedin class="w-4 h-4 text-white"/>
+
+                                        <small>Share</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -309,18 +337,95 @@
         </div>
 
         @if(count($similarBlogPosts))
-            <div class="flex flex-wrap">
-                <div class="w-full">
-                    <h3 class="mt-5 mb-4 text-center">{{ __('Related posts') }}</h3>
-                    <div class="owl-carousel owl-theme" data-margin="15" data-items="4" data-dots="false"
-                         data-nav="true" data-autoplay="false">
+            @push('styles')
+                <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/>
+            @endpush
+
+            <div class="flex flex-wrap w-full justify-center">
+                <h3 class="my-5 font-semibold text-2xl">{{ __('Related posts') }}</h3>
+
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper">
                         @foreach($similarBlogPosts as $similar)
-                            {{--                                @include('partials.blog-card', ['blogpost' => $similar, 'thumbnailsize' => [241, 241]])--}}
+                            @php
+                                $similarTrans = $similar->blogPostTranslations->first();
+                            @endphp
+                            <div class="card mb-4 shadow-none blog-post-card swiper-slide">
+                                <a href="{{ route('blog-article', ['slug' => $similarTrans->slug]) }}">
+                                    <img class="w-72 h-72 object-fill"
+                                         loading="lazy"
+                                         src="{{ $similar->image_name ? $similar->getImagePath() : $similar->getImagePlaceholder() }}"
+                                         alt="{{ $similarTrans->name }}"
+                                    />
+                                </a>
+
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        @if ($similar->blogPostCategory)
+                                            <small class="text-muted mr-3 mt-2">
+                                                <a href="{{ route('blog', ['category' => $similar->blogPostCategory->slug]) }}"
+                                                   class="text-dark flex gap-x-2 flex-row">
+                                                    <x-fas-sitemap class="w-4 h-4"/>
+
+                                                    {{ $similar->blogPostCategory->name }}
+                                                </a>
+                                            </small>
+                                        @endif
+                                        @isset($showdate)
+                                            <small class="text-muted mr-3">
+                                                <x-fas-clock class="w-4 h-4"/>
+
+                                                {{ $blogpost->createdAt->diffForHumans() }}
+                                            </small>
+                                        @endisset
+                                        @if ($similar->readtime)
+                                            <small class="text-muted"><i
+                                                    class="fas fa-book-reader"></i> {{ $similar->readtime }} {{ __('min read') }}
+                                            </small>
+                                        @endif
+                                    </p>
+                                    <h5 class="card-title"><a
+                                            href="{{ route('blog-article', ['slug' => $similarTrans->slug]) }}"
+                                            class="text-dark">{{ $similarTrans->name }}</a></h5>
+                                </div>
+                            </div>
                         @endforeach
                     </div>
+
+                    <div class="swiper-pagination"></div>
                 </div>
             </div>
-        @endif
 
+            @push('scripts')
+                <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+                <script>
+                    var swiper = new Swiper(".mySwiper", {
+                        slidesPerView: 4,
+                        spaceBetween: 20,
+                        freeMode: true,
+                        pagination: {
+                            el: ".swiper-pagination",
+                            clickable: true,
+                        },
+                        breakpoints: {
+                            640: {
+                                slidesPerView: 2,
+                                spaceBetween: 20,
+                            },
+                            768: {
+                                slidesPerView: 3,
+                                spaceBetween: 40,
+                            },
+                            1024: {
+                                slidesPerView: 4,
+                                spaceBetween: 50,
+                            },
+                        },
+                    });
+                </script>
+            @endpush
+
+        @endif
     </div>
+
 </div>

@@ -24,11 +24,6 @@ class BlogArticle extends Component
         $this->blogPost->update(['views' => $this->blogPost->views + 1]);
     }
 
-    public function search()
-    {
-
-    }
-
     public function render()
     {
         $blogPostCategories = BlogPostCategory::limit(5)
@@ -57,6 +52,12 @@ class BlogArticle extends Component
                 $query->where('slug', $this->blogPost->blogPostCategory->slug);
             });
         })
+            ->with([
+                'blogPostTranslations' => static function ($query) {
+                    $query->where('locale', app()->getLocale());
+                },
+                'blogPostCategory'
+            ])
             ->where('id', '!=', $this->blogPost->id)
             ->take(8)
             ->get();
