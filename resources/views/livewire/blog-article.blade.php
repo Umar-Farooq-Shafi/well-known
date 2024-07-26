@@ -27,43 +27,75 @@
     </div>
 
     <div class="container mx-auto p-6">
-        <div class="flex flex-wrap">
-            <aside class="w-full lg:w-1/4 order-1 lg:order-none">
-                <div class="card bg-gray-100">
-                    <article class="card-group-item">
-                        <header class="px-2 py-4 bg-gray-200">
-                            <a href="#" data-toggle="collapse" data-target="#filter-keyword"
-                               class="flex items-center justify-between">
-                                <h6 class="text-gray-700">{{ __('Search blog') }}</h6>
+        <div class="flex flex-col lg:flex-row justify-between mb-4">
+            <aside class="w-full lg:w-1/5 mb-4 lg:mb-0 space-y-2 mx-4">
+                <article class="card-group-item" id="search-open" x-data="{ searchOpen: true }">
+                    <header class="px-2 py-3 bg-gray-200" @click="searchOpen = ! searchOpen">
+                        <div class="flex items-center justify-between">
+                            <h6 class="text-gray-700">{{ __('Search blog') }}</h6>
+
+                            <template x-if="searchOpen">
                                 <x-fas-chevron-down class="w-4 h-4"/>
-                            </a>
-                        </header>
+                            </template>
 
-                        <div class="p-4 collapse show" id="filter-keyword">
-                            <form wire:submit="search" class="pb-3">
-                                <input
-                                    wire:model="keyword"
-                                    class="form-control mb-3" placeholder="{{ __('Keyword') }}" name="keyword"
-                                    type="text"
+                            <template x-if="!searchOpen">
+                                <x-fas-chevron-up class="w-4 h-4"/>
+                            </template>
+                        </div>
+                    </header>
+
+                    <template x-teleport="#search-open">
+                        <div
+                            class="flex flex-row gap-x-2 items-center p-4"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 scale-90"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-300"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-90"
+                            x-show="searchOpen">
+                            <div wire:loading wire:target="keyword">
+                                <x-heroicon-o-arrow-path class="animate-spin h-5 w-5 text-blue-500"/>
+                            </div>
+
+                            <form>
+                                <x-input
+                                    right-icon="magnifying-glass"
+                                    placeholder="Keywords"
+                                    wire:model.live.debounce.500ms="keyword"
+                                    class="w-full"
+                                    wire:loading.attr="disabled"
                                 />
-
-                                <button type="submit" class="btn btn-outline-primary btn-block">
-                                    <x-fas-search class="w-4 h-4"/>
-                                    {{ __('Search') }}
-                                </button>
                             </form>
                         </div>
-                    </article>
+                    </template>
+                </article>
 
-                    <article class="card-group-item">
-                        <header class="p-4 bg-gray-200">
-                            <a href="#" data-toggle="collapse" data-target="#filter-event-type"
-                               class="flex items-center justify-between">
-                                <h6 class="text-gray-700">{{ __('Categories') }}</h6>
+                <article id="blog-post-open" x-data="{ blogPostCategories: true }">
+                    <header class="px-2 py-3 bg-gray-200" @click="blogPostCategories = ! blogPostCategories">
+                        <div class="flex items-center justify-between">
+                            <h6 class="text-gray-700">{{ __('Categories') }}</h6>
+
+                            <template x-if="blogPostCategories">
                                 <x-fas-chevron-down class="w-4 h-4"/>
-                            </a>
-                        </header>
-                        <div class="p-4 collapse show" id="filter-event-type">
+                            </template>
+
+                            <template x-if="!blogPostCategories">
+                                <x-fas-chevron-up class="w-4 h-4"/>
+                            </template>
+                        </div>
+                    </header>
+
+                    <template x-teleport="#blog-post-open">
+                        <div
+                            class="flex flex-row gap-x-2 items-center p-4"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 scale-90"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-300"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-90"
+                            x-show="blogPostCategories">
                             <ul class="list-none">
                                 @foreach($blogPostCategories as $category)
                                     <li class="mb-2">
@@ -77,67 +109,73 @@
                                 @endforeach
                             </ul>
                         </div>
-                    </article>
-                    <article class="card-group-item">
-                        <header class="p-4 bg-gray-200">
-                            <a href="#" data-toggle="collapse" data-target="#collapsePopular"
-                               class="flex items-center justify-between">
-                                <h6 class="text-gray-700">{{ __('Popular') }}</h6>
-                                <i class="fa fa-chevron-down"></i>
-                            </a>
-                        </header>
-                        <div class="p-4 collapse show" id="collapsePopular">
-                            @foreach($popularBlogPosts as $popular)
-                                @php
-                                    $currBlogPost = $popular->blogPostTranslations->first()
-                                @endphp
-                                <article class="flex items-center mb-3">
-                                    <div class="w-1/3 pr-2">
-                                        <a href="#">
-                                            <img
-                                                src="{{ $popular->image_name ? $popular->getImagePath() : $popular->getImagePlaceholder() }}"
-                                                class="img-lazy-load img-fluid"
-                                                alt="{{ $currBlogPost?->name }}"
-                                                loading="lazy"
-                                            />
-                                        </a>
-                                    </div>
-                                    <div class="w-2/3">
-                                        <small class="text-gray-500">{{ $popular->blogPostCategory->name }}</small>
-                                        <h6 class="mb-0">
-                                            <a href="#"
-                                               class="text-gray-700">{{ $currBlogPost->name }}</a>
-                                        </h6>
-                                    </div>
-                                </article>
-                            @endforeach
-                        </div>
-                    </article>
-                    <article class="card-group-item">
-                        <header class="p-4 bg-gray-200">
-                            <a href="#" data-toggle="collapse" data-target="#collapseTags"
-                               class="flex items-center justify-between">
-                                <h6 class="text-gray-700">{{ __('Tags') }}</h6>
-                                <i class="fa fa-chevron-down"></i>
-                            </a>
-                        </header>
-                        <div class="p-4 collapse show" id="collapseTags">
-                            @foreach(explode(',', $blogPostTranslation->tags) as $tag)
-                                <a href="{{ route('blog', ['keyword' => $tag]) }}"
-                                   class="btn btn-sm btn-default mr-2 mb-2 mt-2">{{ $tag }}</a>
-                            @endforeach
-                        </div>
-                    </article>
-                    @if(config('settings.newsletter_enabled') == 'yes' && config('settings.mailchimp_api_key') && config('settings.mailchimp_list_id'))
-                        @include('partials.newsletter-box')
-                    @endif
-                </div>
+                    </template>
+                </article>
+
+                <article class="card-group-item">
+                    <header class="p-4 bg-gray-200">
+                        <a href="#" data-toggle="collapse" data-target="#collapsePopular"
+                           class="flex items-center justify-between">
+                            <h6 class="text-gray-700">{{ __('Popular') }}</h6>
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                    </header>
+                    <div class="p-4 collapse show" id="collapsePopular">
+                        @foreach($popularBlogPosts as $popular)
+                            @php
+                                $currBlogPost = $popular->blogPostTranslations->first()
+                            @endphp
+                            <article class="flex items-center mb-3">
+                                <div class="w-1/3 pr-2">
+                                    <a href="#">
+                                        <img
+                                            src="{{ $popular->image_name ? $popular->getImagePath() : $popular->getImagePlaceholder() }}"
+                                            class="img-lazy-load img-fluid"
+                                            alt="{{ $currBlogPost?->name }}"
+                                            loading="lazy"
+                                        />
+                                    </a>
+                                </div>
+                                <div class="w-2/3">
+                                    <small class="text-gray-500">{{ $popular->blogPostCategory->name }}</small>
+                                    <h6 class="mb-0">
+                                        <a href="#"
+                                           class="text-gray-700">{{ $currBlogPost->name }}</a>
+                                    </h6>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                </article>
+
+                <article class="card-group-item">
+                    <header class="p-4 bg-gray-200">
+                        <a href="#" data-toggle="collapse" data-target="#collapseTags"
+                           class="flex items-center justify-between">
+                            <h6 class="text-gray-700">{{ __('Tags') }}</h6>
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                    </header>
+                    <div class="p-4 collapse show" id="collapseTags">
+                        @foreach(explode(',', $blogPostTranslation->tags) as $tag)
+                            <a href="{{ route('blog', ['keyword' => $tag]) }}"
+                               class="btn btn-sm btn-default mr-2 mb-2 mt-2">{{ $tag }}</a>
+                        @endforeach
+                    </div>
+                </article>
+
+                @if(config('settings.newsletter_enabled') == 'yes' && config('settings.mailchimp_api_key') && config('settings.mailchimp_list_id'))
+                    @include('partials.newsletter-box')
+                @endif
             </aside>
+
             <div class="w-full lg:w-3/4 order-0 lg:order-1">
                 <div class="card box">
-                    <img class="card-img-top img-lazy-load"
+                    <img class="card-img-top img-lazy-load w-full object-fit max-h-[80vh]"
+                         loading="lazy"
                          src="{{ $blogPost->image_name ? asset($blogPost->getImagePath()) : $blogPost->getImagePlaceholder() }}"
                          alt="{{ $blogPostTranslation->name }}">
+
                     <div class="card-body">
                         <header class="mb-1">
                             <h1 class="text-3xl">{{ $blogPostTranslation->name }}</h1>
