@@ -30,7 +30,7 @@
         <div class="flex flex-col lg:flex-row justify-between mb-4">
             <aside class="w-full lg:w-1/5 mb-4 lg:mb-0 space-y-2 mx-4">
                 <article class="card-group-item" id="search-open" x-data="{ searchOpen: true }">
-                    <header class="px-2 py-3 bg-gray-200" @click="searchOpen = ! searchOpen">
+                    <header class="p-3 cursor-pointer bg-gray-200 rounded" @click="searchOpen = ! searchOpen">
                         <div class="flex items-center justify-between">
                             <h6 class="text-gray-700">{{ __('Search blog') }}</h6>
 
@@ -72,7 +72,7 @@
                 </article>
 
                 <article id="blog-post-open" x-data="{ blogPostCategories: true }">
-                    <header class="px-2 py-3 bg-gray-200" @click="blogPostCategories = ! blogPostCategories">
+                    <header class="p-3 bg-gray-200 cursor-pointer rounded" @click="blogPostCategories = ! blogPostCategories">
                         <div class="flex items-center justify-between">
                             <h6 class="text-gray-700">{{ __('Categories') }}</h6>
 
@@ -88,7 +88,7 @@
 
                     <template x-teleport="#blog-post-open">
                         <div
-                            class="flex flex-row gap-x-2 items-center p-4"
+                            class="gap-x-2 p-4"
                             x-transition:enter="transition ease-out duration-300"
                             x-transition:enter-start="opacity-0 scale-90"
                             x-transition:enter-end="opacity-100 scale-100"
@@ -98,12 +98,20 @@
                             x-show="blogPostCategories">
                             <ul class="list-none">
                                 @foreach($blogPostCategories as $category)
-                                    <li class="mb-2">
-                                        <a href="{{ route('blog', ['category' => $category->slug]) }}"
-                                           class="flex items-center justify-between">
-                                            <span>{{ $category->name }}</span>
-                                            <span
-                                                class="badge badge-primary">{{ count($category->blogPosts) }}</span>
+                                    @php
+                                        $cat = $category->blogPostCategoryTranslations->first();
+                                    @endphp
+
+                                    <li class="mb-2 w-full">
+                                        <a href="{{ route('blog', ['category' => $cat?->slug]) }}"
+                                           class="flex flex-row items-center justify-between text-blue-400">
+                                            <p class="flex flex-row gap-x-2 items-center">
+                                                <x-fas-chevron-right class="w-3 h-3"/>
+
+                                                {{ $cat?->name }}
+                                            </p>
+
+                                            <x-badge primary label="{{ count($category?->blogPosts) }}"/>
                                         </a>
                                     </li>
                                 @endforeach
@@ -112,56 +120,94 @@
                     </template>
                 </article>
 
-                <article class="card-group-item">
-                    <header class="p-4 bg-gray-200">
-                        <a href="#" data-toggle="collapse" data-target="#collapsePopular"
-                           class="flex items-center justify-between">
+                <article id="popular-blog-post-open" x-data="{ popularBlogPostCategories: true }">
+                    <header class="p-3 bg-gray-200 cursor-pointer rounded"
+                            @click="popularBlogPostCategories = ! popularBlogPostCategories">
+                        <div class="flex items-center justify-between">
                             <h6 class="text-gray-700">{{ __('Popular') }}</h6>
-                            <i class="fa fa-chevron-down"></i>
-                        </a>
+
+                            <template x-if="popularBlogPostCategories">
+                                <x-fas-chevron-down class="w-4 h-4"/>
+                            </template>
+
+                            <template x-if="!blogPostCategories">
+                                <x-fas-chevron-up class="w-4 h-4"/>
+                            </template>
+                        </div>
                     </header>
-                    <div class="p-4 collapse show" id="collapsePopular">
-                        @foreach($popularBlogPosts as $popular)
-                            @php
-                                $currBlogPost = $popular->blogPostTranslations->first()
-                            @endphp
-                            <article class="flex items-center mb-3">
-                                <div class="w-1/3 pr-2">
-                                    <a href="#">
-                                        <img
-                                            src="{{ $popular->image_name ? $popular->getImagePath() : $popular->getImagePlaceholder() }}"
-                                            class="img-lazy-load img-fluid"
-                                            alt="{{ $currBlogPost?->name }}"
-                                            loading="lazy"
-                                        />
-                                    </a>
-                                </div>
-                                <div class="w-2/3">
-                                    <small class="text-gray-500">{{ $popular->blogPostCategory->name }}</small>
-                                    <h6 class="mb-0">
-                                        <a href="#"
-                                           class="text-gray-700">{{ $currBlogPost->name }}</a>
-                                    </h6>
-                                </div>
-                            </article>
-                        @endforeach
-                    </div>
+
+                    <template x-teleport="#popular-blog-post-open">
+                        <div
+                            class="gap-x-2 p-4"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 scale-90"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-300"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-90"
+                            x-show="popularBlogPostCategories">
+                            @foreach($popularBlogPosts as $popular)
+                                @php
+                                    $currBlogPost = $popular->blogPostTranslations->first()
+                                @endphp
+
+                                <article class="flex items-center mb-3">
+                                    <div class="w-1/3 pr-2">
+                                        <a href="#">
+                                            <img
+                                                src="{{ $popular->image_name ? $popular->getImagePath() : $popular->getImagePlaceholder() }}"
+                                                class="img-lazy-load img-fluid h-16 w-16"
+                                                alt="{{ $currBlogPost?->name }}"
+                                                loading="lazy"
+                                            />
+                                        </a>
+                                    </div>
+
+                                    <div class="w-2/3">
+                                        <small class="text-gray-500">{{ $popular->blogPostCategory->name }}</small>
+
+                                        <h6 class="mb-0">
+                                            <a href="#"
+                                               class="text-gray-700 text-truncate">{{ $currBlogPost->name }}</a>
+                                        </h6>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                    </template>
                 </article>
 
-                <article class="card-group-item">
-                    <header class="p-4 bg-gray-200">
-                        <a href="#" data-toggle="collapse" data-target="#collapseTags"
-                           class="flex items-center justify-between">
+                <article id="tags" x-data="{ tags: true }">
+                    <header class="p-3 bg-gray-200 cursor-pointer rounded" @click="tags = ! tags">
+                        <div class="flex items-center justify-between">
                             <h6 class="text-gray-700">{{ __('Tags') }}</h6>
-                            <i class="fa fa-chevron-down"></i>
-                        </a>
+
+                            <template x-if="tags">
+                                <x-fas-chevron-down class="w-4 h-4"/>
+                            </template>
+
+                            <template x-if="!tags">
+                                <x-fas-chevron-up class="w-4 h-4"/>
+                            </template>
+                        </div>
                     </header>
-                    <div class="p-4 collapse show" id="collapseTags">
-                        @foreach(explode(',', $blogPostTranslation->tags) as $tag)
-                            <a href="{{ route('blog', ['keyword' => $tag]) }}"
-                               class="btn btn-sm btn-default mr-2 mb-2 mt-2">{{ $tag }}</a>
-                        @endforeach
-                    </div>
+
+                    <template x-teleport="#tags">
+                        <div
+                            class="gap-x-2 p-4"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 scale-90"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-300"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-90"
+                            x-show="tags">
+                            @foreach(explode(',', $blogPostTranslation->tags) as $tag)
+                                <a href="{{ route('blog', ['keyword' => $tag]) }}"
+                                   class="btn btn-sm btn-default mr-2 mb-2 mt-2">{{ $tag }}</a>
+                            @endforeach
+                        </div>
+                    </template>
                 </article>
 
                 @if(config('settings.newsletter_enabled') == 'yes' && config('settings.mailchimp_api_key') && config('settings.mailchimp_list_id'))
@@ -170,34 +216,46 @@
             </aside>
 
             <div class="w-full lg:w-3/4 order-0 lg:order-1">
-                <div class="card box">
+                <div class="bg-white shadow p-4 rounded">
                     <img class="card-img-top img-lazy-load w-full object-fit max-h-[80vh]"
                          loading="lazy"
                          src="{{ $blogPost->image_name ? asset($blogPost->getImagePath()) : $blogPost->getImagePlaceholder() }}"
-                         alt="{{ $blogPostTranslation->name }}">
+                         alt="{{ $blogPostTranslation->name }}"
+                    />
 
                     <div class="card-body">
-                        <header class="mb-1">
+                        <header class="my-1">
                             <h1 class="text-3xl">{{ $blogPostTranslation->name }}</h1>
                         </header>
-                        <p class="mb-4">
-                            <small class="text-gray-500 mr-2"><a
-                                    href="{{ route('blog', ['category' => $blogPost->blogPostCategory->slug]) }}"><i
-                                        class="fas fa-sitemap"></i> {{ $blogPost->blogPostCategory->name }}
-                                </a></small>
-                            <small class="text-gray-500 mr-2"><i
-                                    class="far fa-clock"></i> {{ $blogPost->created_at->diffForHumans() }}
+
+                        <p class="mb-4 flex items-center gap-x-4">
+                            <small class="text-gray-500">
+                                <a class="flex items-center gap-x-2" href="{{ route('blog', ['category' => $blogPost->blogPostCategory->slug]) }}">
+                                    <x-fas-sitemap class="w-5 h-5"/>
+
+                                    {{ $blogPost->blogPostCategory->name }}
+                                </a>
                             </small>
+
+                            <small class="text-gray-500 flex items-center gap-x-2">
+                                <x-fas-clock class="w-5 h-5"/>
+
+                                {{ $blogPost->created_at->diffForHumans() }}
+                            </small>
+
                             @if($blogPost->readtime)
                                 <small class="text-gray-500"><i
                                         class="fas fa-book-reader"></i> {{ $blogPost->readtime }} {{ __('min read') }}
                                 </small>
                             @endif
                         </p>
+
                         <article>
                             {!! $blogPostTranslation->content !!}
                         </article>
-                        <hr>
+
+                        <hr class="my-12 h-0.5 border-t-0 bg-neutral-200 dark:bg-white/10" />
+
                         <div class="flex flex-wrap">
                             @if($blogPost->tags)
                                 <div class="w-full lg:w-1/2 text-center lg:text-left">
@@ -207,10 +265,12 @@
                                     @endforeach
                                 </div>
                             @endif
+
                             <div class="w-full lg:w-1/2 text-center lg:text-right sharer mt-3">
                                 <!-- Social media share buttons can be added here -->
                             </div>
                         </div>
+
                         @if(config('settings.blog_comments_enabled') != 'no')
                             <div class="mt-5">
                                 @if(config('settings.blog_comments_enabled') == 'native')

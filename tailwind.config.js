@@ -14,5 +14,12 @@ export default {
     theme: {
         extend: {},
     },
-    plugins: [],
+    plugins: [
+        require('@tailwindcss/forms'),
+        require('@tailwindcss/aspect-ratio'),
+        require('@tailwindcss/typography')
+    ],
+    presets: [
+        require('./vendor/wireui/wireui/tailwind.config.js')
+    ],
 }

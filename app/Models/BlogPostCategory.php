@@ -49,6 +49,13 @@ class BlogPostCategory extends Model
             ->first()?->slug;
     }
 
+    public function getNameAttribute()
+    {
+        return $this->blogPostCategoryTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->name;
+    }
+
     /**
      * @return HasMany
      */
