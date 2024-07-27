@@ -132,6 +132,13 @@ class Venue extends Model
         return $this->street . " " . $this->street2 . ", " . $this->city . " " . $this->state . " " . $this->postalcode;
     }
 
+    public function getSlugAttribute()
+    {
+        return $this->venueTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->slug;
+    }
+
     public function getNameAttribute()
     {
         return $this->venueTranslations()

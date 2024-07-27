@@ -14,6 +14,7 @@ use App\Livewire\OrganizerProfile;
 use App\Livewire\Pages;
 use App\Livewire\ToursAndAdventure;
 use App\Livewire\Venue;
+use App\Livewire\Venues;
 use App\Livewire\WorkshopTraining;
 use Illuminate\Support\Facades\Route;
 
@@ -51,4 +52,6 @@ Route::get('/blog-article/{slug}', BlogArticle::class)->name('blog-article');
 
 Route::get('/order/print-ticket/{record}', PrintTicket::class)->name('print-ticket');
 
-Route::get('/venues', Venue::class)->name('venue');
+Route::get('/venues', Venues::class)->name('venues');
+
+Route::get('/venue/{slug}', Venue::class)->name('venue');

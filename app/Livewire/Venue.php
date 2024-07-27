@@ -2,53 +2,46 @@
 
 namespace App\Livewire;
 
-use App\Models\Venue as ModelsVenue;
-use Livewire\Attributes\Title;
+use App\Models\VenueTranslation;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class Venue extends Component
 {
-    use WithPagination;
+    public $venue;
 
-    public $created_at = 'desc';
+    public $venueTranslation;
 
-    public $name;
+    #[Validate('required|email')]
+    public $email;
 
-    public $country;
+    #[Validate('required')]
+    public $phone;
 
-    public function search()
+    #[Validate('required')]
+    public $guests;
+
+    #[Validate('required')]
+    public $note;
+
+    public function mount(string $slug)
     {
-        $this->resetPage();
+        $this->venueTranslation = VenueTranslation::where('slug', $slug)->firstOrFail();
+
+        $this->venue = $this->venueTranslation->venue;
     }
 
-    #[Title("Venue | 'Aafno Ticket Nepal'")]
+    /**
+     * @return void
+     */
+    public function submit()
+    {
+        $this->validate();
+    }
+
     public function render()
     {
-        $venues = ModelsVenue::query()
-            ->with([
-                'venueTranslations' => function ($query) {
-                    $query
-                        ->when(
-                            $this->name,
-                            fn($query, $name) => $query->where('name', 'like', '%' . $name . '%')
-                        );
-                },
-                'venueType',
-                'country' => function ($query) {
-                    $query->when(
-                        $this->country,
-                        fn($query) => $query->where('id', $this->country)
-                    );
-                }
-            ])
-            ->orderBy("created_at", $this->created_at)
-            ->paginate(8);
-
-
-        return view('livewire.venue', [
-            'venues' => $venues,
-            'total_venue' => ModelsVenue::count(),
-        ]);
+        return view('livewire.venue')
+            ->title($this->venueTranslation->name . " | 'Aafno Ticket Nepal'");
     }
 }

@@ -43,5 +43,9 @@ Breadcrumbs::for('contact-us')
 Breadcrumbs::for('payment-delivery-and-return')
     ->push('Payment Delivery and Return');
 
+Breadcrumbs::for('venues')
+    ->push('Venues');
+
 Breadcrumbs::for('venue')
-    ->push('venue');
+    ->push('Venues', route('venues'))
+    ->push('Venue Detail');
