@@ -6,9 +6,10 @@ use App\Traits\ImageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $venue_id
@@ -63,6 +64,14 @@ class VenueImage extends Model
         self::updating(function ($model) {
             self::saveImage($model, 'venues');
         });
+    }
+
+    /**
+     * @return string
+     */
+    public function getImagePath(): string
+    {
+        return Storage::disk('public')->url("venues/" . $this->image_name);
     }
 
     /**

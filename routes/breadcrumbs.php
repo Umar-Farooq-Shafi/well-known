@@ -39,3 +39,9 @@ Breadcrumbs::for('blog-article')
 
 Breadcrumbs::for('contact-us')
     ->push('Contact Us');
+
+Breadcrumbs::for('payment-delivery-and-return')
+    ->push('Payment Delivery and Return');
+
+Breadcrumbs::for('venue')
+    ->push('venue');

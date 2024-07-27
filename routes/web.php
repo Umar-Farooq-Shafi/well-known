@@ -13,6 +13,7 @@ use App\Livewire\Movies;
 use App\Livewire\OrganizerProfile;
 use App\Livewire\Pages;
 use App\Livewire\ToursAndAdventure;
+use App\Livewire\Venue;
 use App\Livewire\WorkshopTraining;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,8 @@ Route::prefix('page')->group(function () {
     Route::get('/about-us', Pages\AboutUs::class)->name('about-us');
 
     Route::get('/contact-us', Pages\ContactUs::class)->name('contact-us');
+
+    Route::get('/payment-delivery-and-return', Pages\PaymentDeliveryAndReturn::class)->name('payment-delivery-and-return');
 });
 
 Route::get('/blog', Blog::class)->name('blog');
@@ -47,3 +50,5 @@ Route::get('/blog', Blog::class)->name('blog');
 Route::get('/blog-article/{slug}', BlogArticle::class)->name('blog-article');
 
 Route::get('/order/print-ticket/{record}', PrintTicket::class)->name('print-ticket');
+
+Route::get('/venues', Venue::class)->name('venue');

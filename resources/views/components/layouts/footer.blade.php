@@ -7,7 +7,7 @@
                     <li><a href="{{ route('about-us') }}" class="text-gray-600 hover:text-gray-800">About us</a></li>
                     <li><a href="{{ route('help-center') }}" class="text-gray-600 hover:text-gray-800">Help center</a></li>
                     <li><a href="{{ route('blog') }}" class="text-gray-600 hover:text-gray-800">Blog</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">Venues</a></li>
+                    <li><a href="{{ route('venue') }}" class="text-gray-600 hover:text-gray-800">Venues</a></li>
                     <li><a href="{{ route('contact-us') }}" class="text-gray-600 hover:text-gray-800">Send us an email</a></li>
                 </ul>
             </div>
@@ -18,7 +18,7 @@
                     <li><a href="#" class="text-gray-600 hover:text-gray-800">Sell tickets online</a></li>
                     <li><a href="#" class="text-gray-600 hover:text-gray-800">My tickets</a></li>
                     <li><a href="{{ route('filament.admin.auth.password-reset.request') }}" class="text-gray-600 hover:text-gray-800">Forgot your password?</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">Payment, delivery and return</a></li>
+                    <li><a href="{{ route('payment-delivery-and-return') }}" class="text-gray-600 hover:text-gray-800">Payment, delivery and return</a></li>
                 </ul>
             </div>
             <div>

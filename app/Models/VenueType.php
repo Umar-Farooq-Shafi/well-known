@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $hidden
@@ -41,6 +41,13 @@ class VenueType extends Model
     protected $fillable = [
         'hidden'
     ];
+
+    public function getNameAttribute()
+    {
+        return $this->venueTypeTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->name;
+    }
 
     /**
      * @return HasMany
