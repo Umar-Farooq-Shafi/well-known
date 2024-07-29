@@ -18,6 +18,8 @@ use App\Livewire\Venues;
 use App\Livewire\WorkshopTraining;
 use Illuminate\Support\Facades\Route;
 
+Route::feeds();
+
 Route::get('/', Home::class)->name('home');
 
 Route::get('/event/{slug}', Event::class)->name('event');

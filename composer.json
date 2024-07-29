@@ -21,6 +21,7 @@
         "livewire/livewire": "^3.5",
         "owenvoke/blade-fontawesome": "^2.6",
         "simplesoftwareio/simple-qrcode": "^4.2",
+        "spatie/laravel-feed": "^4.4",
         "spatie/laravel-pdf": "^1.5",
         "spatie/laravel-sitemap": "^7.2",
         "stechstudio/filament-impersonate": "^3.9",

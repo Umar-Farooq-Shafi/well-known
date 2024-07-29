@@ -13,37 +13,79 @@
 @endpush
 
 <div class="container mx-auto p-6">
+    <div class="bg-gray-100 flex items-center justify-between p-4 mb-4">
+        <p><span class="font-semibold">{{ $events_count }}</span> event(s) found</p>
+
+        <a href="/rss" target="_blank" class="p-2 rounded-full bg-[#90ccf4]">
+            <x-fas-rss class="h-4 w-4 text-blue-500"/>
+        </a>
+    </div>
+
     <div class="flex flex-col lg:flex-row justify-between mb-4">
         <!-- Sidebar -->
         <div class="w-full lg:w-1/4 mb-4 lg:mb-0 space-y-2 mx-4">
-            <form wire:submit="search">
-                <x-input
-                    label="Keyword"
-                    wire:model="query"
-                    placeholder="Enter keywords"
-                />
+            <form class="flex flex-col gap-y-4">
+                <div class="flex flex-row gap-x-2">
+                    <div wire:loading wire:target="query">
+                        <x-heroicon-o-arrow-path class="animate-spin h-5 mt-8 w-5 text-blue-500"/>
+                    </div>
 
-                <x-select
-                    label="Categories"
-                    placeholder="Select an option"
-                    wire:model.defer="category"
-                    option-label="name"
-                    option-value="id"
-                    :async-data="route('api.events.categories')"
-                />
+                    <x-input
+                        label="Keyword"
+                        wire:model.live.debounce.500ms="query"
+                        wire:loading.attr="disabled"
+                        placeholder="Enter keywords"
+                    />
+                </div>
 
-                <div class="flex flex-col gap-y-2 p-4 my-4 border">
-                    <x-checkbox id="label" label="Online events only" md/>
-
-                    <x-checkbox id="label" label="Local events only" md/>
+                <div class="flex flex-row gap-x-2">
+                    <div wire:loading wire:target="category">
+                        <x-heroicon-o-arrow-path class="animate-spin h-5 mt-8 w-5 text-blue-500"/>
+                    </div>
 
                     <x-select
-                        label="Country"
-                        placeholder="Select a country"
+                        label="Categories"
+                        placeholder="Select an option"
+                        wire:model.live.debounce.500ms="category"
                         option-label="name"
                         option-value="id"
-                        :async-data="route('api.events.country')"
+                        wire:loading.attr="disabled"
+                        :async-data="route('api.events.categories')"
                     />
+                </div>
+
+                <div class="flex flex-col gap-y-2 p-4 border">
+                    <x-checkbox
+                        id="is_online"
+                        wire:model.live.debounce.500ms="is_online"
+                        wire:loading.attr="disabled"
+                        label="Online events only"
+                        md
+                    />
+
+                    <x-checkbox
+                        id="is_local"
+                        label="Local events only"
+                        wire:model.live.debounce.500ms="is_local"
+                        wire:loading.attr="disabled"
+                        md
+                    />
+
+                    <div class="flex flex-row gap-x-2">
+                        <div wire:loading wire:target="country">
+                            <x-heroicon-o-arrow-path class="animate-spin h-5 mt-8 w-5 text-blue-500"/>
+                        </div>
+
+                        <x-select
+                            label="Country"
+                            placeholder="Select a country"
+                            wire:model.live.debounce.500ms="country"
+                            wire:loading.attr="disabled"
+                            option-label="name"
+                            option-value="id"
+                            :async-data="route('api.events.country')"
+                        />
+                    </div>
                 </div>
 
                 <div class="flex flex-col gap-y-2 p-4 border">
@@ -121,10 +163,6 @@
                         </div>
 
                     </div>
-                </div>
-
-                <div class="flex justify-center w-full">
-                    <x-button label="Search" lg icon="magnifying-glass" interaction="negative" gray type="submit"/>
                 </div>
             </form>
         </div>

@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Feed\Feedable;
+use Spatie\Feed\FeedItem;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $category_id
@@ -107,7 +109,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read mixed $name
  * @mixin \Eloquent
  */
-class Event extends Model
+class Event extends Model implements Feedable
 {
     use HasFactory, SoftDeletes, ImageTrait;
 
@@ -163,6 +165,13 @@ class Event extends Model
         return $this->eventTranslations()
             ->where('locale', app()->getLocale())
             ->first()?->name;
+    }
+
+    public function getSlugAttribute()
+    {
+        return $this->eventTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->slug;
     }
 
     /**
@@ -258,4 +267,15 @@ class Event extends Model
         return $this->belongsTo(Country::class);
     }
 
+    public function toFeedItem(): FeedItem
+    {
+        return FeedItem::create()
+            ->id($this->id)
+            ->title($this->name)
+            ->link(env('APP_URL') . '/event/' . $this->slug)
+            ->category($this->category->name)
+            ->summary($this->created_at)
+            ->authorName(auth()->user()->username)
+            ->updated($this->updated_at);
+    }
 }
