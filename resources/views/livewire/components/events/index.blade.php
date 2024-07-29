@@ -89,19 +89,61 @@
                 </div>
 
                 <div class="flex flex-col gap-y-2 p-4 border">
-                    <x-radio id="day-today" wire:model="day" name="day" label="Today" value="today" md/>
-                    <x-radio id="day-tomorrow" wire:model="day" name="day" label="Tomorrow" value="tomorrow" md/>
-                    <x-radio id="day-this-weekend" wire:model="day" name="day" label="This Weekend"
-                             value="this-weekend"
-                             md/>
-                    <x-radio id="day-this-week" wire:model="day" name="day" label="This Week" value="this-week" md/>
-                    <x-radio id="day-next-week" wire:model="day" name="day" label="Next Week" value="next-week" md/>
-                    <x-radio id="day-this-month" wire:model="day" name="day" label="This Month" value="this-month"
-                             md/>
-                    <x-radio id="day-next-month" wire:model="day" name="day" label="Next Month" value="next-month"
-                             md/>
-                    <x-radio id="day-pick-date" wire:model="day" name="day" label="Pick a date" value="pick-date"
-                             md/>
+                    <x-radio
+                        id="day-today"
+                        wire:model.live.debounce.500ms="day"
+                        wire:loading.attr="disabled"
+                        name="day" label="Today" value="today" md
+                    />
+
+                    <x-radio
+                        id="day-tomorrow"
+                        wire:model.live.debounce.500ms="day"
+                        wire:loading.attr="disabled"
+                        name="day" label="Tomorrow" value="tomorrow" md
+                    />
+
+                    <x-radio
+                        id="day-this-weekend"
+                        wire:model.live.debounce.500ms="day"
+                        wire:loading.attr="disabled"
+                        name="day" label="This Weekend" value="this-weekend" md
+                    />
+
+                    <x-radio
+                        id="day-this-week"
+                        wire:model.live.debounce.500ms="day"
+                        wire:loading.attr="disabled"
+                        name="day" label="This Week" value="this-week" md
+                    />
+
+                    <x-radio
+                        id="day-next-week"
+                        wire:model.live.debounce.500ms="day"
+                        wire:loading.attr="disabled"
+                        name="day" label="Next Week" value="next-week" md
+                    />
+
+                    <x-radio
+                        id="day-this-month"
+                        wire:model.live.debounce.500ms="day"
+                        wire:loading.attr="disabled"
+                        name="day" label="This Month" value="this-month" md
+                    />
+
+                    <x-radio
+                        id="day-next-month"
+                        wire:model.live.debounce.500ms="day"
+                        wire:loading.attr="disabled"
+                        name="day" label="Next Month" value="next-month" md
+                    />
+
+                    <x-radio
+                        id="day-pick-date"
+                        wire:model.live.debounce.500ms="day"
+                        wire:loading.attr="disabled"
+                        name="day" label="Pick a date" value="pick-date" md
+                    />
                 </div>
 
                 @if($day === 'pick-date')

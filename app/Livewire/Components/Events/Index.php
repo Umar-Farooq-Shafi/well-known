@@ -24,6 +24,8 @@ class Index extends Component
 
     public $country;
 
+    public $customDate;
+
     public function mount(?int $category = null)
     {
         $this->category = $category;
@@ -72,6 +74,59 @@ class Index extends Component
                         'eventDates',
                         function ($query) {
                             $query->where('online', !$this->is_local);
+                        }
+                    );
+                }
+            )
+            ->when(
+                $this->day,
+                function (Builder $query, string $day) {
+                    $query->whereHas(
+                        'eventDates',
+                        function (Builder $query) use ($day) {
+                            if ($day === 'today') {
+                                $query->whereDate('startdate', '=', now());
+                            }
+
+                            if ($day === 'tomorrow') {
+                                $query->whereDate('startdate', '=', now()->subDay());
+                            }
+
+                            if ($day === 'this-weekend') {
+                                $query->whereDate('startdate', '>=', now()->startOfWeek())
+                                    ->whereDate('startdate', '<=', now()->endOfWeek());
+                            }
+
+                            if ($day === 'this-week') {
+                                $query->whereDate('startdate', '>=', now()->endOfWeek()->subDays(2))
+                                    ->whereDate('startdate', '<=', now()->endOfWeek());
+                            }
+
+                            if ($day === 'next-week') {
+                                $query->whereDate('startdate', '>=', now()->startOfWeek())
+                                    ->whereDate('startdate', '<=', now()->endOfWeek()->addDays(7));
+                            }
+
+                            if ($day === 'this-month') {
+                                $query->whereDate('startdate', '>=', now()->startOfMonth())
+                                    ->whereDate('startdate', '<=', now()->endOfMonth());
+                            }
+
+                            if ($day === 'next-month') {
+                                $query->whereDate('startdate', '>=', now()->startOfMonth()->addDays(1))
+                                    ->whereDate('startdate', '<=', now()->endOfMonth()->addMonth());
+                            }
+                        }
+                    );
+                }
+            )
+            ->when(
+                $this->customDate,
+                function (Builder $query, string $customDate) {
+                    $query->whereHas(
+                        'eventDates',
+                        function (Builder $query) use ($customDate) {
+                            $query->whereDate('startdate', '=', $customDate);
                         }
                     );
                 }
