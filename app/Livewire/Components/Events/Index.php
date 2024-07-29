@@ -26,6 +26,12 @@ class Index extends Component
 
     public $customDate;
 
+    public $is_free;
+
+    public $minPrice;
+
+    public $maxPrice;
+
     public function mount(?int $category = null)
     {
         $this->category = $category;
@@ -63,6 +69,48 @@ class Index extends Component
                         'eventDates',
                         function ($query) {
                             $query->where('online', $this->is_online);
+                        }
+                    );
+                }
+            )
+            ->when(
+                $this->is_free,
+                function (Builder $query) {
+                    $query->whereHas(
+                        'eventDates',
+                        function (Builder $query) {
+                            $query->whereHas(
+                                'eventDateTickets',
+                                fn (Builder $query) => $query->where('free', $this->is_free)
+                            );
+                        }
+                    );
+                }
+            )
+            ->when(
+                $this->minPrice,
+                function (Builder $query) {
+                    $query->whereHas(
+                        'eventDates',
+                        function (Builder $query) {
+                            $query->whereHas(
+                                'eventDateTickets',
+                                fn (Builder $query) => $query->where('price', '>=', $this->minPrice)
+                            );
+                        }
+                    );
+                }
+            )
+            ->when(
+                $this->maxPrice,
+                function (Builder $query) {
+                    $query->whereHas(
+                        'eventDates',
+                        function (Builder $query) {
+                            $query->whereHas(
+                                'eventDateTickets',
+                                fn (Builder $query) => $query->where('price', '<=', $this->maxPrice)
+                            );
                         }
                     );
                 }
