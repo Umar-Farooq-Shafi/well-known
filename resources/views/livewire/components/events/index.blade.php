@@ -173,10 +173,9 @@
                                        step="100"
                                        x-bind:min="min" x-bind:max="max"
                                        x-on:input="mintrigger"
-                                       wire:model=""
                                        wire:model.live.debounce.500ms="minPrice"
                                        wire:loading.attr="disabled"
-                                       class="absolute pointer-events-none appearance-none z-20 h-2 w-full opacity-0 cursor-pointer">
+                                       class="absolute pointer-events-none appearance-none z-20 h-2 w-full opacity-0 cursor-pointer"/>
 
                                 <input type="range"
                                        step="100"
@@ -184,21 +183,21 @@
                                        x-on:input="maxtrigger"
                                        wire:model.live.debounce.500ms="maxPrice"
                                        wire:loading.attr="disabled"
-                                       class="absolute pointer-events-none appearance-none z-20 h-2 w-full opacity-0 cursor-pointer">
+                                       class="absolute pointer-events-none appearance-none z-20 h-2 w-full opacity-0 cursor-pointer"/>
 
-                                <div class="relative z-10 h-2">
+                                <div class="relative h-2">
 
                                     <div
-                                        class="absolute z-10 left-0 right-0 bottom-0 top-0 rounded-md bg-gray-200"></div>
+                                        class="absolute left-0 right-0 bottom-0 top-0 rounded-md bg-gray-200"></div>
 
-                                    <div class="absolute z-20 top-0 bottom-0 rounded-md bg-blue-300"
+                                    <div class="absolute top-0 bottom-0 rounded-md bg-blue-300"
                                          x-bind:style="'right:'+maxthumb+'%; left:'+minthumb+'%'"></div>
 
-                                    <div class="absolute z-30 w-6 h-6 top-0 left-0 bg-blue-300 rounded-full -mt-2 -ml-1"
+                                    <div class="absolute w-6 h-6 top-0 left-0 bg-blue-300 rounded-full -mt-2 -ml-1"
                                          x-bind:style="'left: '+minthumb+'%'"></div>
 
                                     <div
-                                        class="absolute z-30 w-6 h-6 top-0 right-0 bg-blue-300 rounded-full -mt-2 -mr-3"
+                                        class="absolute w-6 h-6 top-0 right-0 bg-blue-300 rounded-full -mt-2 -mr-3"
                                         x-bind:style="'right: '+maxthumb+'%'"></div>
 
                                 </div>
@@ -251,8 +250,8 @@
     <script>
         function range() {
             return {
-                minprice: 1000,
-                maxprice: 7000,
+                minprice: 0,
+                maxprice: 10000,
                 min: 100,
                 max: 10000,
                 minthumb: 0,

@@ -421,8 +421,8 @@
     <script>
         function range() {
             return {
-                minprice: 1000,
-                maxprice: 7000,
+                minprice: 0,
+                maxprice: 10000,
                 min: 100,
                 max: 10000,
                 minthumb: 0,
