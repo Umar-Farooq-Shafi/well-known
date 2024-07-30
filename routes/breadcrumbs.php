@@ -49,3 +49,7 @@ Breadcrumbs::for('venues')
 Breadcrumbs::for('venue')
     ->push('Venues', route('venues'))
     ->push('Venue Detail');
+
+Breadcrumbs::for('add-review')
+    ->push('Events', route('events'))
+    ->push('Add Review');

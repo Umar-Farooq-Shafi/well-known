@@ -6,7 +6,8 @@
         ->where('locale', app()->getLocale())
         ->first();
 
-    $country = $eventTranslation?->event?->country?->code;
+    $event = $eventTranslation->event;
+    $country = $event?->country?->code;
 
     $componentName = 'flag-4x3-' . strtolower($country);
 @endphp
@@ -20,12 +21,12 @@
     </div>
 
     <div class="w-full">
-        <img src="{{ Storage::url('events/' . $eventTranslation->event->image_name) }}" alt="Canyon Swing"
+        <img src="{{ Storage::url('events/' . $event->image_name) }}" alt="Canyon Swing"
              loading="lazy"
              class="object-contain z-10 w-full relative opacity-100 p-8 h-[50rem]"/>
 
         <div class="absolute top-[13rem] opacity-75 bg-gradient-to-b blur-xl bg-cover h-[40rem] bg-no-repeat w-full"
-             style="background-image: url({{ Storage::url('events/' . $eventTranslation->event->image_name) }})"
+             style="background-image: url({{ Storage::url('events/' . $event->image_name) }})"
         >
         </div>
     </div>
