@@ -16,6 +16,10 @@ class Event extends Component
 
     public function render()
     {
-        return view('livewire.event');
+        $reviews = $this->eventTranslation->event->reviews;
+
+        return view('livewire.event', [
+            'reviews' => $reviews
+        ]);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PrintTicket;
+use App\Livewire\AddReview;
 use App\Livewire\AllCategories;
 use App\Livewire\Blog;
 use App\Livewire\BlogArticle;
@@ -23,6 +24,8 @@ Route::feeds();
 Route::get('/', Home::class)->name('home');
 
 Route::get('/event/{slug}', Event::class)->name('event');
+
+Route::get('/event/my-reviews/{slug}/add', AddReview::class)->name('add-review');
 
 Route::get('/events', Events::class)->name('events');
 
