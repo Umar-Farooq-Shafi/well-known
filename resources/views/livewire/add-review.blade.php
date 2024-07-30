@@ -7,6 +7,19 @@
     </div>
 
     <div class="container mx-auto p-6">
+        <div class="flex justify-between items-center">
+            <div class="flex gap-x-6">
+                <img
+                    loading="lazy"
+                    class="w-52 h-52"
+                    alt="{{ $eventTranslation->name }}"
+                    src="{{ \Illuminate\Support\Facades\Storage::url('events/' . $event->image_name) }}"
+                />
+
+                <h1 class="text-3xl font-semibold text-blue-400">{{ $eventTranslation->name }}</h1>
+            </div>
+        </div>
+
 
     </div>
 </div>
