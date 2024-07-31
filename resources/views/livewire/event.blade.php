@@ -36,8 +36,17 @@
             <div class="mt-8 p-6">
                 <h1 class="text-2xl font-bold mb-4">{{ $eventTranslation->name }}</h1>
                 <div class="flex items-center mb-4">
-                    <span class="text-blue-500">★★★☆☆</span>
-                    <span class="ml-2 text-gray-600">(1 review)</span>
+                    <div class="flex gap-x-1">
+                        @for($i = 0; $i < $averageRating; $i++)
+                            <x-heroicon-s-star class="w-4 h-4 text-blue-600"/>
+                        @endfor
+
+                        @for($i = $averageRating; $i < 5; $i++)
+                            <x-heroicon-o-star class="w-4 h-4"/>
+                        @endfor
+                    </div>
+
+                    <span class="ml-2 text-gray-600">({{ count($reviews) }} review)</span>
                 </div>
 
                 <h1 class="mb-4">Description</h1>
@@ -73,51 +82,85 @@
                 <div class="flex justify-between items-center">
                     <h2 class="text-xl font-bold mb-4">{{ count($reviews) }} review</h2>
 
-                    @if(auth()->user()->hasRole('ROLE_ATTENDEE'))
-                        <x-button href="{{ route('add-review', ['slug' => $eventTranslation->slug]) }}"
-                                  label="ADD YOUR REVIEW" icon="star" teal/>
+                    @if(auth()->user()?->hasRole('ROLE_ATTENDEE'))
+                        @if($event->reviews()->where('user_id', auth()->id())->exists())
+                            <x-button
+                                href="{{ route('filament.admin.resources.reviews.index') }}"
+                                label="MY REVIEWS" icon="star"
+                                teal
+                            />
+                        @else
+                            <x-button
+                                href="{{ route('add-review', ['slug' => $eventTranslation->slug]) }}"
+                                label="ADD YOUR REVIEW" icon="star"
+                                teal
+                            />
+                        @endif
                     @endif
                 </div>
 
                 <div class="mb-4">
                     <div class="flex items-center mb-2">
-                        <span class="text-blue-500">★★★☆☆</span>
-                        <span class="ml-2 text-gray-600">3 out of 5 stars</span>
+                        <div class="flex gap-x-1">
+                            @for($i = 0; $i < $averageRating; $i++)
+                                <x-heroicon-s-star class="w-4 h-4 text-blue-600"/>
+                            @endfor
+
+                            @for($i = $averageRating; $i < 5; $i++)
+                                <x-heroicon-o-star class="w-4 h-4"/>
+                            @endfor
+                        </div>
+
+                        <span class="ml-2 text-gray-600">{{ (int) $averageRating }} out of 5 stars</span>
                     </div>
 
-                    <div class="flex items-center">
-                        <span class="text-gray-600 mr-2">5 stars</span>
-                        <div class="w-full bg-gray-200 rounded-lg h-4">
-                            <div class="bg-blue-500 h-4 rounded-lg" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-gray-600 mr-2">4 stars</span>
-                        <div class="w-full bg-gray-200 rounded-lg h-4">
-                            <div class="bg-blue-500 h-4 rounded-lg" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-gray-600 mr-2">3 stars</span>
-                        <div class="w-full bg-gray-200 rounded-lg h-4">
-                            <div class="bg-blue-500 h-4 rounded-lg" style="width: 100%;"></div>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-gray-600 mr-2">2 stars</span>
-                        <div class="w-full bg-gray-200 rounded-lg h-4">
-                            <div class="bg-blue-500 h-4 rounded-lg" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-gray-600 mr-2">1 star</span>
-                        <div class="w-full bg-gray-200 rounded-lg h-4">
-                            <div class="bg-blue-500 h-4 rounded-lg" style="width: 0%;"></div>
-                        </div>
+                    <div class="w-full flex flex-col gap-y-2 my-8">
+                        @foreach ([5, 4, 3, 2, 1] as $rating)
+                            <div class="flex items-center gap-x-3 mb-2">
+                                <span class="text-gray-600 mr-2 w-auto whitespace-nowrap">{{ $rating }} stars</span>
+                                <div class="flex-1 bg-gray-200 h-4">
+                                    <div class="bg-blue-500 h-4 rounded" style="width: {{ $ratingPercentages[$rating] }}%;"></div>
+                                </div>
+                                <span class="text-gray-600 ml-2 w-8 whitespace-nowrap">{{ $ratingPercentages[$rating] }}%</span>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
-                <div>
-                    <span class="text-gray-600">Reviewed by Dinesh Karki</span>
+
+                <div class="mt-4 flex flex-col gap-y-4">
+                    @foreach($reviews as $review)
+                        <div class="flex flex-col gap-y-4">
+                            <div class="flex items-center gap-x-2">
+                                <x-avatar sm :src="$review->user->getFilamentAvatarUrl()"/>
+
+                                <p class="text-lg">{{ $review->user->getFullNameAttribute() }}</p>
+                            </div>
+
+                            <div>
+                                <div class="flex gap-x-2 items-center">
+                                    <div class="flex gap-x-1">
+                                        @for($i = 0; $i < $review->rating; $i++)
+                                            <x-heroicon-s-star class="w-4 h-4 text-blue-600"/>
+                                        @endfor
+
+                                        @for($i = $review->rating; $i < 5; $i++)
+                                            <x-heroicon-o-star class="w-4 h-4"/>
+                                        @endfor
+                                    </div>
+
+                                    <p class="text-base text-muted">{{ $review->rating }} out of 5 stars</p>
+                                </div>
+
+                                <p class="text-sm text-muted">{{ $review->created_at }}</p>
+                            </div>
+
+                            <div class="flex flex-col gap-y-1">
+                                <h1 class="font-semibold text-base">{{ $review->headline }}</h1>
+
+                                <p class="text-sm">{{ $review->details }}</p>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>

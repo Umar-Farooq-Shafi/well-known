@@ -11,6 +11,7 @@ use App\Livewire\Events;
 use App\Livewire\HelpCenter;
 use App\Livewire\Home;
 use App\Livewire\Movies;
+use App\Livewire\MyReviews;
 use App\Livewire\OrganizerProfile;
 use App\Livewire\Pages;
 use App\Livewire\ToursAndAdventure;
@@ -21,11 +22,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::feeds();
 
+Route::redirect('/login', '/admin/login')->name('login');
+
 Route::get('/', Home::class)->name('home');
 
 Route::get('/event/{slug}', Event::class)->name('event');
-
-Route::get('/event/my-reviews/{slug}/add', AddReview::class)->name('add-review');
 
 Route::get('/events', Events::class)->name('events');
 
@@ -60,3 +61,7 @@ Route::get('/order/print-ticket/{record}', PrintTicket::class)->name('print-tick
 Route::get('/venues', Venues::class)->name('venues');
 
 Route::get('/venue/{slug}', Venue::class)->name('venue');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/event/my-reviews/{slug}/add', AddReview::class)->name('add-review');
+});
