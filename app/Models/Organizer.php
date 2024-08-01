@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -188,6 +188,19 @@ class Organizer extends Model
             'eventic_organizer_category',
             'Organizer_id',
             'Category_id'
+        );
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function followings(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'eventic_following',
+            'Organizer_id',
+            'User_id'
         );
     }
 

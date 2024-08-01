@@ -31,8 +31,8 @@
         </div>
     </div>
 
-    <div class="flex justify-center rounded-lg shadow-lg bg-white mx-20 my-8">
-        <div class="container w-[60%]">
+    <div class="flex justify-center rounded-lg shadow-lg bg-white mx-28 lg:mx-44 my-8">
+        <div class="container w-[65%]">
             <div class="mt-8 p-6">
                 <h1 class="text-2xl font-bold mb-4">{{ $eventTranslation->name }}</h1>
                 <div class="flex items-center mb-4">
@@ -119,7 +119,8 @@
                             <div class="flex items-center gap-x-3 mb-2">
                                 <span class="text-gray-600 mr-2 w-auto whitespace-nowrap">{{ $rating }} stars</span>
                                 <div class="flex-1 bg-gray-200 h-4">
-                                    <div class="bg-blue-500 h-4 rounded" style="width: {{ $ratingPercentages[$rating] }}%;"></div>
+                                    <div class="bg-blue-500 h-4 rounded"
+                                         style="width: {{ $ratingPercentages[$rating] }}%;"></div>
                                 </div>
                                 <span class="text-gray-600 ml-2 w-8 whitespace-nowrap">{{ $ratingPercentages[$rating] }}%</span>
                             </div>
@@ -173,6 +174,38 @@
                 <x-fas-info-circle class="w-4 h-4"/>
 
                 <p>No tickets on sale at this moment</p>
+            </div>
+
+            <hr class="my-8 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
+
+            <div class="flex flex-col gap-y-2">
+                <div class="flex justify-between items-center text-sm">
+                    <p class="font-semibold">Organizer</p>
+
+                    <a href="#" class="text-blue-400 flex gap-x-1 items-center">
+                        <x-fas-id-card class="w-3 h-3"/>
+
+                        Details
+                    </a>
+                </div>
+
+                <div class="bg-gray-200 flex flex-col gap-y-2 justify-between items-center p-8">
+                    <p class="text-blue-300 font-semibold">{{ $event->organizer->name }}</p>
+
+                    <button type="button"
+                            @if(!$event->organizer->followings()->where('User_id', auth()->id())->exists())
+                                wire:click="followOrganization"
+                            @endif
+                            class="text-white flex gap-x-1 items-center bg-blue-400 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 rounded-lg text-sm px-3 py-1 focus:outline-none">
+                        <x-fas-folder-plus class="w-3 h-3"/>
+
+                        @if($event->organizer->followings()->where('User_id', auth()->id())->exists())
+                            Following
+                        @else
+                            Follow
+                        @endif
+                    </button>
+                </div>
             </div>
         </div>
     </div>

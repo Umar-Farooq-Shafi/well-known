@@ -3,11 +3,14 @@
 namespace App\Livewire;
 
 use App\Models\EventTranslation;
+use App\Models\Organizer;
 use App\Traits\RatingTrait;
 use Livewire\Component;
+use WireUi\Traits\WireUiActions;
 
 class Event extends Component
 {
+    use WireUiActions;
     use RatingTrait;
 
     public ?EventTranslation $eventTranslation = null;
@@ -15,6 +18,17 @@ class Event extends Component
     public function mount(string $slug)
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
+    }
+
+    public function followOrganization(): void
+    {
+        Organizer::find($this->eventTranslation->event->organizer_id)
+            ->followings()->attach(auth()->id());
+
+        $this->notification()->send([
+            'icon' => 'success',
+            'title' => 'Saved!',
+        ]);
     }
 
     public function render()
