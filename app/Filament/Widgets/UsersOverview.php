@@ -10,6 +10,11 @@ class UsersOverview extends BaseWidget
 {
     protected static ?string $pollingInterval = null;
 
+    public static function canView(): bool
+    {
+        return !auth()->user()->hasRole('ROLE_ATTENDEE');
+    }
+
     protected function getStats(): array
     {
         $attendees = User::whereRoles('a:1:{i:0;s:13:"ROLE_ATTENDEE";}')

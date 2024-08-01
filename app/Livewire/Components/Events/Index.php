@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\App;
 use Livewire\Component;
 use Livewire\WithPagination;
+use WireUi\Traits\WireUiActions;
 
 class Index extends Component
 {
     use WithPagination;
+    use WireUiActions;
 
     public $day = '';
 
@@ -40,6 +42,22 @@ class Index extends Component
     public function search()
     {
         $this->resetPage();
+    }
+
+    public function eventFavourite($id)
+    {
+        $event = Event::find($id);
+
+        if ($event->favourites()->where('user_id', auth()->id())->exists()) {
+            $event->favourites()->detach(auth()->id());
+        } else {
+            $event->favourites()->attach(auth()->id());
+        }
+
+        $this->notification()->send([
+            'icon' => 'success',
+            'title' => 'Saved!',
+        ]);
     }
 
     public function render()

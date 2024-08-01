@@ -12,7 +12,7 @@
     </style>
 @endpush
 
-<div class="container mx-auto p-6">
+<div class="container ml-36 mr-44 p-6">
     <div class="bg-gray-100 flex items-center justify-between p-4 mb-4">
         <p><span class="font-semibold">{{ $events_count }}</span> event(s) found</p>
 
@@ -23,7 +23,7 @@
 
     <div class="flex flex-col lg:flex-row justify-between mb-4">
         <!-- Sidebar -->
-        <div class="w-full lg:w-1/4 mb-4 lg:mb-0 space-y-2 mx-4">
+        <div class="w-full lg:w-1/4 mb-4 lg:mb-0 space-y-2 ml-4 mr-8">
             <form class="flex flex-col gap-y-4">
                 <div class="flex flex-row gap-x-2">
                     <div wire:loading wire:target="query">
@@ -223,20 +223,44 @@
 
         <!-- Event Cards -->
         <div class="w-full lg:w-3/4 flex flex-col gap-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 @foreach($events as $event)
-                    <a href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
-                        <div class="border p-4 rounded-lg flex items-center space-x-4">
-                            <img src="{{ Storage::url('events/' . $event->image_name) }}" loading="lazy"
-                                 alt="Bungy and Canyoning Day Trip" class="w-24 h-24 rounded-lg">
 
-                            <div>
-                                <h3 class="text-lg font-semibold">{{ $event->eventTranslations->first()?->name }}</h3>
-                                <span
-                                    class="bg-gray-200 text-sm px-2 py-1 rounded">{{ $event->category->categoryTranslations->first()?->name }}</span>
-                            </div>
+                    <div class="bg-white border border-gray-200 rounded shadow dark:bg-gray-800 dark:border-gray-700">
+                        <a class="relative"
+                           href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
+                            <img
+                                class="w-full h-64 rounded"
+                                src="{{ Storage::url('events/' . $event->image_name) }}"
+                                loading="lazy"
+                                alt="{{ $event->eventTranslations->first()?->name }}    "
+                            />
+
+                            <span
+                                wire:click.prevent="eventFavourite({{ $event->id }})"
+                                class="absolute right-2 -bottom-2 z-10 bg-gray-50 shadow rounded-full p-1">
+                                @if(count($event->favourites))
+                                    <x-heroicon-s-heart class="w-4 h-4"/>
+                                @else
+                                    <x-heroicon-o-heart class="w-4 h-4"/>
+                                @endif
+                            </span>
+
+                        </a>
+
+                        <div class="p-5">
+                            <a href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
+                                <h5 class="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                                    {{ $event->category->categoryTranslations->first()?->name }}
+                                </h5>
+
+                                <p class="mb-3 font-normal text-xl text-gray-700 dark:text-gray-400">
+                                    {{ $event->eventTranslations->first()?->name }}
+                                </p>
+                            </a>
                         </div>
-                    </a>
+                    </div>
+
                 @endforeach
             </div>
 

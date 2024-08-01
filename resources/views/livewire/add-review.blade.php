@@ -20,47 +20,31 @@
                     <h1 class="text-4xl font-semibold text-blue-400">{{ $eventTranslation->name }}</h1>
 
                     <div class="flex items-center mb-4">
-                        <span class="text-blue-500 text-xl">★★★☆☆</span>
-                        <span class="ml-2 text-xl text-gray-600">5 out of 5 stars</span>
+                        <div class="flex gap-x-1">
+                            @for($i = 0; $i < $averageRating; $i++)
+                                <x-heroicon-s-star class="w-4 h-4 text-blue-600"/>
+                            @endfor
+
+                            @for($i = $averageRating; $i < 5; $i++)
+                                <x-heroicon-o-star class="w-4 h-4"/>
+                            @endfor
+                        </div>
+
+                        <span class="ml-2 text-gray-600">({{ $reviews }} review)</span>
                     </div>
                 </div>
             </div>
 
             <div class="w-1/2 flex flex-col gap-y-2">
-                <div class="flex items-center gap-x-3">
-                    <span class="text-gray-600 mr-2 w-auto whitespace-nowrap">5 stars</span>
-                    <div class="flex-1 bg-gray-200 h-4">
-                        <div class="bg-blue-500 h-4 rounded" style="width: 0%;"></div>
+                @foreach ([5, 4, 3, 2, 1] as $rating)
+                    <div class="flex items-center gap-x-3 mb-2">
+                        <span class="text-gray-600 mr-2 w-auto whitespace-nowrap">{{ $rating }} stars</span>
+                        <div class="flex-1 bg-gray-200 h-4">
+                            <div class="bg-blue-500 h-4 rounded" style="width: {{ $ratingPercentages[$rating] }}%;"></div>
+                        </div>
+                        <span class="text-gray-600 ml-2 w-8 whitespace-nowrap">{{ $ratingPercentages[$rating] }}%</span>
                     </div>
-                </div>
-
-                <div class="flex items-center gap-x-3">
-                    <span class="text-gray-600 mr-2 whitespace-nowrap">4 stars</span>
-                    <div class="flex-1 bg-gray-200 h-4">
-                        <div class="bg-blue-500 h-4 rounded" style="width: 0%;"></div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-x-3">
-                    <span class="text-gray-600 mr-2 whitespace-nowrap">3 stars</span>
-                    <div class="flex-1 bg-gray-200 h-4">
-                        <div class="bg-blue-500 h-4 rounded" style="width: 100%;"></div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-x-3">
-                    <span class="text-gray-600 mr-2 whitespace-nowrap">2 stars</span>
-                    <div class="flex-1 bg-gray-200 h-4">
-                        <div class="bg-blue-500 h-4 rounded" style="width: 0%;"></div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-x-3">
-                    <span class="text-gray-600 mx-2 whitespace-nowrap">1 star </span>
-                    <div class="flex-1 bg-gray-200 h-4">
-                        <div class="bg-blue-500 h-4 rounded" style="width: 0%;"></div>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
 

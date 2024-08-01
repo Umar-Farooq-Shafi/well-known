@@ -1,25 +1,46 @@
 @php use Illuminate\Support\Facades\Storage; @endphp
 
 <x-filament-panels::page>
-    <x-filament::section class="mt-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @foreach($events as $event)
-                <div class="inline-block px-3">
-                    <a href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
-                        <div
-                            class="w-72 h-72 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
-                        >
-                            <img class="w-full h-40"
-                                 src="{{ Storage::url('events/' . $event->image_name) }}"
-                                 alt="{{ $event->eventTranslations->first()->name }}"/>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        @foreach($events as $event)
 
-                            <p class="p-2 font-medium text-lg">{{ $event->eventTranslations->first()->name }}</p>
-                        </div>
+            <div class="bg-white border border-gray-200 rounded shadow dark:bg-gray-800 dark:border-gray-700">
+                <a class="relative"
+                   href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
+                    <img
+                        class="w-full h-50 rounded"
+                        src="{{ Storage::url('events/' . $event->image_name) }}"
+                        loading="lazy"
+                        alt="{{ $event->eventTranslations->first()?->name }}    "
+                    />
+
+                    <span
+                        wire:click.prevent="eventFavourite({{ $event->id }})"
+                        class="absolute right-2 -bottom-2 z-10 bg-gray-50 shadow rounded-full p-1">
+                                @if(count($event->favourites))
+                            <x-heroicon-s-heart class="w-4 h-4"/>
+                        @else
+                            <x-heroicon-o-heart class="w-4 h-4"/>
+                        @endif
+                            </span>
+
+                </a>
+
+                <div class="p-5">
+                    <a href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
+                        <h5 class="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                            {{ $event->category->categoryTranslations->first()?->name }}
+                        </h5>
+
+                        <p class="mb-3 font-normal text-xl text-gray-700 dark:text-gray-400">
+                            {{ $event->eventTranslations->first()?->name }}
+                        </p>
                     </a>
                 </div>
-            @endforeach
-        </div>
+            </div>
 
-        {{ $events->links() }}
-    </x-filament::section>
+        @endforeach
+    </div>
+
+    {{ $events->links() }}
 </x-filament-panels::page>

@@ -11,6 +11,11 @@ class EventsOverview extends BaseWidget
 {
     protected static ?string $pollingInterval = null;
 
+    public static function canView(): bool
+    {
+        return !auth()->user()->hasRole('ROLE_ATTENDEE');
+    }
+
     protected function getStats(): array
     {
         $total = Event::count();

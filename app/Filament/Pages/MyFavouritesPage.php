@@ -3,8 +3,10 @@
 namespace App\Filament\Pages;
 
 use App\Models\Event;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\App;
 
 class MyFavouritesPage extends Page
 {
@@ -23,16 +25,38 @@ class MyFavouritesPage extends Page
         return str_contains($role, 'ATTENDEE');
     }
 
+    public function eventFavourite($id)
+    {
+        $event = Event::find($id);
+
+        if ($event->favourites()->where('user_id', auth()->id())->exists()) {
+            $event->favourites()->detach(auth()->id());
+        } else {
+            $event->favourites()->attach(auth()->id());
+        }
+
+        Notification::make()
+            ->title('Saved!')
+            ->success()
+            ->send();
+    }
+
      protected function getViewData(): array
      {
          return array_merge(
              parent::getViewData(),
              [
-                 'events' => Event::with([
-                     'favourites' => function ($query) {
-                         $query->where('User_id', auth()->id());
-                     }
-                 ])->paginate(16)
+                 'events' => Event::query()
+                     ->whereHas(
+                         'favourites',
+                         fn ($query) => $query->where('User_id', auth()->id())
+                     )
+                     ->with([
+                         'category.categoryTranslations' => function ($query) {
+                             $query->where('locale', App::getLocale());
+                         }
+                     ])
+                     ->paginate(16)
              ]
          );
      }

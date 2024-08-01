@@ -11,6 +11,11 @@ class UsersTableOverview extends BaseWidget
 {
     protected int | string | array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        return !auth()->user()->hasRole('ROLE_ATTENDEE');
+    }
+
     public function table(Table $table): Table
     {
         return $table

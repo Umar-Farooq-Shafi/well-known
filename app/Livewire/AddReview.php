@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\EventTranslation;
+use App\Traits\RatingTrait;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -12,6 +13,7 @@ use WireUi\Traits\WireUiActions;
 class AddReview extends Component
 {
     use WireUiActions;
+    use RatingTrait;
 
     public ?EventTranslation $eventTranslation = null;
 
@@ -62,11 +64,20 @@ class AddReview extends Component
             'description' => 'Your review has been submitted.',
         ]);
 
-        $this->redirect(Url::previous());
+        $this->redirect(route(Url::previous()));
     }
 
     public function render()
     {
-        return view('livewire.add-review');
+        $averageRating = $this->calculateAverageRating();
+        $ratingPercentages = $this->calculateRatingPercentages();
+
+        $reviews = $this->event->reviews()->count();
+
+        return view('livewire.add-review', [
+            'averageRating' => $averageRating,
+            'ratingPercentages' => $ratingPercentages,
+            'reviews' => $reviews,
+        ]);
     }
 }
