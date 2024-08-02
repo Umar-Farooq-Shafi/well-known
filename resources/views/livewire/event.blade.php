@@ -182,7 +182,8 @@
                 <div class="flex justify-between items-center text-sm">
                     <p class="font-semibold">Organizer</p>
 
-                    <a href="#" class="text-blue-400 flex gap-x-1 items-center">
+                    <a href="{{ route('organizer-profile', ['slug' => $event->organizer->slug]) }}"
+                       class="text-blue-400 flex gap-x-1 items-center">
                         <x-fas-id-card class="w-3 h-3"/>
 
                         Details
