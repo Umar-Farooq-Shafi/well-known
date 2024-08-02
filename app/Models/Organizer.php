@@ -214,4 +214,12 @@ class Organizer extends Model
         );
     }
 
+    /**
+     * @return HasMany
+     */
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
+
 }

@@ -48,7 +48,7 @@ class Index extends Component
     {
         $event = Event::find($id);
 
-        if ($event->favourites()->where('user_id', auth()->id())->exists()) {
+        if ($event->favourites()->where('User_id', auth()->id())->exists()) {
             $event->favourites()->detach(auth()->id());
         } else {
             $event->favourites()->attach(auth()->id());

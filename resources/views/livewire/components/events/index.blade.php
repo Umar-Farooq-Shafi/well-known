@@ -236,16 +236,17 @@
                                 alt="{{ $event->eventTranslations->first()?->name }}    "
                             />
 
-                            <span
-                                wire:click.prevent="eventFavourite({{ $event->id }})"
-                                class="absolute right-2 -bottom-2 z-10 bg-gray-50 shadow rounded-full p-1">
-                                @if(count($event->favourites))
-                                    <x-heroicon-s-heart class="w-4 h-4"/>
-                                @else
-                                    <x-heroicon-o-heart class="w-4 h-4"/>
-                                @endif
-                            </span>
-
+                            @if(auth()->check())
+                                <span
+                                    wire:click.prevent="eventFavourite({{ $event->id }})"
+                                    class="absolute right-2 -bottom-2 z-10 bg-gray-50 shadow rounded-full p-1">
+                                    @if($event->favourites()->where('User_id', auth()->id())->exists())
+                                        <x-heroicon-s-heart class="w-4 h-4"/>
+                                    @else
+                                        <x-heroicon-o-heart class="w-4 h-4"/>
+                                    @endif
+                                </span>
+                            @endif
                         </a>
 
                         <div class="p-5">
