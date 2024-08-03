@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $event_id
@@ -44,6 +44,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $point_of_sales_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Scanner> $scanners
  * @property-read int|null $scanners_count
+ * @property-read mixed $organizer_payout_amount
+ * @property-read mixed $ticket_price_percentage_cut_sum
+ * @property-read int|float $ticket_sold
+ * @property-read mixed $total_ticket_fees
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PayoutRequest> $payoutRequests
+ * @property-read int|null $payout_requests_count
  * @mixin \Eloquent
  */
 class EventDate extends Model
@@ -66,6 +72,189 @@ class EventDate extends Model
         'recurrent_startdate',
         'recurrent_enddate'
     ];
+
+    public function getTicketSoldAttribute(): float|int
+    {
+        if ($this->getOrderElementsQuantitySum() == 0)
+            return 0;
+
+        return round(($this->getScannedTicketsCount() / $this->getOrderElementsQuantitySum()) * 100);
+    }
+
+    public function getOrganizerPayoutAmountAttribute()
+    {
+        return $this->getSales() - $this->getTicketPricePercentageCutSum() - $this->getSales("ROLE_POINTOFSALE");
+    }
+
+    public function getTicketPricePercentageCutSumAttribute()
+    {
+        return $this->getTicketPricePercentageCutSum();
+    }
+
+    public function getTotalTicketFeesAttribute()
+    {
+        return $this->getTotalTicketFees();
+    }
+
+    public function stringifyStatus(): string
+    {
+        if (!$this->event->organizer->user->enabled) {
+            return "Organizer is disabled";
+        }
+
+        if (!$this->event->published) {
+            return "Event is not published";
+        }
+
+        if (!$this->active) {
+            return "Event date is disabled";
+        }
+
+        if ($this->startdate < new \Datetime) {
+            return "Event already started";
+        }
+
+        if ($this->isSoldOut()) {
+            return "Sold out";
+        }
+
+        if ($this->payoutRequested()) {
+            return "Locked (Payout request " . strtolower($this->payoutRequestStatus()) . ")";
+        }
+
+        if (!$this->hasATicketOnSale()) {
+            return "No ticket on sale";
+        }
+
+        return "On sale";
+    }
+
+    public function stringifyStatusClass()
+    {
+        if (!$this->event->organizer->user->enabled) {
+            return "danger";
+        }
+
+        if (!$this->active) {
+            return "danger";
+        }
+
+        if (!$this->event->published) {
+            return "warning";
+        }
+
+        if ($this->startdate < new \Datetime) {
+            return "info";
+        }
+
+        if ($this->isSoldOut()) {
+            return "warning";
+        }
+
+        if ($this->payoutRequested()) {
+            return "warning";
+        }
+
+        if (!$this->hasATicketOnSale()) {
+            return "danger";
+        }
+
+        return "success";
+    }
+
+    public function hasATicketOnSale(): bool
+    {
+        foreach ($this->eventDateTickets as $ticket) {
+            if ($ticket->isOnSale()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function payoutRequestStatus()
+    {
+        foreach ($this->payoutRequests as $payoutRequest) {
+            if ($payoutRequest->status == 0 || $payoutRequest->status == 1) {
+                return $payoutRequest->stringifyStatus();
+            }
+        }
+
+        return "Unknown";
+    }
+
+
+    public function payoutRequested(): bool
+    {
+        foreach ($this->payoutRequests as $payoutRequest) {
+            if ($payoutRequest->status == 0 || $payoutRequest->status == 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function isSoldOut(): bool
+    {
+        foreach ($this->eventDateTickets as $ticket) {
+            if (!$ticket->isSoldOut()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function getTotalTicketFees(): float|int
+    {
+        return $this->getSales("all", "all", false, true) - $this->getSales();
+    }
+
+    public function getSales($role = "all", $user = "all", $formattedForPayoutApproval = false, $includeFees = false): float|int
+    {
+        $sum = 0;
+
+        foreach ($this->eventDateTickets as $eventDateTicket) {
+            $sum += $eventDateTicket->getSales($role, $user, $formattedForPayoutApproval, $includeFees);
+        }
+
+        return $sum;
+    }
+
+    public function getTicketPricePercentageCutSum($role = "all"): float|int
+    {
+        $sum = 0;
+
+        foreach ($this->eventDateTickets as $eventDateTicket) {
+            $sum += $eventDateTicket->getTicketPricePercentageCutSum($role);
+        }
+
+        return $sum;
+    }
+
+    public function getOrderElementsQuantitySum($status = 1, $user = "all", $role = "all"): int
+    {
+        $sum = 0;
+
+        foreach ($this->eventDateTickets as $ticket) {
+            $sum += $ticket->getOrderElementsQuantitySum($status, $user, $role);
+        }
+
+        return $sum;
+    }
+
+    public function getScannedTicketsCount(): int
+    {
+        $count = 0;
+
+        foreach ($this->eventDateTickets as $ticket) {
+            $count += $ticket->getScannedTicketsCount();
+        }
+
+        return $count;
+    }
 
     /**
      * @return BelongsTo
@@ -114,6 +303,14 @@ class EventDate extends Model
     public function eventDateTickets(): HasMany
     {
         return $this->hasMany(EventDateTicket::class, 'eventdate_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function payoutRequests(): HasMany
+    {
+        return $this->hasMany(PayoutRequest::class, 'event_date_id');
     }
 
 }

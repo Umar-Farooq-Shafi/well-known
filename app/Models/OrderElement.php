@@ -36,6 +36,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderTicket> $orderTickets
  * @property-read int|null $order_tickets_count
  * @property-read mixed $sub_total
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TicketReservation> $ticketReservations
+ * @property-read int|null $ticket_reservations_count
  * @mixin \Eloquent
  */
 class OrderElement extends Model
@@ -57,6 +59,15 @@ class OrderElement extends Model
     public function getSubTotalAttribute()
     {
         return $this->quantity * $this->unitprice;
+    }
+
+    public function getPrice($formattedForPayoutApproval = false): float|int
+    {
+        if ($formattedForPayoutApproval) {
+            return $this->unitprice * $this->quantity;
+        }
+
+        return (float)$this->unitprice * $this->quantity;
     }
 
     /**
@@ -94,7 +105,15 @@ class OrderElement extends Model
      */
     public function displayUnitPrice(): float
     {
-        return (float) $this->unitprice;
+        return (float)$this->unitprice;
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function ticketReservations(): HasMany
+    {
+        return $this->hasMany(TicketReservation::class, 'orderelement_id');
     }
 
 }

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $eventdate_id
@@ -51,6 +51,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereTicketFee($value)
  * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereTicketsperattendee($value)
  * @property-read \App\Models\Currency|null $currency
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TicketReservation> $ticketReservations
+ * @property-read int|null $ticket_reservations_count
  * @mixin \Eloquent
  */
 class EventDateTicket extends Model
@@ -80,12 +82,136 @@ class EventDateTicket extends Model
         'currency_symbol_position'
     ];
 
+    public function getOrderElementsQuantitySum($status = 1, $user = "all", $role = "all"): int
+    {
+        $sum = 0;
+
+        foreach ($this->orderElements as $orderElement) {
+            if (($status == "all" ||
+                    $orderElement?->order?->status === $status) &&
+                ($user == "all" || $orderElement?->order?->user == $user)
+                && ($role == "all" || $orderElement?->order?->user->hasRole($role))) {
+                $sum += $orderElement->quantity;
+            }
+        }
+
+        return $sum;
+    }
+
+    public function getTicketPricePercentageCutSum($role = "all"): float|int
+    {
+        $sum = 0;
+
+        foreach ($this->orderElements as $orderElement) {
+            if ($role == "all" || $orderElement->order?->user->hasRole($role)) {
+                $sum += (($orderElement->order?->ticket_price_percentage_cut * $orderElement->unitprice) / 100) * $orderElement->quantity;
+            }
+        }
+
+        return $sum;
+    }
+
+    public function getTicketsLeftCount(): ?int
+    {
+        return $this->quantity - $this->getOrderElementsQuantitySum() - $this->getValidTicketReservationsQuantitySum();
+    }
+
+    public function isSoldOut(): bool
+    {
+        if ($this->quantity == 0 || $this->getTicketsLeftCount() > 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getValidTicketReservationsQuantitySum($user = null): int
+    {
+        $sum = 0;
+
+        foreach ($this->ticketReservations as $ticketReservation) {
+            if (!$ticketReservation->isExpired() && ($user == null || $ticketReservation->user == $user)) {
+                $sum += $ticketReservation->quantity;
+            }
+        }
+
+        return $sum;
+    }
+
+    public function getScannedTicketsCount(): int
+    {
+        $count = 0;
+
+        foreach ($this->orderElements as $orderElement) {
+            foreach ($orderElement->orderTickets as $ticket) {
+                if ($ticket->scanned)
+                    $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    public function getSales($role = "all", $user = "all", $formattedForPayoutApproval = false, $includeFees = false): float|int
+    {
+        $sum = 0;
+        foreach ($this->orderElements as $orderElement) {
+            if ($orderElement->order?->status === 1 &&
+                ($role == "all" || $orderElement->order?->user?->hasRole($role))
+                && ($user == "all" || $orderElement->order?->user == $user)) {
+                $sum += $orderElement->getPrice($formattedForPayoutApproval);
+            }
+        }
+
+        if ($includeFees) {
+            $sum += $this->getTotalFees();
+        }
+
+        return $sum;
+    }
+
+    public function getTotalFees(): float|int
+    {
+        $sum = 0;
+        $sum += $this->getTotalTicketFees();
+        return $sum;
+    }
+
+    public function getTotalTicketFees($role = "all", $user = "all"): float|int
+    {
+        $sum = 0;
+
+        foreach ($this->orderElements as $orderElement) {
+            if ($orderElement->order?->status === 1
+                && ($role == "all" || $orderElement->order?->user?->hasRole($role))
+                && ($user == "all" || $orderElement->order?->user == $user) && !$this->free) {
+                $sum += $orderElement->order->ticket_fee * $orderElement->quantity;
+            }
+        }
+
+        return $sum;
+    }
+
+    public function isOnSale(): bool
+    {
+        if (!$this->eventDate || !$this->eventDate->event || !$this->eventDate->event->organizer || !$this->eventDate->event->organizer->user) {
+            return false;
+        }
+
+        return $this->eventDate->event->organizer->user->enabled
+            && $this->eventDate->event->published && $this->eventDate->active
+            && ($this->eventDate->startdate >= new \Datetime
+                || ($this->eventDate->recurrent == true && $this->eventDate->recurrent_startdate > new \DateTime()))
+            && $this->active && !$this->isSoldOut() && ($this->salesstartdate < new \Datetime || !$this->salesstartdate)
+            && ($this->salesenddate > new \Datetime || !$this->salesenddate) && (!$this->eventDate->payoutRequested());
+    }
+
     /**
      * @return HasMany
      */
     public function orderElements(): HasMany
     {
-        return $this->hasMany(OrderElement::class);
+        return $this->hasMany(OrderElement::class, 'eventticket_id');
     }
 
     /**
@@ -102,6 +228,14 @@ class EventDateTicket extends Model
     public function currency(): BelongsTo
     {
         return $this->belongsTo(Currency::class, 'currency_code_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function ticketReservations(): HasMany
+    {
+        return $this->hasMany(TicketReservation::class, 'eventticket_id');
     }
 
 }

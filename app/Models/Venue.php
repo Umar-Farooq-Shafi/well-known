@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -85,6 +85,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\Country|null $country
  * @property-read mixed $name
  * @property-read string $stringify_address
+ * @property-read mixed $description
+ * @property-read mixed $slug
  * @mixin \Eloquent
  */
 #[ObservedBy([VenueObserver::class])]

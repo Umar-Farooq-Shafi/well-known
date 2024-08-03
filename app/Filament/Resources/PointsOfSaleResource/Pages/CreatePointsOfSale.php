@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PointsOfSaleResource\Pages;
 use App\Filament\Resources\PointsOfSaleResource;
 use App\Models\PointsOfSale;
 use App\Models\User;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
@@ -12,6 +13,8 @@ use Illuminate\Support\Str;
 
 class CreatePointsOfSale extends CreateRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = PointsOfSaleResource::class;
 
     protected function handleRecordCreation(array $data): Model

@@ -13,7 +13,7 @@ use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $category_id
@@ -107,6 +107,7 @@ use Spatie\Feed\FeedItem;
  * @property-read int|null $favourites_count
  * @method static \Illuminate\Database\Eloquent\Builder|Event whereCompleted($value)
  * @property-read mixed $name
+ * @property-read mixed $slug
  * @mixin \Eloquent
  */
 class Event extends Model implements Feedable

@@ -18,7 +18,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -127,6 +127,8 @@ use Illuminate\Support\Facades\Storage;
  * @property-read int|null $scanners_count
  * @property-read \App\Models\PointsOfSale|null $pointOfSale
  * @property-read \App\Models\Scanner|null $scanner
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TicketReservation> $ticketReservations
+ * @property-read int|null $ticket_reservations_count
  * @mixin \Eloquent
  */
 class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
@@ -336,6 +338,14 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
     public function pointOfSale(): BelongsTo
     {
         return $this->belongsTo(PointsOfSale::class, 'pointofsale_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function ticketReservations(): HasMany
+    {
+        return $this->hasMany(TicketReservation::class);
     }
 
 }

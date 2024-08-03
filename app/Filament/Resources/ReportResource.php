@@ -3,28 +3,32 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReportResource\Pages;
-use App\Models\Event;
+use App\Models\EventDate;
+use Exception;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\App;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class ReportResource extends Resource
 {
-    protected static ?string $model = Event::class;
+    protected static ?string $model = EventDate::class;
 
     protected static ?string $navigationIcon = 'fas-filter-circle-dollar';
 
     protected static ?string $navigationLabel = 'Reports';
 
+    protected static ?string $label = 'Reports';
+
     public static function canViewAny(): bool
     {
-        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
-
-        return !str_contains($role, 'ATTENDEE');
+        return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_POINTOFSALE', 'ROLE_SCANNER']);
     }
 
+    /**
+     * @throws Exception
+     */
     public static function table(Table $table): Table
     {
         return $table
@@ -33,41 +37,59 @@ class ReportResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('id')
-                    ->label('Name')
-                    ->formatStateUsing(
-                        fn($record) => $record->eventTranslations()
-                            ->where('locale', App::getLocale())->first()?->name
-                    ),
+                Tables\Columns\TextColumn::make('event.name')
+                    ->label('Name'),
 
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Event date')
-                    ->formatStateUsing(
-                        fn($record) => $record->eventDates()->first()->startdate
-                    )
+                Tables\Columns\TextColumn::make('startdate')
+                    ->label('Start Date')
                     ->date(),
+
+                Tables\Columns\TextColumn::make('event.organizer.name')
+                    ->label('Organizer')
+                    ->hidden(auth()->user()->hasRole('ROLE_ORGANIZER')),
+
+                Tables\Columns\TextColumn::make('ticket_sold')
+                    ->label('Tickets Sold'),
+
+                Tables\Columns\TextColumn::make('organizer_payout_amount')
+                    ->prefix('RS ')
+                    ->label('Net sales'),
+
+                Tables\Columns\TextColumn::make('total_ticket_fees')
+                    ->prefix('RS ')
+                    ->label('Ticket fee'),
+
+                Tables\Columns\TextColumn::make('ticket_price_percentage_cut_sum')
+                    ->prefix('RS ')
+                    ->weight('bold')
+                    ->label('Percentage Cut'),
+
+                Tables\Columns\TextColumn::make('id')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn ($record) => $record->stringifyStatusClass())
+                    ->formatStateUsing(fn ($record) => $record->stringifyStatus()),
             ])
             ->filters([
-                //
+                DateRangeFilter::make('startdate')
+                    ->label('Event Date'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\ActionGroup::make([
+
+                ])
             ]);
     }
 
     public static function getEloquentQuery(): Builder
     {
-        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
-
         return parent::getEloquentQuery()
             ->when(
-                str_contains($role, 'ORGANIZER'),
-                fn($query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                auth()->user()->hasRole('ROLE_ORGANIZER'),
+                fn(Builder $query) => $query->whereHas(
+                    'event',
+                    fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                )
             );
     }
 
@@ -75,8 +97,6 @@ class ReportResource extends Resource
     {
         return [
             'index' => Pages\ListReports::route('/'),
-            'create' => Pages\CreateReport::route('/create'),
-            'edit' => Pages\EditReport::route('/{record}/edit'),
         ];
     }
 }

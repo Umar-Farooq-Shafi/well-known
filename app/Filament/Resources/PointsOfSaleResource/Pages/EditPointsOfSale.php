@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PointsOfSaleResource\Pages;
 
 use App\Filament\Resources\PointsOfSaleResource;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,8 @@ use Illuminate\Support\Str;
 
 class EditPointsOfSale extends EditRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = PointsOfSaleResource::class;
 
     protected function mutateFormDataBeforeFill(array $data): array

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int $hidden
@@ -30,6 +30,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|BlogPostCategory whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|BlogPostCategory withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|BlogPostCategory withoutTrashed()
+ * @property-read mixed $name
+ * @property-read mixed $slug
  * @mixin \Eloquent
  */
 class BlogPostCategory extends Model

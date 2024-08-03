@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ScannerResource\Pages;
 use App\Filament\Resources\ScannerResource;
 use App\Models\Scanner;
 use App\Models\User;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,8 @@ use Illuminate\Support\Str;
 
 class CreateScanner extends CreateRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = ScannerResource::class;
 
     protected function handleRecordCreation(array $data): Model

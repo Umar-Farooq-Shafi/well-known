@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ScannerResource\Pages;
 
 use App\Filament\Resources\ScannerResource;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,8 @@ use Illuminate\Support\Str;
 
 class EditScanner extends EditRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = ScannerResource::class;
 
     protected function mutateFormDataBeforeFill(array $data): array

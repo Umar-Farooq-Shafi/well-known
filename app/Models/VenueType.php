@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int $hidden
@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|VenueType whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VenueType withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|VenueType withoutTrashed()
+ * @property-read mixed $name
  * @mixin \Eloquent
  */
 class VenueType extends Model

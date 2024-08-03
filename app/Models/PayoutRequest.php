@@ -40,6 +40,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|PayoutRequest whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PayoutRequest withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|PayoutRequest withoutTrashed()
+ * @property-read \App\Models\EventDate|null $eventDate
  * @mixin \Eloquent
  */
 class PayoutRequest extends Model
@@ -72,6 +73,14 @@ class PayoutRequest extends Model
     public function paymentGateway(): BelongsTo
     {
         return $this->belongsTo(PayoutRequest::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function eventDate(): BelongsTo
+    {
+        return $this->belongsTo(EventDate::class, 'event_date_id');
     }
 
 }

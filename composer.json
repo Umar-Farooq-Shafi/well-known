@@ -19,6 +19,7 @@
         "laravel/tinker": "^2.9",
         "laravelcm/livewire-slide-overs": "^1.0",
         "livewire/livewire": "^3.5",
+        "malzariey/filament-daterangepicker-filter": "^2.8",
         "owenvoke/blade-fontawesome": "^2.6",
         "ralphjsmit/livewire-urls": "^1.4",
         "simplesoftwareio/simple-qrcode": "^4.2",
