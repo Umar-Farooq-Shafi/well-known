@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Event;
 use App\Models\Organizer;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\App;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
@@ -69,11 +70,55 @@ class OrganizerProfile extends Component
                     $query->where('locale', App::getLocale());
                 }
             ])
+            ->when(
+                $this->activeTab === 1,
+                function (Builder $query) {
+                    $query->whereHas(
+                        'eventDates',
+                        function ($query) {
+                            $query->whereDate('enddate', '>=', now());
+                        }
+                    );
+                }
+            )
+            ->when(
+                $this->activeTab === 2,
+                function (Builder $query) {
+                    $query->whereHas(
+                        'eventDates',
+                        function ($query) {
+                            $query->whereDate('enddate', '<', now());
+                        }
+                    );
+                }
+            )
             ->where('organizer_id', $this->organizer->id)
             ->get();
 
+        $eventsOnSale = Event::query()
+            ->whereHas(
+                'eventDates',
+                function ($query) {
+                    $query->whereDate('enddate', '>=', now());
+                }
+            )
+            ->where('organizer_id', $this->organizer->id)
+            ->count();
+
+        $pastEvent = Event::query()
+            ->whereHas(
+                'eventDates',
+                function ($query) {
+                    $query->whereDate('enddate', '<', now());
+                }
+            )
+            ->where('organizer_id', $this->organizer->id)
+            ->count();
+
         return view('livewire.organizer-profile', [
             'events' => $events,
+            'eventsOnSale' => $eventsOnSale,
+            'pastEvent' => $pastEvent
         ]);
     }
 }
