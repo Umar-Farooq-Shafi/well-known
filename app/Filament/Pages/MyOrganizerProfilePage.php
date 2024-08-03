@@ -124,8 +124,8 @@ class MyOrganizerProfilePage extends Page
                     ->label('Cover Photo')
                     ->helperText('Optionally add a cover photo to showcase your organizer activities')
                     ->disk('public')
-                    ->directory('organizers')
-                    ->formatStateUsing(fn($state) => $state ? ['organizers/' . $state] : null)
+                    ->directory('organizers/covers')
+                    ->formatStateUsing(fn($state) => $state ? ['organizers/covers/' . $state] : null)
                     ->visibility('public')
                     ->storeFileNamesIn('cover_original_name'),
 
@@ -230,13 +230,15 @@ class MyOrganizerProfilePage extends Page
     {
         $img = Str::ulid() . '.' . $tempFileUpload->getClientOriginalExtension();
 
-        $tempFileUpload->storeAs('organizers', $img, 'public');
+        $disk = $isLogo ? "organizers" : "organizers/covers";
 
-        $size = Storage::disk('public')->size("organizers/" . $img);
-        $mimetype = File::mimeType(Storage::disk('public')->path("organizers/" . $img));
+        $tempFileUpload->storeAs($disk, $img, 'public');
+
+        $size = Storage::disk('public')->size("$disk/" . $img);
+        $mimetype = File::mimeType(Storage::disk('public')->path("$disk/" . $img));
 
         $manager = new ImageManager(new Driver());
-        $image = $manager->read(Storage::disk('public')->path("organizers/" . $img));
+        $image = $manager->read(Storage::disk('public')->path("$disk/" . $img));
 
         if ($isLogo) {
             $organizer->update([

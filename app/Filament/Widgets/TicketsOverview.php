@@ -6,6 +6,7 @@ use App\Models\OrderTicket;
 use Filament\Widgets\ChartWidget;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 class TicketsOverview extends ChartWidget
@@ -14,16 +15,29 @@ class TicketsOverview extends ChartWidget
 
     protected static ?string $pollingInterval = null;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool
     {
-        return !auth()->user()->hasRole('ROLE_ATTENDEE');
+        return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_POINTOFSALE', 'ROLE_SCANNER']);
     }
 
     protected function getData(): array
     {
-        $trend = Trend::model(OrderTicket::class)
+        $trend = Trend::query(
+            OrderTicket::query()
+                ->when(
+                    auth()->user()->hasRole('ROLE_ORGANIZER'),
+                    function (Builder $query) {
+                        $query->whereHas(
+                            'orderElement.order',
+                            function (Builder $query) {
+                                $query->where('user_id', auth()->id());
+                            }
+                        );
+                    }
+                )
+        )
             ->between(
                 start: now()->startOfMonth(),
                 end: now()->endOfMonth(),
@@ -35,7 +49,7 @@ class TicketsOverview extends ChartWidget
             'datasets' => [
                 [
                     'label' => 'Ticket Sold',
-                    'data' => $trend->map(fn (TrendValue $value) => $value->aggregate),
+                    'data' => $trend->map(fn(TrendValue $value) => $value->aggregate),
                     'backgroundColor' => [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
@@ -55,8 +69,8 @@ class TicketsOverview extends ChartWidget
                     'borderWidth' => 1,
                 ],
             ],
-            'labels' =>  $trend
-                ->map(fn (TrendValue $value) => Carbon::make($value->date)->format('m-D'))
+            'labels' => $trend
+                ->map(fn(TrendValue $value) => Carbon::make($value->date)->format('m-D'))
         ];
     }
 

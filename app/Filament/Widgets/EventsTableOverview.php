@@ -17,7 +17,7 @@ class EventsTableOverview extends BaseWidget
 
     public static function canView(): bool
     {
-        return !auth()->user()->hasRole('ROLE_ATTENDEE');
+        return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_POINTOFSALE', 'ROLE_SCANNER', 'ROLE_ORGANIZER']);
     }
 
     public function table(Table $table): Table

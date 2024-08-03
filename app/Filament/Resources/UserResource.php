@@ -82,8 +82,9 @@ class UserResource extends Resource
                         ->visible(function ($record) {
                             $roles = ucwords(str_replace('ROLE_', '', implode(', ', unserialize($record->roles))));
 
-                            return str_contains($roles, 'ADMINISTRATOR');
+                            return str_contains($roles, 'ORGANIZER');
                         })
+                        ->url(fn ($record) => route('organizer-profile', ['slug' => $record->organizer->slug]))
                         ->icon('fas-id-card'),
 
                     Tables\Actions\Action::make('empty-cart')

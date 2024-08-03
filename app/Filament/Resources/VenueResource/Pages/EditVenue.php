@@ -5,6 +5,7 @@ namespace App\Filament\Resources\VenueResource\Pages;
 use App\Filament\Resources\VenueResource;
 use App\Models\VenueTranslation;
 use App\Traits\DuplicateNameValidationTrait;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
@@ -13,6 +14,7 @@ use Filament\Support\Exceptions\Halt;
 class EditVenue extends EditRecord
 {
     use DuplicateNameValidationTrait;
+    use FilamentNavigationTrait;
 
     protected static string $resource = VenueResource::class;
 

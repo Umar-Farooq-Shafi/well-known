@@ -13,18 +13,50 @@ class EventsOverview extends BaseWidget
 
     public static function canView(): bool
     {
-        return !auth()->user()->hasRole('ROLE_ATTENDEE');
+        return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_POINTOFSALE', 'ROLE_SCANNER']);
     }
 
     protected function getStats(): array
     {
-        $total = Event::count();
+        $total = Event::when(
+            auth()->user()->hasRole('ROLE_ORGANIZER'),
+            function ($query) {
+                $query->where('organizer_id', auth()->user()->organizer_id);
+            }
+        )
+            ->count();
 
-        $published = Event::wherePublished(true)->count();
+        $published = Event::wherePublished(true)
+            ->when(
+                auth()->user()->hasRole('ROLE_ORGANIZER'),
+                function ($query) {
+                    $query->where('organizer_id', auth()->user()->organizer_id);
+                }
+            )
+            ->count();
 
-        $upcoming = EventDate::where('startdate', '>=', now()->startOfDay())->count();
+        $upcoming = EventDate::where('startdate', '>=', now()->startOfDay())
+            ->when(
+                auth()->user()->hasRole('ROLE_ORGANIZER'),
+                function ($query) {
+                    $query->whereHas(
+                        'event',
+                        fn ($query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                    );
+                }
+            )
+            ->count();
 
-        $eventDates = EventDate::count();
+        $eventDates = EventDate::when(
+            auth()->user()->hasRole('ROLE_ORGANIZER'),
+            function ($query) {
+                $query->whereHas(
+                    'event',
+                    fn ($query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                );
+            }
+        )
+            ->count();
 
         return [
             Stat::make('Events Added', "$total"),

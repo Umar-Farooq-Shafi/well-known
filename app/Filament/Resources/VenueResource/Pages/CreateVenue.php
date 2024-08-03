@@ -5,6 +5,7 @@ namespace App\Filament\Resources\VenueResource\Pages;
 use App\Filament\Resources\VenueResource;
 use App\Models\VenueTranslation;
 use App\Traits\DuplicateNameValidationTrait;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Exceptions\Halt;
@@ -17,8 +18,16 @@ use Intervention\Image\ImageManager;
 class CreateVenue extends CreateRecord
 {
     use DuplicateNameValidationTrait;
+    use FilamentNavigationTrait;
 
     protected static string $resource = VenueResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['organizer_id'] = auth()->user()->organizer_id;
+
+        return $data;
+    }
 
     /**
      * @throws Halt
@@ -70,4 +79,5 @@ class CreateVenue extends CreateRecord
             ]);
         }
     }
+
 }
