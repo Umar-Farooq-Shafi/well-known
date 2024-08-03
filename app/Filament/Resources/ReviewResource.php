@@ -17,6 +17,11 @@ class ReviewResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-star';
 
+    public static function canViewAny(): bool
+    {
+        return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_SCANNER']);
+    }
+
     public static function table(Table $table): Table
     {
         return $table

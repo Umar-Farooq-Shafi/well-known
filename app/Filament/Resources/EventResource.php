@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Event;
+use App\Models\EventTranslation;
 use App\Models\Language;
 use App\Models\PointsOfSale;
 use App\Models\Scanner;
@@ -477,7 +478,25 @@ class EventResource extends Resource
                     ->searchable(),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('event')
+                    ->searchable()
+                    ->options(function () {
+                        return EventTranslation::query()
+                            ->when(
+                                auth()->user()->hasRole('ROLE_ORGANIZER'),
+                                fn(Builder $query) => $query->whereHas(
+                                    'event',
+                                    fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                                )
+                            )
+                            ->pluck('name', 'translatable_id');
+                    })
+                    ->query(
+                        fn(Builder $query, array $data) => $query->when(
+                            $data['value'],
+                            fn(Builder $query, $value) => $query->where('id', $value)
+                        )
+                    ),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

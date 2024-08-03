@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Exports\OrderExporter;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Mail\OrderConfirmation;
+use App\Models\EventTranslation;
 use App\Models\Order;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -23,9 +24,7 @@ class OrderResource extends Resource
 
     public static function canViewAny(): bool
     {
-        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
-
-        return !str_contains($role, 'ATTENDEE');
+        return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_SCANNER']);
     }
 
     /**
@@ -111,7 +110,30 @@ class OrderResource extends Resource
                     ->relationship(
                         'user',
                         'username'
-                    )
+                    ),
+
+                Tables\Filters\SelectFilter::make('event')
+                    ->searchable()
+                    ->options(function () {
+                        return EventTranslation::query()
+                            ->when(
+                                auth()->user()->hasRole('ROLE_ORGANIZER'),
+                                fn(Builder $query) => $query->whereHas(
+                                    'event',
+                                    fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                                )
+                            )
+                            ->pluck('name', 'translatable_id');
+                    })
+                    ->query(
+                        fn(Builder $query, array $data) => $query->when(
+                            $data['value'],
+                            fn(Builder $query, $value) => $query->whereHas(
+                                'orderElements.eventDateTicket.eventDate',
+                                fn(Builder $query) => $query->where('event_id', $value)
+                            )
+                        )
+                    ),
             ])
             ->headerActions([
                 Tables\Actions\ExportAction::make()

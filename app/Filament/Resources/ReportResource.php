@@ -94,7 +94,29 @@ class ReportResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('manage-event')
+                        ->icon('fas-calendar-alt')
+                        ->url(function (EventDate $record) {
+                            return EventResource::getUrl('index', [
+                                'tableFilters[event][value]' => $record->event_id
+                            ]);
+                        }, true),
 
+                    Tables\Actions\Action::make('view-detailed-statistic')
+                        ->icon('fas-chart-line')
+                        ->url(function (EventDate $record) {
+                            return EventResource::getUrl('view-stats', [
+                                'record' => $record->event_id
+                            ]);
+                        }, true),
+
+                    Tables\Actions\Action::make('orders')
+                        ->icon('fas-cart-arrow-down')
+                        ->url(function (EventDate $record) {
+                            return OrderResource::getUrl('index', [
+                                'tableFilters[event][value]' => $record->event_id
+                            ]);
+                        }, true),
                 ])
             ]);
     }
