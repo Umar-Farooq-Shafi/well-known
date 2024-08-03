@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\EventDate;
+use App\Models\Organizer;
 use Exception;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -67,12 +68,29 @@ class ReportResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                     ->label('Status')
                     ->badge()
-                    ->color(fn ($record) => $record->stringifyStatusClass())
-                    ->formatStateUsing(fn ($record) => $record->stringifyStatus()),
+                    ->color(fn($record) => $record->stringifyStatusClass())
+                    ->formatStateUsing(fn($record) => $record->stringifyStatus()),
             ])
             ->filters([
                 DateRangeFilter::make('startdate')
                     ->label('Event Date'),
+
+                Tables\Filters\SelectFilter::make('organizer')
+                    ->label('Organizer')
+                    ->visible(auth()->user()->hasAnyRole(['ROLE_SUPER_ADMIN', 'ROLE_ADMINISTRATOR']))
+                    ->searchable()
+                    ->options(function () {
+                        return Organizer::pluck('name', 'id');
+                    })
+                    ->query(
+                        fn(Builder $query, array $data) => $query->when(
+                            $data['value'],
+                            fn(Builder $query, $value) => $query->whereHas(
+                                'event',
+                                fn(Builder $query) => $query->where('organizer_id', $value)
+                            )
+                        )
+                    )
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
