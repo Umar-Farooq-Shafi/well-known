@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
+use Carbon\Carbon;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -47,28 +48,30 @@ class OrdersTableOverview extends BaseWidget
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Order Date')
-                    ->dateTime()
+                    ->formatStateUsing(function ($state) {
+                        if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
+                            $country = auth()->user()->organizer->country;
+
+                            $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
+
+                            return Carbon::make($state)->timezone($timezone[0]);
+                        }
+
+                        return $state;
+                    })
                     ->searchable(isIndividual: true)
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('status')
-                    ->formatStateUsing(function ($state): string {
-                        return match ($state) {
-                            1 => 'Paid',
-                            0 => 'Awaiting payment',
-                            -1 => 'Cancel',
-                            default => $state
-                        };
-                    })
+                    ->formatStateUsing(fn($record) => $record->stringifyStatus())
                     ->badge()
-                    ->color(function ($state) {
-                        return match ($state) {
-                            1 => 'success',
-                            0 => 'warning',
-                            -1 => 'danger',
-                            default => 'info'
-                        };
-                    })
+                    ->color(fn($record) => $record->getStatusClass()),
+
+                Tables\Columns\IconColumn::make('deleted_at')
+                    ->label('Is Deleted')
+                    ->icon(fn($state) => $state ? 'heroicon-o-check' : '')
+                    ->alignCenter()
+                    ->color(fn($state) => $state ? 'danger' : 'info')
             ]);
     }
 }
