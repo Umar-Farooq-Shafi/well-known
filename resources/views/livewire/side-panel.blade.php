@@ -4,7 +4,7 @@
     @push('styles')
         <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/>
     @endpush
-    <div class="swiper mySwiper mt-[70px]">
+    <div class="swiper mySwiper mt-[15%] md:mt-[11%] lg:mt-[7%]">
         <div class="swiper-wrapper">
             @foreach($sliderContents as $sliderContent)
                 <div class="swiper-slide">
