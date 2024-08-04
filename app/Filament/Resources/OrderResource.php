@@ -5,12 +5,14 @@ namespace App\Filament\Resources;
 use App\Filament\Exports\OrderExporter;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Mail\OrderConfirmation;
+use App\Models\Country;
 use App\Models\EventTranslation;
 use App\Models\Order;
+use Carbon\Carbon;
+use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Forms;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -71,30 +73,30 @@ class OrderResource extends Resource
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Order Date')
-                    ->dateTime()
+                    ->formatStateUsing(function ($state) {
+                        if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
+                            $country = auth()->user()->organizer->country;
+
+                            $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
+
+                            return Carbon::make($state)->timezone($timezone[0]);
+                        }
+
+                        return $state;
+                    })
                     ->searchable(isIndividual: true)
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('status')
-                    ->formatStateUsing(function ($state): string {
-                        return match ($state) {
-                            1 => 'Paid',
-                            0 => 'Awaiting payment',
-                            -1 => 'Cancel',
-                            -2 => 'Failed',
-                            default => $state
-                        };
-                    })
+                    ->formatStateUsing(fn($record) => $record->stringifyStatus())
                     ->badge()
-                    ->color(function ($state) {
-                        return match ($state) {
-                            1 => 'success',
-                            0 => 'gray',
-                            -1 => 'warning',
-                            -2 => 'danger',
-                            default => 'info'
-                        };
-                    })
+                    ->color(fn($record) => $record->getStatusClass()),
+
+                Tables\Columns\IconColumn::make('deleted_at')
+                    ->label('Is Deleted')
+                    ->icon(fn($state) => $state ? 'heroicon-o-check' : '')
+                    ->alignCenter()
+                    ->color(fn($state) => $state ? 'danger' : 'info')
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('paymentgateway_id')
@@ -175,9 +177,9 @@ class OrderResource extends Resource
 
                     Tables\Actions\Action::make('payment-details')
                         ->visible(fn($record) => $record->status === 1)
-                        ->modalHeading(fn ($record) => "Order payment details - " . $record->reference)
+                        ->modalHeading(fn($record) => "Order payment details - " . $record->reference)
                         ->modalContent(
-                            fn ($record) => view('filament.resources.order-resource.payment-detail', [
+                            fn($record) => view('filament.resources.order-resource.payment-detail', [
                                 'payment' => $record->payment,
                             ])
                         )

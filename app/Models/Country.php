@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $code
@@ -56,6 +56,14 @@ class Country extends Model
     public function venues(): HasMany
     {
         return $this->hasMany(Venue::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function organizers(): HasMany
+    {
+        return $this->hasMany(Organizer::class);
     }
 
 }

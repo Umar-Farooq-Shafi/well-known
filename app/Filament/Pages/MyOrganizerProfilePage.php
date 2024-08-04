@@ -131,6 +131,7 @@ class MyOrganizerProfilePage extends Page
 
                 Forms\Components\Select::make('country_id')
                     ->label('Country')
+                    ->searchable()
                     ->options(function () {
                         $countries = Country::all();
                         $options = [];

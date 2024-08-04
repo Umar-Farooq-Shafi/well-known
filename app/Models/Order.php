@@ -7,12 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -77,6 +76,63 @@ class Order extends Model
         'currency_ccy',
         'currency_symbol'
     ];
+
+    public function stringifyStatus(): string
+    {
+        return match ($this->status) {
+            -2 => "Failed",
+            -1 => "Canceled",
+            0 => "Awaiting payment",
+            1 => "Paid",
+            default => "Unknown",
+        };
+    }
+
+    public function getStatusClass()
+    {
+        return match ($this->status) {
+            0 => "warning",
+            1 => "success",
+            default => "danger",
+        };
+    }
+
+    public function getPaymentStatusClass($status)
+    {
+        if ($status == "new") {
+            return "info";
+        }
+
+        if ($status == "pending") {
+            return "warning";
+        }
+
+        if ($status == "authorized") {
+            return "success";
+        }
+
+        if ($status == "captured") {
+            return "success";
+        }
+
+        if ($status == "canceled") {
+            return "danger";
+        }
+
+        if ($status == "suspended") {
+            return "danger";
+        }
+
+        if ($status == "failed") {
+            return "danger";
+        }
+
+        if ($status == "unknown") {
+            return "danger";
+        }
+
+        return "";
+    }
 
     /**
      * @return BelongsTo
