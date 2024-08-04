@@ -25,9 +25,7 @@ class PayoutRequestResource extends Resource
 
     public static function canViewAny(): bool
     {
-        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
-
-        return !str_contains($role, 'ATTENDEE');
+        return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_SCANNER', 'ROLE_POINTOFSALE']);
     }
 
     public static function form(Form $form): Form

@@ -9,7 +9,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\App;
 
 class ReviewResource extends Resource
 {
@@ -19,7 +18,7 @@ class ReviewResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_SCANNER']);
+        return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_SCANNER', 'ROLE_POINTOFSALE']);
     }
 
     public static function table(Table $table): Table

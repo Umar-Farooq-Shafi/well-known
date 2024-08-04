@@ -22,6 +22,15 @@ class OrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
+    public static function getNavigationLabel(): string
+    {
+        if (auth()->user()->hasRole('ROLE_POINTOFSALE')) {
+            return 'My Orders';
+        }
+
+        return 'Orders';
+    }
+
     public static function canViewAny(): bool
     {
         return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_SCANNER']);
@@ -199,11 +208,9 @@ class OrderResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
-
         return parent::getEloquentQuery()
             ->when(
-                str_contains($role, 'ORGANIZER'),
+                auth()->user()->hasAnyRole(['ROLE_POINTOFSALE', 'ROLE_ORGANIZER']),
                 fn(Builder $query): Builder => $query->where('user_id', auth()->id())
             )
             ->withoutGlobalScopes([

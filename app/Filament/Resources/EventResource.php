@@ -34,6 +34,19 @@ class EventResource extends Resource
 
     protected static ?string $navigationLabel = 'Manage Events';
 
+    public static function getNavigationLabel(): string
+    {
+        if (auth()->user()->hasRole('ROLE_SCANNER')) {
+            return 'Events List';
+        }
+
+        if (auth()->user()->hasRole('ROLE_POINTOFSALE')) {
+            return 'Events On Sale';
+        }
+
+        return static::$navigationLabel;
+    }
+
     public static function canViewAny(): bool
     {
         $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
@@ -701,14 +714,25 @@ class EventResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
-
-        if (str_contains($role, 'ORGANIZER')) {
-            return parent::getEloquentQuery()
-                ->where('organizer_id', auth()->user()->organizer_id);
-        }
-
-        return parent::getEloquentQuery();
+        return parent::getEloquentQuery()
+            ->when(
+                auth()->user()->hasRole('ROLE_ORGANIZER'),
+                fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
+            )
+            ->when(
+                auth()->user()->hasRole('ROLE_SCANNER'),
+                fn(Builder $query) => $query->whereHas(
+                    'eventDates.scanners',
+                    fn(Builder $query) => $query->where('scanner_id', auth()->user()->scanner->id)
+                )
+            )
+            ->when(
+                auth()->user()->hasRole('ROLE_POINTOFSALE'),
+                fn(Builder $query) => $query->whereHas(
+                    'eventDates.pointOfSales',
+                    fn(Builder $query) => $query->where('pointofsale_id', auth()->user()->pointOfSale->id)
+                )
+            );
     }
 
     public static function getPages(): array

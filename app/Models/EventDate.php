@@ -281,6 +281,7 @@ class EventDate extends Model
             Scanner::class,
             'eventic_eventdate_scanner',
             'eventdate_id',
+            'scanner_id'
         );
     }
 
