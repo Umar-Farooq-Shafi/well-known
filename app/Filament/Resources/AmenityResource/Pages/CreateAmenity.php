@@ -5,6 +5,7 @@ namespace App\Filament\Resources\AmenityResource\Pages;
 use App\Filament\Resources\AmenityResource;
 use App\Models\Amenity;
 use App\Models\AmenityTranslation;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Exceptions\Halt;
@@ -13,6 +14,8 @@ use Illuminate\Support\Str;
 
 class CreateAmenity extends CreateRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = AmenityResource::class;
 
     /**

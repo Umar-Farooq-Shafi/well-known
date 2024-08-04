@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\AmenityResource\Pages;
 
 use App\Filament\Resources\AmenityResource;
+use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,8 @@ use Illuminate\Support\Str;
 
 class EditAmenity extends EditRecord
 {
+    use FilamentNavigationTrait;
+
     protected static string $resource = AmenityResource::class;
 
     protected function mutateFormDataBeforeFill(array $data): array
