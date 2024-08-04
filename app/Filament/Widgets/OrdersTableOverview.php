@@ -25,14 +25,19 @@ class OrdersTableOverview extends BaseWidget
                     ->searchable(isIndividual: true)
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('paymentGateway.organizer.name')
-                    ->searchable(isIndividual: true)
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('orderElements.eventDateTicket.eventDate.event.organizer.name'),
 
-                Tables\Columns\TextColumn::make('eventDateTickets.name')
-                    ->label('Event')
-                    ->searchable(isIndividual: true)
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('orderElements.eventDateTicket.eventDate.event.name')
+                    ->state(function ($record) {
+                        $state = '';
+
+                        foreach ($record->orderElements as $orderElement) {
+                            $state .= $orderElement?->eventDateTicket?->eventDate?->event?->name ?? '';
+                        }
+
+                        return $state;
+                    })
+                    ->label('Event'),
 
                 Tables\Columns\TextColumn::make('user.fullName')
                     ->label('Attendee / POS')

@@ -41,7 +41,7 @@ class HomepagePage extends Page
             'content' => $homepage->content,
             'show_search_box' => $homepage->show_search_box,
             'homepage_events_number' => Setting::where('key', 'homepage_events_number')->first()?->value,
-            'events' => Event::whereIsonhomepagesliderId($homepage->id)->pluck('id'),
+            'events' => Event::whereIsonhomepagesliderId($homepage->id)->where('completed', false)->pluck('id'),
             'homepage_categories_number' => Setting::where('key', 'homepage_categories_number')->first()?->value,
             'homepage_blogposts_number' => Setting::where('key', 'homepage_blogposts_number')->first()?->value,
             'homepage_featured_events_nb' => Setting::where('key', 'homepage_featured_events_nb')->first()?->value,

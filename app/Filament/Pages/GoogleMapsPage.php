@@ -55,7 +55,13 @@ class GoogleMapsPage extends Page
     {
         $this->validate();
 
-        putenv('GOOGLE_MAPS_API_KEY=' . $this->data['google_map_api_key']);
+        $envPath = base_path('.env');
+
+        $envContent = file_get_contents($envPath);
+
+        $envContent = preg_replace('/^GOOGLE_MAPS_API_KEY=.*/m', 'GOOGLE_MAPS_API_KEY=' . $this->data['google_map_api_key'], $envContent);
+
+        file_put_contents($envPath, $envContent);
 
         Notification::make()
             ->title('Saved')

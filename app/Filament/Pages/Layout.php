@@ -15,7 +15,13 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Intervention\Image\Drivers\Imagick\Driver;
+use Intervention\Image\ImageManager;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class Layout extends Page implements HasForms
 {
@@ -76,6 +82,8 @@ class Layout extends Page implements HasForms
             'primary_email' => Setting::query()->where('key', ESetting::NO_REPLY_EMAIL)->first()?->value,
             'logo' => $layout?->logo_name,
             'logo_original_name' => $layout?->logo_original_name,
+            'favicon_name' => $layout?->favicon_name,
+            'favicon_original_name' => $layout?->favicon_original_name,
             'show_terms_of_service_page' => Setting::query()->where('key', ESetting::SHOW_TERMS_OF_SERVICE_PAGE)->first()?->value,
             'terms_of_service_page_content' => Setting::query()->where('key', ESetting::TERMS_OF_SERVICE_PAGE_CONTENT)->first()?->value,
             'show_privacy_policy_page' => Setting::query()->where('key', ESetting::SHOW_PRIVACY_POLICY_PAGE)->first()?->value,
@@ -209,17 +217,14 @@ class Layout extends Page implements HasForms
                     Forms\Components\Tabs\Tab::make('Mots-clés du site Web')
                         ->schema([
                             Forms\Components\TextInput::make('website_keywords_fr')
-                                ->required()
                         ]),
                     Forms\Components\Tabs\Tab::make('Palabras clave del sitio web')
                         ->schema([
                             Forms\Components\TextInput::make('website_keywords_es')
-                                ->required()
                         ]),
                     Forms\Components\Tabs\Tab::make('الكلمات الرئيسية لموقع الويب')
                         ->schema([
                             Forms\Components\TextInput::make('website_keywords_ar')
-                                ->required()
                         ]),
                 ]),
 
@@ -255,13 +260,17 @@ class Layout extends Page implements HasForms
                 ->label('Logo')
                 ->disk('public')
                 ->directory('layout')
-                ->formatStateUsing(fn ($state) => ['layout/' . $state])
+                ->required()
+                ->formatStateUsing(fn ($state) => $state ? ['layout/' . $state] : null)
                 ->visibility('public')
-                ->storeFileNamesIn('')
+                ->storeFileNamesIn('logo_original_name')
                 ->helperText('Please choose a 200x50 image size to ensure compatibility with the website design'),
 
-            Forms\Components\FileUpload::make('favicon')
+            Forms\Components\FileUpload::make('favicon_name')
+                ->disk('public')
                 ->formatStateUsing(fn ($state) => $state ? ['layout/' . $state] : null)
+                ->directory('layout')
+                ->storeFileNamesIn('favicon_original_name')
                 ->label('Favicon'),
 
             Forms\Components\Radio::make('show_terms_of_service_page')
@@ -328,15 +337,79 @@ class Layout extends Page implements HasForms
     public function submit(): void
     {
         $this->validate();
+        $logo = head($this->data['logo']);
+        $originalName = $this->data['logo_original_name'];
 
-        putenv('APP_NAME=' . $this->data['website_name']);
-        putenv('APP_URL=' . $this->data['website_url']);
+        if ($logo instanceof TemporaryUploadedFile) {
+            $img = Str::ulid() . '.' . $logo->getClientOriginalExtension();
 
-        putenv('APP_ENV=' . $this->data['app_env']);
+            $logo->storeAs('layout', $img, 'public');
+
+            $originalName = $logo->getClientOriginalName();
+        } else {
+            $img = last(explode('/', $logo));
+        }
+
+        $layout = AppLayoutSetting::query()->first();
+
+        $size = Storage::disk('public')->size("layout/" . $img);
+        $mimetype = File::mimeType(Storage::disk('public')->path("layout/" . $img));
+
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read(Storage::disk('public')->path("layout/" . $img));
+
+        $layout->update([
+            'logo_name' => $img,
+            'logo_size' => $size,
+            'logo_mime_type' => $mimetype,
+            'logo_original_name' => $originalName,
+            'logo_dimensions' => $image->width() . "," . $image->height()
+        ]);
+
+        if (count($this->data['favicon_name'])) {
+            $logo = head($this->data['favicon_name']);
+            $originalName = $this->data['favicon_original_name'];
+
+            if ($logo instanceof TemporaryUploadedFile) {
+                $img = Str::ulid() . '.' . $logo->getClientOriginalExtension();
+
+                $logo->storeAs('layout', $img, 'public');
+
+                $originalName = $logo->getClientOriginalName();
+            } else {
+                $img = last(explode('/', $logo));
+            }
+
+            $size = Storage::disk('public')->size("layout/" . $img);
+            $mimetype = File::mimeType(Storage::disk('public')->path("layout/" . $img));
+
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read(Storage::disk('public')->path("layout/" . $img));
+
+            $layout->update([
+                'favicon_name' => $img,
+                'favicon_size' => $size,
+                'favicon_mime_type' => $mimetype,
+                'favicon_original_name' => $originalName,
+                'favicon_dimensions' => $image->width() . "," . $image->height()
+            ]);
+        }
+
+        $envPath = base_path('.env');
+
+        $envContent = file_get_contents($envPath);
+
+        $escapedWebsiteName = '"' . addslashes($this->data['website_name']) . '"';
+
+        $envContent = preg_replace('/^APP_URL=.*/m', 'APP_URL=' . $this->data['website_url'], $envContent);
+        $envContent = preg_replace('/^APP_NAME=.*/m', 'APP_NAME=' . $escapedWebsiteName, $envContent);
+        $envContent = preg_replace('/^APP_ENV=.*/m', 'APP_ENV=' . $this->data['app_env'], $envContent);
+        $envContent = preg_replace('/^APP_DEBUG=.*/m', 'APP_DEBUG=' . $this->data['debug'], $envContent);
+        $envContent = preg_replace('/^APP_KEY=.*/m', 'APP_KEY=' . $this->data['app_secret'], $envContent);
+
+        file_put_contents($envPath, $envContent);
+
         Setting::query()->where('key', ESetting::APP_ENVIRONMENT)->update(['value' => $this->data['app_env']]);
-
-        putenv('APP_DEBUG=' . $this->data['debug']);
-        putenv('APP_KEY=' . $this->data['app_secret']);
 
         Setting::query()->where('key', ESetting::MAINTENANCE_MODE)->update(['value' => $this->data['maintenance_mode']]);
 
@@ -371,16 +444,15 @@ class Layout extends Page implements HasForms
         Carbon::setToStringFormat($this->data['date_time_format']);
         \app()->setLocale($this->data['default_language']);
 
-        putenv('APP_NAME=' . $this->data['website_name']);
-        putenv('APP_URL=' . $this->data['website_url']);
         date_default_timezone_set($this->data['timezone']);
 
 //        [
 //            'date_time_format' => "eee dd MMM y, h:mm a z",
 //            'date_format' => 'd/m/Y, g:i A T',
-//            'logo' => $layout?->logo_name,
-//            'logo_original_name' => $layout?->logo_original_name,
 //        ]
+
+        Artisan::call('optimize:clear');
+        Artisan::call('optimize');
 
         Notification::make()
             ->title('Saved')

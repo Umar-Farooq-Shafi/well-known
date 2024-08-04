@@ -49,9 +49,7 @@ class OrderResource extends Resource
                     ->searchable(isIndividual: true)
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('orderElements.eventDateTicket.eventDate.event.organizer.name')
-                    ->searchable(isIndividual: true)
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('orderElements.eventDateTicket.eventDate.event.organizer.name'),
 
                 Tables\Columns\TextColumn::make('orderElements.eventDateTicket.eventDate.event.name')
                     ->state(function ($record) {
@@ -63,9 +61,7 @@ class OrderResource extends Resource
 
                         return $state;
                     })
-                    ->label('Event')
-                    ->searchable(isIndividual: true)
-                    ->sortable(),
+                    ->label('Event'),
 
                 Tables\Columns\TextColumn::make('user.fullName')
                     ->label('Attendee / POS')
