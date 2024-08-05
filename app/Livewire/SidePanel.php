@@ -25,6 +25,7 @@ class SidePanel extends Component
                     $query->where('locale', App::getLocale());
                 },
             ])
+                ->where('completed', false)
                 ->where('isonhomepageslider_id', $homepageHeroSetting->id)
                 ->get();
         }

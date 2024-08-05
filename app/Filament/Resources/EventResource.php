@@ -478,8 +478,28 @@ class EventResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                     ->label('Name')
                     ->formatStateUsing(fn($record) => $record->eventTranslations()->where('locale', App::getLocale())->first()?->name)
-                    ->searchable(isIndividual: true)
-                    ->sortable(),
+                    ->searchable(
+                        query: function (Builder $query, $search) {
+                            $query->whereHas(
+                                'eventTranslations',
+                                fn (Builder $query) => $query->where('name', 'LIKE', "%{$search}%")
+                            );
+                        },
+                        isIndividual: true
+                    )
+                    ->sortable(
+                        query: function (Builder $query, string $direction) {
+                            $query->whereHas('eventTranslations')
+                                ->with(['eventTranslations' => function ($query) use ($direction) {
+                                    $query->orderBy('name', $direction);
+                                }])
+                                ->orderBy(EventTranslation::select('name')
+                                    ->whereColumn('eventic_event_translation.translatable_id', 'eventic_event.id')
+                                    ->orderBy('name', $direction)
+                                    ->limit(1),
+                                    $direction);
+                        }
+                    ),
 
                 Tables\Columns\TextColumn::make('organizer.name')
                     ->searchable(isIndividual: true)

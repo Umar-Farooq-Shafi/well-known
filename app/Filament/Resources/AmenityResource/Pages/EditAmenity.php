@@ -3,9 +3,12 @@
 namespace App\Filament\Resources\AmenityResource\Pages;
 
 use App\Filament\Resources\AmenityResource;
+use App\Models\AmenityTranslation;
 use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Exceptions\Halt;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -34,6 +37,30 @@ class EditAmenity extends EditRecord
         return $data;
     }
 
+    /**
+     * @throws Halt
+     */
+    public function beforeSave(): void
+    {
+        foreach ($this->data as $name => $value) {
+            if ($value && $name !== 'icon') {
+                $amTrans = AmenityTranslation::query()->where('slug', Str::slug($value))
+                    ->whereNot('translatable_id', $this->record->id)
+                    ->exists();
+
+                if ($amTrans) {
+                    Notification::make()
+                        ->title('Duplicate')
+                        ->danger()
+                        ->body($value . " already exists.")
+                        ->send();
+
+                    $this->halt();
+                }
+            }
+        }
+    }
+
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         $record->update([
@@ -41,27 +68,26 @@ class EditAmenity extends EditRecord
         ]);
 
         foreach ($record->amenityTranslations as $translation) {
-            if ($translation->locale === 'ar') {
-                $translation->name = $data['name-ar'];
-                $translation->slug = Str::slug($data['name-ar'] ?? '');
-                $translation->save();
-            }
+            $locale = $translation->locale;
+            $nameKey = 'name-' . $locale;
+            $nameValue = $data[$nameKey] ?? '';
 
-            if ($translation->locale === 'en') {
-                $translation->name = $data['name-en'];
-                $translation->slug = Str::slug($data['name-en'] ?? '');
-                $translation->save();
-            }
+            if (in_array($locale, ['ar', 'en', 'fr', 'es'])) {
+                $baseSlug = Str::slug($nameValue, language: $locale);
+                $slug = $baseSlug;
+                $counter = 1;
 
-            if ($translation->locale === 'fr') {
-                $translation->name = $data['name-fr'];
-                $translation->slug = Str::slug($data['name-fr'] ?? '');
-                $translation->save();
-            }
+                while ($record->amenityTranslations()
+                    ->where('slug', $slug)
+                    ->where('id', '!=', $translation->id)
+                    ->exists()) {
+                    $slug = $baseSlug . '-' . $counter;
+                    $counter++;
+                }
 
-            if ($translation->locale === 'es') {
-                $translation->name = $data['name-es'];
-                $translation->slug = Str::slug($data['name-es'] ?? '');
+                $translation->name = $nameValue;
+                $translation->slug = $slug;
+
                 $translation->save();
             }
         }
