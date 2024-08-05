@@ -6,7 +6,6 @@ use App\Filament\Resources\ScannerResource\Pages;
 use App\Models\Scanner;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -42,21 +41,16 @@ class ScannerResource extends Resource
                 Forms\Components\TextInput::make('username')
                     ->required(),
 
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->autocomplete(false)
-                    ->required(),
-
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                    ->dehydrated(fn ($state) => filled($state))
+                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                    ->dehydrated(fn($state) => filled($state))
                     ->autocomplete('new-password')
-                    ->required(fn (string $context): bool => $context === 'create'),
+                    ->required(fn(string $context): bool => $context === 'create'),
 
                 Forms\Components\TextInput::make('password_confirmation')
                     ->password()
-                    ->required(fn (string $context): bool => $context === 'create')
+                    ->required(fn(string $context): bool => $context === 'create')
                     ->maxLength(255)
                     ->same('password')
                     ->label('Confirm Password'),
@@ -91,9 +85,6 @@ class ScannerResource extends Resource
                     ->color(fn($state) => $state ? 'primary' : 'danger')
                     ->icon(fn($state) => $state ? 'fas-user-plus' : 'fas-user-times')
                     ->badge(),
-            ])
-            ->filters([
-                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

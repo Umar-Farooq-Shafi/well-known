@@ -19,11 +19,13 @@ class CreatePointsOfSale extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
+        $email = Str::uuid()->toString() . '@' . env('APP_URL');
+
         $user = User::create([
             'username' => $data['username'],
             'username_canonical' => strtolower($data['username']),
-            'email' => $data['email'],
-            'email_canonical' => strtolower($data['email']),
+            'email' => $email,
+            'email_canonical' => strtolower($email),
             'password' => Hash::make($data['password']),
             'enabled' => 1,
             'roles' => 'a:1:{i:0;s:12:"ROLE_SCANNER";}',

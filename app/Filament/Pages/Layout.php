@@ -182,6 +182,8 @@ class Layout extends Page implements HasForms
 
             Forms\Components\TextInput::make('website_url')
                 ->label('Website URL')
+                ->url()
+                ->rule('url')
                 ->required(),
 
             Forms\Components\Tabs::make('Website description')

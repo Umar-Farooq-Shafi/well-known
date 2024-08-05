@@ -37,11 +37,6 @@ class PointsOfSaleResource extends Resource
                 Forms\Components\TextInput::make('username')
                     ->required(),
 
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->autocomplete(false)
-                    ->required(),
-
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->dehydrateStateUsing(fn ($state) => Hash::make($state))
