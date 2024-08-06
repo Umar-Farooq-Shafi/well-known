@@ -24,6 +24,7 @@ class ListPaymentGateways extends ListRecords
             Actions\Action::make('manage-currency')
                 ->label('MANAGE CURRENCIES')
                 ->icon('fas-coins')
+                ->hidden(auth()->user()->hasRole('ROLE_ORGANIZER'))
                 ->url(PaymentGatewayResource\Pages\Currency\CurrencyListPage::getUrl()),
 
             Actions\CreateAction::make()

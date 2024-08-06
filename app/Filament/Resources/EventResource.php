@@ -15,6 +15,7 @@ use App\Models\Scanner;
 use App\Models\Venue;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
@@ -535,6 +536,7 @@ class EventResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('statistic')
                         ->label('Statistics')
+                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
                         ->modalHeading(
                             fn($record) => $record->eventTranslations()
                                     ->where('locale', App::getLocale())->first()?->name . ' : Event dates'
@@ -548,6 +550,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('payout-request')
                         ->label('Request payout')
+                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
                         ->icon('fas-file-invoice-dollar')
                         ->modalHeading(
                             fn($record) => $record->eventTranslations()
@@ -564,6 +567,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('details')
                         ->label('Details')
+                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
                         ->requiresConfirmation()
                         ->fillForm(function (Event $event) {
                             $languages = [];
@@ -671,6 +675,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('attendees')
                         ->label('Attendees')
+                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
                         ->url(
                             fn($record) => route('filament.admin.resources.orders.index')
                         )
@@ -678,6 +683,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('reviews')
                         ->label('Reviews')
+                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
                         ->url(
                             fn($record) => route('filament.admin.resources.reviews.index')
                         )
@@ -685,7 +691,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('Mark as featured')
                         ->icon('heroicon-o-eye-slash')
-                        ->hidden(fn($record) => $record->featured)
+                        ->hidden(fn($record) => $record->featured || auth()->user()->hasRole('ROLE_SCANNER'))
                         ->visible(function () {
                             $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
 
@@ -695,7 +701,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('Mark as not featured')
                         ->icon('heroicon-o-eye')
-                        ->hidden(fn($record) => !$record->featured)
+                        ->hidden(fn($record) => !$record->featured || auth()->user()->hasRole('ROLE_SCANNER'))
                         ->visible(function () {
                             $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
 
@@ -706,7 +712,7 @@ class EventResource extends Resource
                     Tables\Actions\Action::make('completed')
                         ->label('Completed')
                         ->icon('heroicon-o-check')
-                        ->hidden(fn($record) => $record->completed)
+                        ->hidden(fn($record) => $record->completed || auth()->user()->hasRole('ROLE_SCANNER'))
                         ->action(fn($record) => $record->update([
                             'completed' => 1,
                             'is_featured' => false
@@ -715,15 +721,22 @@ class EventResource extends Resource
                     Tables\Actions\Action::make('not-completed')
                         ->label('Not Completed')
                         ->icon('heroicon-o-x-mark')
+                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
                         ->visible(fn($record) => $record->completed)
                         ->action(fn($record) => $record->update([
                             'completed' => false
                         ])),
 
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER')),
 
-                    Tables\Actions\DeleteAction::make(),
-                ])
+                    Tables\Actions\DeleteAction::make()
+                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER')),
+                ]),
+
+                Tables\Actions\Action::make('check-in')
+                    ->label(strtoupper('Check in attendees for this event date'))
+                    ->visible(auth()->user()->hasRole('ROLE_SCANNER')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -764,4 +777,5 @@ class EventResource extends Resource
             'view-stats' => Pages\ViewStatsPage::route('/{record}/stats'),
         ];
     }
+
 }

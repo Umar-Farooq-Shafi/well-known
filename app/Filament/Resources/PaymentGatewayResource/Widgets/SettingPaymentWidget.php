@@ -21,6 +21,11 @@ class SettingPaymentWidget extends Widget implements HasForms
 
     public ?array $data = [];
 
+    public static function canView(): bool
+    {
+        return !auth()->user()->hasRole('ROLE_ORGANIZER');
+    }
+
     public function mount(): void
     {
         $this->form->fill([

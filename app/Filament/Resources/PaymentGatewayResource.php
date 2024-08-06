@@ -25,11 +25,20 @@ class PaymentGatewayResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationLabel(): string
+    {
+        if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
+            return "Payments Gateway Settings";
+        }
+
+        return static::$navigationLabel;
+    }
+
     public static function canViewAny(): bool
     {
         $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
 
-        return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
+        return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR') || str_contains($role, 'ORGANIZER');
     }
 
     public static function form(Form $form): Form
@@ -143,6 +152,7 @@ class PaymentGatewayResource extends Resource
 
                 Tables\Columns\CheckboxColumn::make('membership_types')
                     ->label('Free')
+                    ->hidden(auth()->user()->hasRole('ROLE_ORGANIZER'))
                     ->beforeStateUpdated(function ($state, $record) {
                         $membershipType = $record->membership_type ?? [];
 
@@ -165,6 +175,7 @@ class PaymentGatewayResource extends Resource
 
                 Tables\Columns\CheckboxColumn::make('id')
                     ->label('Commission')
+                    ->hidden(auth()->user()->hasRole('ROLE_ORGANIZER'))
                     ->beforeStateUpdated(function ($state, $record) {
                         $membershipType = $record->membership_type ?? [];
 

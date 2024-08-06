@@ -53,16 +53,25 @@ class ReportResource extends Resource
                     ->label('Tickets Sold'),
 
                 Tables\Columns\TextColumn::make('organizer_payout_amount')
-                    ->prefix('RS ')
+                    ->prefix(fn ($record) => $record->getCurrencyCode() . ' ')
+                    ->formatStateUsing(
+                        fn ($state, $record) => empty($record->getCurrencyCode()) ? '(Multi-currency tickets)' : $state
+                    )
                     ->label('Net sales'),
 
                 Tables\Columns\TextColumn::make('total_ticket_fees')
-                    ->prefix('RS ')
+                    ->prefix(fn ($record) => $record->getCurrencyCode() . ' ')
+                    ->formatStateUsing(
+                        fn ($state, $record) => empty($record->getCurrencyCode()) ? '(Multi-currency tickets)' : $state
+                    )
                     ->label('Ticket fee'),
 
                 Tables\Columns\TextColumn::make('ticket_price_percentage_cut_sum')
-                    ->prefix('RS ')
+                    ->prefix(fn ($record) => $record->getCurrencyCode() . ' ')
                     ->weight('bold')
+                    ->formatStateUsing(
+                        fn ($state, $record) => empty($record->getCurrencyCode()) ? '(Multi-currency tickets)' : $state
+                    )
                     ->label('Percentage Cut'),
 
                 Tables\Columns\TextColumn::make('id')

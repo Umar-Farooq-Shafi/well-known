@@ -14,6 +14,10 @@ class ListEvents extends ListRecords
 
     public function getTabs(): array
     {
+        if (auth()->user()->hasRole('ROLE_SCANNER')) {
+            return [];
+        }
+
         return [
             'active' => Tab::make()
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('completed', false)),

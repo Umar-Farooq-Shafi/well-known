@@ -173,6 +173,23 @@ class EventDate extends Model
         return false;
     }
 
+    public function getCurrencyCode()
+    {
+        $ccys = [];
+
+        foreach ($this->eventDateTickets as $ticket) {
+            if ($ticket->currency && !in_array($ticket->currency->ccy, $ccys)) {
+                $ccys[] = $ticket->currency->ccy;
+            }
+        }
+
+        if (count($ccys) > 1) {
+            return '';
+        }
+
+        return count($ccys) ? $ccys[0] : '';
+    }
+
     public function payoutRequestStatus()
     {
         foreach ($this->payoutRequests as $payoutRequest) {
