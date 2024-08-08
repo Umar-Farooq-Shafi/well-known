@@ -38,7 +38,11 @@ class PaymentGatewayResource extends Resource
     {
         $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
 
-        return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR') || str_contains($role, 'ORGANIZER');
+        if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
+            return auth()->user()->membership_type === 'Membership';
+        }
+
+        return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
     }
 
     public static function form(Form $form): Form
@@ -62,6 +66,13 @@ class PaymentGatewayResource extends Resource
                     ->label('Image')
                     ->disk('public')
                     ->directory('payment/gateways')
+                    ->visible(function (Forms\Get $get) {
+                        if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
+                            return $get('gateway_name') === 'offline';
+                        }
+
+                        return true;
+                    })
                     ->columnSpanFull()
                     ->formatStateUsing(fn($state) => $state ? ['payment/gateways/' . $state] : null)
                     ->visibility('public')
