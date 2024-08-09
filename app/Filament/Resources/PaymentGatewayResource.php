@@ -53,12 +53,32 @@ class PaymentGatewayResource extends Resource
                     ->required(),
 
                 Forms\Components\Select::make('gateway_name')
-                    ->options([
-                        'offline' => 'Cash / Check / Offline',
-                        'paypal_express_checkout' => 'Paypal Express Checkout',
-                        'stripe_checkout' => 'Stripe Checkout',
-                        'eseva' => 'ESeva'
-                    ])
+                    ->options(function () {
+                        $options = [
+                            'offline' => 'Cash / Check / Offline',
+                        ];
+
+                        $exists = [
+                            'paypal_express_checkout' => 'Paypal Express Checkout',
+                            'stripe_checkout' => 'Stripe Checkout',
+                            'eseva' => 'ESeva'
+                        ];
+
+                        foreach ($exists as $key => $value) {
+                            if (
+                                !PaymentGateway::whereGatewayName($key)
+                                    ->when(
+                                        auth()->user()->hasRole('ROLE_ORGANIZER'),
+                                        fn (Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                                    )
+                                    ->exists()
+                            ) {
+                                $options[$key] = $value;
+                            }
+                        }
+
+                        return $options;
+                    })
                     ->live()
                     ->required(),
 
