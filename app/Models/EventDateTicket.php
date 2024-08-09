@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  *
@@ -236,6 +237,18 @@ class EventDateTicket extends Model
     public function ticketReservations(): HasMany
     {
         return $this->hasMany(TicketReservation::class, 'eventticket_id');
+    }
+
+    public function eventDateTickets(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            OrderTicket::class, // The final model you want to access
+            OrderElement::class,    // The intermediate model
+            'orderelement_id',      // Foreign key on the intermediate model (OrderElement)
+            'id',                   // Foreign key on the final model (EventDateTicket)
+            'id',                   // Local key on this model (OrderTicket)
+            'eventticket_id'        // Local key on the intermediate model (OrderElement)
+        );
     }
 
 }

@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $orderelement_id
@@ -48,6 +49,18 @@ class OrderTicket extends Model
     public function orderElement(): BelongsTo
     {
         return $this->belongsTo(OrderElement::class, 'orderelement_id');
+    }
+
+    public function eventDateTicket(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            EventDateTicket::class, // The final model you want to access
+            OrderElement::class,    // The intermediate model
+            'id',                   // Foreign key on the intermediate model (OrderElement) referencing its primary key
+            'id',                   // Foreign key on the final model (EventDateTicket) referencing its primary key
+            'orderelement_id',      // Local key on this model (OrderTicket)
+            'eventticket_id'        // Local key on the intermediate model (OrderElement)
+        );
     }
 
 }

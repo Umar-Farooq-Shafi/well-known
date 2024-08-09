@@ -736,6 +736,7 @@ class EventResource extends Resource
 
                 Tables\Actions\Action::make('check-in')
                     ->label(strtoupper('Check in attendees for this event date'))
+                    ->url(fn ($record) => Pages\AttendeeCheckInPage::getUrl(['record' => $record]))
                     ->visible(auth()->user()->hasRole('ROLE_SCANNER')),
             ])
             ->bulkActions([
@@ -775,6 +776,7 @@ class EventResource extends Resource
             'create' => Pages\CreateEvent::route('/create'),
             'edit' => Pages\EditEvent::route('/{record}/edit'),
             'view-stats' => Pages\ViewStatsPage::route('/{record}/stats'),
+            'attendee-checkin' => Pages\AttendeeCheckInPage::route('/{record}/attendee-check-in')
         ];
     }
 
