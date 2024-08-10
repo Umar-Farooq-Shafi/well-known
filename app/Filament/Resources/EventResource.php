@@ -4,17 +4,21 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EventResource\Pages;
 use App\Models\Audience;
+use App\Models\CartElement;
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Event;
+use App\Models\EventDateTicket;
 use App\Models\EventTranslation;
 use App\Models\Language;
 use App\Models\PointsOfSale;
 use App\Models\Scanner;
 use App\Models\Venue;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
@@ -23,6 +27,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 
 class EventResource extends Resource
@@ -536,7 +541,7 @@ class EventResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('statistic')
                         ->label('Statistics')
-                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
+                        ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->modalHeading(
                             fn($record) => $record->eventTranslations()
                                     ->where('locale', App::getLocale())->first()?->name . ' : Event dates'
@@ -550,7 +555,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('payout-request')
                         ->label('Request payout')
-                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
+                        ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->icon('fas-file-invoice-dollar')
                         ->modalHeading(
                             fn($record) => $record->eventTranslations()
@@ -567,7 +572,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('details')
                         ->label('Details')
-                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
+                        ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->requiresConfirmation()
                         ->fillForm(function (Event $event) {
                             $languages = [];
@@ -675,7 +680,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('attendees')
                         ->label('Attendees')
-                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
+                        ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->url(
                             fn($record) => route('filament.admin.resources.orders.index')
                         )
@@ -683,7 +688,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('reviews')
                         ->label('Reviews')
-                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
+                        ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->url(
                             fn($record) => route('filament.admin.resources.reviews.index')
                         )
@@ -691,7 +696,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('Mark as featured')
                         ->icon('heroicon-o-eye-slash')
-                        ->hidden(fn($record) => $record->featured || auth()->user()->hasRole('ROLE_SCANNER'))
+                        ->hidden(fn($record) => $record->featured || auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->visible(function () {
                             $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
 
@@ -701,7 +706,7 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('Mark as not featured')
                         ->icon('heroicon-o-eye')
-                        ->hidden(fn($record) => !$record->featured || auth()->user()->hasRole('ROLE_SCANNER'))
+                        ->hidden(fn($record) => !$record->featured || auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->visible(function () {
                             $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
 
@@ -712,7 +717,7 @@ class EventResource extends Resource
                     Tables\Actions\Action::make('completed')
                         ->label('Completed')
                         ->icon('heroicon-o-check')
-                        ->hidden(fn($record) => $record->completed || auth()->user()->hasRole('ROLE_SCANNER'))
+                        ->hidden(fn($record) => $record->completed || auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->action(fn($record) => $record->update([
                             'completed' => 1,
                             'is_featured' => false
@@ -721,23 +726,126 @@ class EventResource extends Resource
                     Tables\Actions\Action::make('not-completed')
                         ->label('Not Completed')
                         ->icon('heroicon-o-x-mark')
-                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER'))
+                        ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->visible(fn($record) => $record->completed)
                         ->action(fn($record) => $record->update([
                             'completed' => false
                         ])),
 
                     Tables\Actions\EditAction::make()
-                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER')),
+                        ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE'])),
 
                     Tables\Actions\DeleteAction::make()
-                        ->hidden(auth()->user()->hasRole('ROLE_SCANNER')),
+                        ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                 ]),
 
                 Tables\Actions\Action::make('check-in')
                     ->label(strtoupper('Check in attendees for this event date'))
                     ->url(fn ($record) => Pages\AttendeeCheckInPage::getUrl(['record' => $record]))
                     ->visible(auth()->user()->hasRole('ROLE_SCANNER')),
+
+                Tables\Actions\Action::make('event-date-and-ticket')
+                    ->label(strtoupper('Show event dates and tickets'))
+                    ->form(function ($record) {
+                        $form = [];
+
+                        foreach ($record->eventDates as $eventDate) {
+                            if ($eventDate->pointOfSales()->where('user_id', auth()->id())->exists()) {
+                                $label = $eventDate->startdate;
+
+                                if ($venue = $eventDate->venue) {
+                                    $label .= " " . $venue->name . ": " . $venue->stringifyAddress;
+                                } else {
+                                    $label .= " Online";
+                                }
+
+                                $form[] = Forms\Components\Section::make($label)
+                                    ->schema(function () use ($eventDate) {
+                                        $form = [];
+
+                                        foreach ($eventDate->eventDateTickets as $eventDateTicket) {
+                                            if ($eventDateTicket->active) {
+                                                $form[] = Forms\Components\Section::make($eventDateTicket->name)
+                                                    ->schema([
+                                                       Forms\Components\TextInput::make('reference')
+                                                           ->label(function () use ($eventDateTicket) {
+                                                               if ($eventDateTicket->free) {
+                                                                   return 'Free';
+                                                               }
+
+                                                               $currency = $eventDateTicket->currency?->ccy ?? '';
+
+                                                               return  $currency . ' ' . $eventDateTicket->getSalePrice();
+                                                           })
+                                                           ->numeric()
+                                                           ->disabled(!$eventDateTicket->isOnSale())
+                                                           ->helperText(function () use ($eventDateTicket) {
+                                                               return "Tickets left: " . $eventDateTicket->getTicketsLeftCount() . ' / ' . $eventDateTicket->quantity;
+                                                           })
+                                                            ->required()
+                                                    ]);
+                                            }
+                                        }
+
+                                        return $form;
+                                    });
+                            }
+                        }
+
+                        return $form;
+                    })
+                    ->action(function (array $data, Tables\Actions\Action $component) {
+                        $chosenEventDate = $data['event-date-pick'] ?? null;
+                        unset($data['event-date-pick']);
+
+                        foreach ($data as $ticketReference => $ticketQuantity) {
+                            if (!empty($ticketQuantity) && intval($ticketQuantity) > 0) {
+                                $eventTicket = EventDateTicket::where('reference', $ticketReference)->first();
+
+                                if (!$eventTicket) {
+                                    Notification::make()
+                                        ->title('The event ticket cannot be found')
+                                        ->danger()
+                                        ->send();
+
+                                    $component->halt();
+                                }
+
+                                if (!$eventTicket->isOnSale()) {
+                                    Notification::make()
+                                        ->title($eventTicket->stringifyStatus())
+                                        ->danger()
+                                        ->send();
+
+
+                                    $component->halt();
+                                }
+
+                                $cartElement = new CartElement();
+                                $cartElement->user_id = Auth::id();
+                                $cartElement->eventticket_id = $eventTicket->id;
+                                $cartElement->quantity = intval($ticketQuantity);
+
+                                if ($chosenEventDate) {
+                                    $cartElement->chosen_event_date = Carbon::createFromFormat('Y-m-d', $chosenEventDate);
+                                }
+
+                                if (Auth::user()->hasRole('ROLE_ATTENDEE') && !$eventTicket->isFree()) {
+//                                    $cartElement->ticket_fee = $services->getSetting('ticket_fee_online');
+                                } elseif (Auth::user()->hasRole('ROLE_POINTOFSALE') && !$eventTicket->isFree()) {
+//                                    $cartElement->ticket_fee = $services->getSetting('ticket_fee_pos');
+                                }
+
+                                $cartElement->save();
+
+                                Notification::make()
+                                    ->title('The tickets has been successfully added to your cart')
+                                    ->success()
+                                    ->send();
+                            }
+                        }
+                    })
+                    ->visible(auth()->user()->hasRole('ROLE_POINTOFSALE')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

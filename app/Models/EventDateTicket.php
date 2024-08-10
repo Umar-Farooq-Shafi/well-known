@@ -139,6 +139,19 @@ class EventDateTicket extends Model
         return $sum;
     }
 
+    public function getSalePrice()
+    {
+        if ($this->promotionalprice) {
+            return (float)$this->promotionalprice;
+        }
+
+        if ($this->price) {
+            return (float)$this->price;
+        }
+
+        return 0;
+    }
+
     public function getScannedTicketsCount(): int
     {
         $count = 0;
