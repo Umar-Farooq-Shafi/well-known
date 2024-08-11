@@ -29,6 +29,9 @@ class Menu extends Model
 
     public $timestamps = false;
 
+    // through error fillable assignment
+    protected $fillable = ['id'];
+
     public function getNameAttribute()
     {
         return $this->menuTranslations()

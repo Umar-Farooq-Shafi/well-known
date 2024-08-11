@@ -67,11 +67,11 @@ class BlogPost extends Model
         'hidden'
     ];
 
-    public function getTitleAttribute()
+    public function getNameAttribute()
     {
         return $this->blogPostTranslations()
             ->where('locale', app()->getLocale())
-            ->first()?->title;
+            ->first()?->name;
     }
 
     public function getSlugAttribute()

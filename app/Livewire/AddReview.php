@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\EventTranslation;
 use App\Traits\RatingTrait;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use RalphJSmit\Livewire\Urls\Facades\Url;
@@ -43,6 +44,7 @@ class AddReview extends Component
         }
     }
 
+    #[Title("Add Review | 'Aafno Ticket Nepal'")]
     public function submit(): void
     {
         $this->validate();

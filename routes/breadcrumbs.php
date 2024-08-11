@@ -53,3 +53,6 @@ Breadcrumbs::for('venue')
 Breadcrumbs::for('add-review')
     ->push('Events', route('events'))
     ->push('Add Review');
+
+Breadcrumbs::for('terms-of-service')
+    ->push('Terms of Service');

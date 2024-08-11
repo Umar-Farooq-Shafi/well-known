@@ -28,7 +28,7 @@ trait LinkTrait
             $staticPagesArray[route($staticPage->slug, [], false)] = $staticPage->title;
         }
 
-        $staticPagesArray[route('contact-us', [], false)] = __('Contact');
+        $staticPagesArray[route('contact-us', [], false)] = __('Contact Us');
         $linksArray[__('Static Pages')] = $staticPagesArray;
 
         // Add authentication pages urls
@@ -42,8 +42,8 @@ trait LinkTrait
 
         // Add dashboard pages urls
         $dashboardPagesArray = [
-            __('Attendee tickets') => ListOrders::getUrl(isAbsolute: false),
-            __('Create event') => CreateEvent::getUrl(isAbsolute: false),
+            ListOrders::getUrl(isAbsolute: false) => __('Attendee tickets'),
+            CreateEvent::getUrl(isAbsolute: false) => __('Create event'),
         ];
         $linksArray[__('Dashboard Pages')] = $dashboardPagesArray;
 
@@ -52,44 +52,44 @@ trait LinkTrait
 
         $categories = Category::all(); // Replace with your actual method to retrieve categories
         foreach ($categories as $category) {
-            $categoryPagesArray[__('Category') . ' - ' . $category->name] = route('events', ['category' => $category->slug], false);
+            $categoryPagesArray[route('events', ['category' => $category->slug], false)] = __('Category') . ' - ' . $category->name;
         }
         $linksArray[__('Event Categories')] = $categoryPagesArray;
 
         // Add blog post pages urls
         $blogPagesArray = [
-            __('Blog page') => route('blog', [], false),
+            route('blog', [], false) => __('Blog page'),
         ];
 
         $blogPosts = BlogPost::all(); // Replace with your actual method to retrieve blog posts
         foreach ($blogPosts as $blogPost) {
-            $blogPagesArray[__('Blog post') . ' - ' . $blogPost->title] = route('blog-article', ['slug' => $blogPost->slug], false);
+            $blogPagesArray[route('blog-article', ['slug' => $blogPost->slug], false)] = __('Blog post') . ' - ' . $blogPost->name;
         }
         $linksArray[__('Blog Pages')] = $blogPagesArray;
 
         // Add event pages urls
         $eventPagesArray = [
-            __('Events page') => route('events', [], false),
+            route('events', [], false) => __('Events page'),
         ];
 
         $events = Event::all(); // Replace with your actual method to retrieve events
         foreach ($events as $event) {
-            $eventPagesArray[__('Event') . ' - ' . $event->name] = route('event', ['slug' => $event->slug], false);
+            $eventPagesArray[route('event', ['slug' => $event->slug], false)] = __('Event') . ' - ' . $event->name;
         }
         $linksArray[__('Events Pages')] = $eventPagesArray;
 
         // Add help center pages urls
         $helpCenterPagesArray = [
-            __('Help Center page') => route('help-center', [], false),
+            route('help-center', [], false) => __('Help Center page'),
         ];
 
         $helpCenterCategories = HelpCenterCategory::all(); // Replace with your actual method to retrieve help center categories
         $helpCenterArticles = HelpCenterArticle::all(); // Replace with your actual method to retrieve help center articles
         foreach ($helpCenterCategories as $helpCenterCategory) {
-            $helpCenterPagesArray[__('Help Center Category') . ' - ' . $helpCenterCategory->name] = route('help-center-category', ['slug' => $helpCenterCategory->slug], false);
+            $helpCenterPagesArray[route('help-center-category', ['slug' => $helpCenterCategory->slug], false)] = __('Help Center Category') . ' - ' . $helpCenterCategory->name;
         }
         foreach ($helpCenterArticles as $helpCenterArticle) {
-            $helpCenterPagesArray[__('Help Center Article') . ' - ' . $helpCenterArticle->title] = route('help-center-article', ['slug' => $helpCenterArticle->slug], false);
+            $helpCenterPagesArray[route('help-center-article', ['slug' => $helpCenterArticle->slug], false)] = __('Help Center Article') . ' - ' . $helpCenterArticle->title;
         }
         $linksArray[__('Help Center Pages')] = $helpCenterPagesArray;
 
@@ -97,17 +97,17 @@ trait LinkTrait
         $organizersPagesArray = [];
         $organizers = User::query()->whereHas('organizer')->get();
         foreach ($organizers as $organizer) {
-            $organizersPagesArray[__('Organizer Profile') . ' - ' . $organizer->organizer->name] = route('organizer-profile', ['slug' => $organizer->organizer->slug], false);
+            $organizersPagesArray[route('organizer-profile', ['slug' => $organizer->organizer->slug], false)] = __('Organizer Profile') . ' - ' . $organizer->organizer->name;
         }
         $linksArray[__('Organizers Pages')] = $organizersPagesArray;
 
         // Add venues pages urls
         $venuesPagesArray = [
-            __('Venues page') => route('venues', [], false),
+            route('venues', [], false) => __('Venues page'),
         ];
         $venues = Venue::all(); // Replace with your actual method to retrieve venues
         foreach ($venues as $venue) {
-            $venuesPagesArray[__('Venue') . ' - ' . $venue->name] = route('venue', ['slug' => $venue->slug], false);
+            $venuesPagesArray[route('venue', ['slug' => $venue->slug], false)] = __('Venue') . ' - ' . $venue->name;
         }
         $linksArray[__('Venues Pages')] = $venuesPagesArray;
 

@@ -3,6 +3,7 @@
 namespace App\Livewire\Pages;
 
 use Illuminate\Support\Facades\Http;
+use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
@@ -48,6 +49,7 @@ class ContactUs extends Component
 
     }
 
+    #[Title("Contact Us | 'Aafno Ticket Nepal'")]
     public function render()
     {
         return view('livewire.pages.contact-us');
