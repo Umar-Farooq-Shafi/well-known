@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $category_id
@@ -50,6 +50,20 @@ class HelpCenterArticle extends Model
         'hidden',
         'featured'
     ];
+
+    public function getTitleAttribute()
+    {
+        return $this->helpCenterTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->title;
+    }
+
+    public function getSlugAttribute()
+    {
+        return $this->helpCenterTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->slug;
+    }
 
     /**
      * @return BelongsTo

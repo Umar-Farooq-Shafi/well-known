@@ -9,9 +9,10 @@ use App\Livewire\ConcertMusic;
 use App\Livewire\Event;
 use App\Livewire\Events;
 use App\Livewire\HelpCenter;
+use App\Livewire\HelpCenterArticle;
+use App\Livewire\HelpCenterCategory;
 use App\Livewire\Home;
 use App\Livewire\Movies;
-use App\Livewire\MyReviews;
 use App\Livewire\OrganizerProfile;
 use App\Livewire\Pages;
 use App\Livewire\ToursAndAdventure;
@@ -28,7 +29,7 @@ Route::get('/', Home::class)->name('home');
 
 Route::get('/event/{slug}', Event::class)->name('event');
 
-Route::get('/events', Events::class)->name('events');
+Route::get('/events/{category?}', Events::class)->name('events');
 
 Route::get('/organizer/{slug}', OrganizerProfile::class)->name('organizer-profile');
 
@@ -44,12 +45,24 @@ Route::get('/events/categories', AllCategories::class)->name('all-categories');
 
 Route::get('/help-center', HelpCenter::class)->name('help-center');
 
+Route::get('/help-center/{slug}', HelpCenterCategory::class)->name('help-center-category');
+
+Route::get('/help-center/{slug}/article', HelpCenterArticle::class)->name('help-center-article');
+
 Route::prefix('page')->group(function () {
     Route::get('/about-us', Pages\AboutUs::class)->name('about-us');
 
     Route::get('/contact-us', Pages\ContactUs::class)->name('contact-us');
 
     Route::get('/payment-delivery-and-return', Pages\PaymentDeliveryAndReturn::class)->name('payment-delivery-and-return');
+
+    Route::get('/terms-of-service', Pages\TermsOfService::class)->name('terms-of-service');
+
+    Route::get('/privacy-policy', Pages\PrivancyPolicy::class)->name('privacy-policy');
+
+    Route::get('/sell-tickets', Pages\SellTickets::class)->name('sell-tickets');
+
+    Route::get('/ed-up', Pages\Ed::class)->name('ed');
 });
 
 Route::get('/blog', Blog::class)->name('blog');

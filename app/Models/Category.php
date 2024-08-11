@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\App;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $icon
@@ -75,6 +75,13 @@ class Category extends Model
         return $this->categoryTranslations()
             ->where('locale', App::getLocale())
             ->first()->name;
+    }
+
+    public function getSlugAttribute()
+    {
+        return $this->categoryTranslations()
+            ->where('locale', App::getLocale())
+            ->first()->slug;
     }
 
     /**

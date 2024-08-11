@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $eventdate_id
@@ -54,6 +54,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property-read \App\Models\Currency|null $currency
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TicketReservation> $ticketReservations
  * @property-read int|null $ticket_reservations_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderTicket> $eventDateTickets
+ * @property-read int|null $event_date_tickets_count
  * @mixin \Eloquent
  */
 class EventDateTicket extends Model

@@ -16,7 +16,7 @@
                 <ul>
                     <li><a href="{{ route('filament.admin.auth.register') }}" class="text-gray-600 hover:text-gray-800">Create an account</a></li>
                     <li><a href="{{ route('filament.admin.auth.register') }}" class="text-gray-600 hover:text-gray-800">Sell tickets online</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">My tickets</a></li>
+                    <li><a href="{{ route('filament.admin.resources.events.index') }}" class="text-gray-600 hover:text-gray-800">My tickets</a></li>
                     <li><a href="{{ route('filament.admin.auth.password-reset.request') }}" class="text-gray-600 hover:text-gray-800">Forgot your password?</a></li>
                     <li><a href="{{ route('payment-delivery-and-return') }}" class="text-gray-600 hover:text-gray-800">Payment, delivery and return</a></li>
                 </ul>
@@ -24,7 +24,7 @@
             <div>
                 <h4 class="font-semibold mb-4">Event Categories</h4>
                 <ul>
-                    <li><a href="#" class="text-gray-600 hover:text-gray-800">Party</a></li>
+                    <li><a href="{{ route('events', ['category' => 'Party']) }}" class="text-gray-600 hover:text-gray-800">Party</a></li>
                     <li><a href="{{ route('concert-music') }}" class="text-gray-600 hover:text-gray-800">Concert / Music</a></li>
                     <li><a href="{{ route('tours-and-adventure') }}" class="text-gray-600 hover:text-gray-800">Tours and Adventure</a></li>
                     <li><a href="#" class="text-gray-600 hover:text-gray-800">Sport / Fitness</a></li>
@@ -43,7 +43,10 @@
             </div>
         </div>
         <div class="border-t border-gray-300 mt-8 pt-4 text-center">
-            <p class="text-gray-600">Terms of service | Privacy policy</p>
+            <p class="text-gray-600">
+                <a href="{{ route('terms-of-service') }}">Terms of service</a> |
+                <a href="{{ route('privacy-policy') }}">Privacy policy</a>
+            </p>
             <p class="text-gray-600">Copyright © 2024</p>
         </div>
     </div>

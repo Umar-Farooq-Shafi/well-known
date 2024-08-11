@@ -5,5 +5,5 @@
         <x-breadcrumbs/>
     </div>
 
-    <livewire:components.events.index />
+    <livewire:components.events.index :category="$categoryTrans->translatable_id"  />
 </div>

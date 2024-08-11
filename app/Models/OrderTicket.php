@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $orderelement_id
@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderTicket whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderTicket withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderTicket withoutTrashed()
+ * @property-read \App\Models\EventDateTicket|null $eventDateTicket
  * @mixin \Eloquent
  */
 class OrderTicket extends Model

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $category_id
@@ -66,6 +66,20 @@ class BlogPost extends Model
         'views',
         'hidden'
     ];
+
+    public function getTitleAttribute()
+    {
+        return $this->blogPostTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->title;
+    }
+
+    public function getSlugAttribute()
+    {
+        return $this->blogPostTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->slug;
+    }
 
     /**
      * @return BelongsTo

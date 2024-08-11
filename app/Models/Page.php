@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -29,6 +29,20 @@ class Page extends Model
     public const CREATED_AT = null;
 
     protected $fillable = [];
+
+    public function getTitleAttribute()
+    {
+        return $this->pageTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->title;
+    }
+
+    public function getSlugAttribute()
+    {
+        return $this->pageTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->slug;
+    }
 
     /**
      * @return HasMany

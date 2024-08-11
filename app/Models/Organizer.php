@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $user_id
@@ -103,6 +103,7 @@ use Illuminate\Support\Facades\Storage;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $followings
  * @property-read int|null $followings_count
  * @property-read mixed $image
+ * @property-read \App\Models\Country|null $country
  * @mixin \Eloquent
  */
 class Organizer extends Model

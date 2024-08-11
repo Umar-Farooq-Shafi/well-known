@@ -19,7 +19,6 @@ use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
@@ -488,7 +487,7 @@ class EventResource extends Resource
                         query: function (Builder $query, $search) {
                             $query->whereHas(
                                 'eventTranslations',
-                                fn (Builder $query) => $query->where('name', 'LIKE', "%{$search}%")
+                                fn(Builder $query) => $query->where('name', 'LIKE', "%{$search}%")
                             );
                         },
                         isIndividual: true
@@ -741,7 +740,7 @@ class EventResource extends Resource
 
                 Tables\Actions\Action::make('check-in')
                     ->label(strtoupper('Check in attendees for this event date'))
-                    ->url(fn ($record) => Pages\AttendeeCheckInPage::getUrl(['record' => $record]))
+                    ->url(fn($record) => Pages\AttendeeCheckInPage::getUrl(['record' => $record]))
                     ->visible(auth()->user()->hasRole('ROLE_SCANNER')),
 
                 Tables\Actions\Action::make('event-date-and-ticket')
@@ -767,21 +766,21 @@ class EventResource extends Resource
                                             if ($eventDateTicket->active) {
                                                 $form[] = Forms\Components\Section::make($eventDateTicket->name)
                                                     ->schema([
-                                                       Forms\Components\TextInput::make('reference')
-                                                           ->label(function () use ($eventDateTicket) {
-                                                               if ($eventDateTicket->free) {
-                                                                   return 'Free';
-                                                               }
+                                                        Forms\Components\TextInput::make('reference')
+                                                            ->label(function () use ($eventDateTicket) {
+                                                                if ($eventDateTicket->free) {
+                                                                    return 'Free';
+                                                                }
 
-                                                               $currency = $eventDateTicket->currency?->ccy ?? '';
+                                                                $currency = $eventDateTicket->currency?->ccy ?? '';
 
-                                                               return  $currency . ' ' . $eventDateTicket->getSalePrice();
-                                                           })
-                                                           ->numeric()
-                                                           ->disabled(!$eventDateTicket->isOnSale())
-                                                           ->helperText(function () use ($eventDateTicket) {
-                                                               return "Tickets left: " . $eventDateTicket->getTicketsLeftCount() . ' / ' . $eventDateTicket->quantity;
-                                                           })
+                                                                return $currency . ' ' . $eventDateTicket->getSalePrice();
+                                                            })
+                                                            ->numeric()
+                                                            ->disabled(!$eventDateTicket->isOnSale())
+                                                            ->helperText(function () use ($eventDateTicket) {
+                                                                return "Tickets left: " . $eventDateTicket->getTicketsLeftCount() . ' / ' . $eventDateTicket->quantity;
+                                                            })
                                                             ->required()
                                                     ]);
                                             }
@@ -830,11 +829,12 @@ class EventResource extends Resource
                                     $cartElement->chosen_event_date = Carbon::createFromFormat('Y-m-d', $chosenEventDate);
                                 }
 
-                                if (Auth::user()->hasRole('ROLE_ATTENDEE') && !$eventTicket->isFree()) {
-//                                    $cartElement->ticket_fee = $services->getSetting('ticket_fee_online');
-                                } elseif (Auth::user()->hasRole('ROLE_POINTOFSALE') && !$eventTicket->isFree()) {
-//                                    $cartElement->ticket_fee = $services->getSetting('ticket_fee_pos');
-                                }
+                                $cartElement->ticket_fee = 0;
+
+//                                if (Auth::user()->hasRole('ROLE_ATTENDEE') && !$eventTicket->isFree()) {
+////                                    $cartElement->ticket_fee = $services->getSetting('ticket_fee_online');
+//                                } elseif (Auth::user()->hasRole('ROLE_POINTOFSALE') && !$eventTicket->isFree()) {
+//                                }
 
                                 $cartElement->save();
 
