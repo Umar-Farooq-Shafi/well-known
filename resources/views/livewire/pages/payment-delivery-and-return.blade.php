@@ -6,7 +6,7 @@
     </div>
 
     <div class="container mx-auto p-4">
-        <div class="bg-white rounded-lg shadow-lg p-6">
+        <article class="bg-white rounded-lg shadow-lg p-6 prose max-w-fit flex flex-col">
             <ul class="list-none list-inside mb-4">
                 <li>
                     <h1 class="font-medium text-xl mb-4">Payments</h1>

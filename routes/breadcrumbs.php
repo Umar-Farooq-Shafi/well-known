@@ -56,3 +56,6 @@ Breadcrumbs::for('add-review')
 
 Breadcrumbs::for('terms-of-service')
     ->push('Terms of Service');
+
+Breadcrumbs::for('privacy-policy')
+    ->push('Privacy Policy');
