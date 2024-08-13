@@ -1,5 +1,8 @@
 @php
-    use App\Models\AppLayoutSetting;use Illuminate\Support\Facades\Request;use Illuminate\Support\Facades\Storage;
+    use App\Models\AppLayoutSetting;
+    use App\Models\MenuTranslation;
+    use Illuminate\Support\Facades\Request;
+    use Illuminate\Support\Facades\Storage;
 
     $layout = AppLayoutSetting::query()->first();
     $logo = $layout->logo_name ? Storage::disk('public')->url('layout/' . $layout->logo_name) : null;
@@ -11,6 +14,10 @@
         'workshop-training' => ['name' => 'Workshop / Training', 'icon' => 'fas-chalkboard-teacher', 'route' => route('workshop-training')],
         'all-categories' => ['name' => 'All Categories', 'icon' => 'fas-folder-open', 'route' => route('all-categories')],
     ];
+
+    $firstMenu = MenuTranslation::whereTranslatableId(1)
+        ->where('locale', app()->getLocale())
+        ->first();
 @endphp
 
 <nav class="fixed w-full z-20 top-0 start-0 mb-24"
@@ -82,27 +89,26 @@
 
         <div class="items-center justify-between hidden w-full lg:flex md:w-auto md:order-1" id="navbar-sticky">
             <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:dark:bg-gray-900 dark:border-gray-700">
-                <li>
-                    <a href="/"
-                       class="flex items-center gap-x-1 my-2 py-4 px-2 text-base {{ Request::url() === env('APP_URL') ? 'text-white' : 'text-gray-900' }} rounded md:bg-transparent md:p-0 md:dark:text-blue-500"
-                       aria-current="page">
-                        <x-heroicon-o-home class="h-5 w-5"/>
-                        Home
-                    </a>
-                </li>
+                @foreach($firstMenu->menu->menuElements as $menuElement)
+                    @php
+                        $trans = $menuElement->menuElementTranslations()
+                            ->where('locale', app()->getLocale())
+                            ->first();
+                    @endphp
 
-                <li>
-                    <a href="{{ route('events') }}"
-                       class="flex items-center gap-x-1 my-2 py-4 px-2 text-base {{ Request::url() === route('events') ? 'text-white' : 'text-gray-900' }} rounded md:bg-transparent md:p-0 md:dark:text-blue-500"
-                       aria-current="page">
-                        <x-heroicon-o-calendar class="h-5 w-5"/>
-                        Browse Events
-                    </a>
-                </li>
-
-                <li>
-                    <div {{ $attributes }}>
-                        <div class="relative inline-block text-left" x-data="{
+                    @if($menuElement->link !== 'categories_dropdown')
+                        <li>
+                            <a href="{{ $menuElement->link }}"
+                               class="flex items-center gap-x-1 my-2 py-4 px-2 text-base {{ Request::url() === $menuElement->link ? 'text-white' : 'text-gray-900' }} rounded md:bg-transparent md:p-0 md:dark:text-blue-500"
+                               aria-current="page">
+                                <x-dynamic-component :component="$menuElement->icon" class="h-5 w-5"/>
+                                {{ $trans->label }}
+                            </a>
+                        </li>
+                    @else
+                        <li>
+                            <div {{ $attributes }}>
+                                <div class="relative inline-block text-left" x-data="{
                             open: false,
                             toggle() {
                                 if (this.open) {
@@ -117,83 +123,47 @@
                                 focusAfter && focusAfter.focus()
                             }
                         }" x-on:keydown.escape.prevent.stop="close($refs.button)"
-                             x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
-                             x-id="['dropdown-button']">
-                            <div>
-                                <button x-ref="button" x-on:click="toggle()" :aria-expanded="open"
-                                        :aria-controls="$id('dropdown-button')" type="button"
-                                        class="inline-flex py-2 text-gray-900 rounded hover:bg-transparent hover:text-blue-700 focus:outline-none"
-                                        id="menu-button" aria-expanded="true" aria-haspopup="true">
-                                    <x-fas-stream class="h-4 w-4 mt-1 mr-1"/>
-                                    Explore
-                                    <svg class="-mr-1 ml-2 mt-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg"
-                                         viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd"
-                                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                              clip-rule="evenodd"/>
-                                    </svg>
-                                </button>
-                            </div>
+                                     x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
+                                     x-id="['dropdown-button']">
+                                    <div>
+                                        <button x-ref="button" x-on:click="toggle()" :aria-expanded="open"
+                                                :aria-controls="$id('dropdown-button')" type="button"
+                                                class="inline-flex py-2 text-gray-900 rounded hover:bg-transparent hover:text-blue-700 focus:outline-none"
+                                                id="menu-button" aria-expanded="true" aria-haspopup="true">
+                                            <x-fas-stream class="h-4 w-4 mt-1 mr-1"/>
+                                            Explore
+                                            <svg class="-mr-1 ml-2 mt-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg"
+                                                 viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fill-rule="evenodd"
+                                                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                      clip-rule="evenodd"/>
+                                            </svg>
+                                        </button>
+                                    </div>
 
-                            <div x-ref="panel" x-show="open" x-transition.origin.top.right
-                                 x-on:click.outside="close($refs.button)" :id="$id('dropdown-button')"
-                                 style="display: none;"
-                                 class="origin-top-right z-10 absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                 role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                                <div class="py-1" role="none">
-                                    @foreach($options as $key => $option)
-                                        <a href="{{ $option['route'] }}" x-on:click="close($refs.button)"
-                                           class="flex gap-x-1 items-center {{ Request::url() === $option['route'] ? 'text-blue-400' : 'text-gray-900' }} hover:bg-transparent hover:text-blue-700 font-medium no-underline px-4 py-2 text-sm"
-                                           role="menuitem" tabindex="-1" id="menu-item-{{$key}}">
-                                            <x-dynamic-component :component="$option['icon']" class="h-6 w-6"/>
-                                            {{ $option['name'] }}
-                                        </a>
-                                    @endforeach
+                                    <div x-ref="panel" x-show="open" x-transition.origin.top.right
+                                         x-on:click.outside="close($refs.button)" :id="$id('dropdown-button')"
+                                         style="display: none;"
+                                         class="origin-top-right z-10 absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                         role="menu" aria-orientation="vertical" aria-labelledby="menu-button"
+                                         tabindex="-1">
+                                        <div class="py-1" role="none">
+                                            @foreach($options as $key => $option)
+                                                <a href="{{ $option['route'] }}" x-on:click="close($refs.button)"
+                                                   class="flex gap-x-1 items-center {{ Request::url() === $option['route'] ? 'text-blue-400' : 'text-gray-900' }} hover:bg-transparent hover:text-blue-700 font-medium no-underline px-4 py-2 text-sm"
+                                                   role="menuitem" tabindex="-1" id="menu-item-{{$key}}">
+                                                    <x-dynamic-component :component="$option['icon']" class="h-6 w-6"/>
+                                                    {{ $option['name'] }}
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </li>
+                        </li>
+                    @endif
+                @endforeach
 
-                <li>
-                    <a href="{{ route('venues') }}"
-                       class="flex items-center gap-x-1 my-2 py-2 px-2 {{ Request::url() === route('venues') ? 'text-white' : 'text-gray-900' }} rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
-                        <x-heroicon-o-question-mark-circle class="h-6 w-6"/>
-                        Venues
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('help-center') }}"
-                       class="flex gap-x-1 my-2 py-2 px-3 {{ Request::url() === route('help-center') ? 'text-white' : 'text-gray-900' }} rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
-                        <x-heroicon-o-question-mark-circle class="h-6 w-6"/>
-                        How it's work?
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('blog') }}"
-                       class="flex items-center gap-x-1 my-2 py-2 px-3 {{ Request::url() === route('blog') ? 'text-white' : 'text-gray-900' }} rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
-                        <x-fas-credit-card class="h-5 w-5"/>
-                        Blog
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('filament.admin.resources.events.index') }}"
-                       class="flex items-center gap-x-1 my-2 py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
-                        <x-fas-ticket class="h-5 w-5"/>
-                        My tickets
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('filament.admin.resources.events.create') }}"
-                       class="flex items-center gap-x-1 my-2 py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
-                        <x-fas-calendar class="h-5 w-5"/>
-                        Add my event
-                    </a>
-                </li>
             </ul>
         </div>
     </div>

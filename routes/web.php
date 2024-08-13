@@ -22,6 +22,7 @@ use App\Livewire\WorkshopTraining;
 use Illuminate\Support\Facades\Route;
 
 Route::feeds();
+Route::impersonate();
 
 Route::redirect('/login', '/admin/login')->name('login');
 

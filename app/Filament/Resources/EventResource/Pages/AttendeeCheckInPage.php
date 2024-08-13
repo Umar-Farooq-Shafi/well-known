@@ -33,6 +33,11 @@ class AttendeeCheckInPage extends Page implements HasTable
         $this->record = $this->resolveRecord($record);
     }
 
+    public static function canAccess(array $parameters = []): bool
+    {
+        return auth()->user()->hasRole('ROLE_SCANNER');
+    }
+
     public function table(Table $table): Table
     {
         return $table
@@ -75,7 +80,9 @@ class AttendeeCheckInPage extends Page implements HasTable
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Bought on')
-                    ->date(),
+                    ->date(
+                        'l jS F Y, h:i A'
+                    ),
             ])
             ->headerActions([
                 Tables\Actions\ExportAction::make()
@@ -113,7 +120,9 @@ class AttendeeCheckInPage extends Page implements HasTable
                     ->action(function (array $data, Tables\Actions\Action $component) {
                         $user = User::whereUsername($data['username'])->first();
 
-                        if (!$user || $user->id === auth()->id() || !Hash::check($data['password'], $user->password)) {
+                        $orgUser = User::whereOrganizerId(auth()->user()->scanner->organizer_id)->firstOrFail();
+
+                        if (!$user || $user->id === $orgUser->id || !Hash::check($data['password'], $user->password)) {
                             Notification::make()
                                 ->title('Credential does not match')
                                 ->danger()

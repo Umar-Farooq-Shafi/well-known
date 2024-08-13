@@ -20,17 +20,16 @@
             />
 
             <div class="flex flex-col gap-y-1">
-                <h1 class="font-bold text-primary-500">{{ $eventTrans?->name }}</h1>
+                <a href="{{ route('event', ['slug' => $eventTrans->slug]) }}"
+                   class="font-bold text-primary-500">{{ $eventTrans?->name }}</a>
 
                 <p class="text-sm">
-                    When:
-                    <span>
-                         {{ $eventDate?->startdate ? \Carbon\Carbon::make($eventDate?->startdate)->format('Y-m-d') : '' }}
-                    </span>
+                    <span class="font-bold">When: </span>
+                    {{ $eventDate?->startdate ? \Carbon\Carbon::make($eventDate?->startdate)->format('l jS F Y, h:i A') : '' }}
                 </p>
 
                 <p class="text-sm">
-                    Where:
+                    <span class="font-bold">Where: </span>
 
                     @if($venue = $eventDate?->venue)
                         <span>{{ $venue?->name }} {{ $venue->stringifyAddress }}</span>
