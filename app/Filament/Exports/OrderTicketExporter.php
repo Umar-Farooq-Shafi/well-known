@@ -30,7 +30,13 @@ class OrderTicketExporter extends Exporter
                 ->label('Ticket Type'),
 
             ExportColumn::make('created_at')
-                ->label('Bought on')
+                ->label('Bought on'),
+
+            ExportColumn::make('scanned')
+                ->state(fn ($state) => $state ? "Yes" : "No"),
+
+            ExportColumn::make('updated_at')
+                ->label('Scanned At'),
         ];
     }
 

@@ -22,6 +22,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
 use Spatie\Sitemap\SitemapGenerator;
 
 class AdminPanelProvider extends PanelProvider
@@ -40,6 +41,9 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->colors([
                 'primary' => Color::Sky,
+            ])
+            ->plugins([
+                FilamentApexChartsPlugin::make()
             ])
             ->profile(Profile::class)
             ->passwordReset()

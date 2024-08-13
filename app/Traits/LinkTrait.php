@@ -48,7 +48,10 @@ trait LinkTrait
         $linksArray[__('Dashboard Pages')] = $dashboardPagesArray;
 
         // Add category pages urls
-        $categoryPagesArray = [];
+        $categoryPagesArray = [
+            'categories_dropdown' => __('Categories Dropdown'),
+            'footer_categories_section' => __('Footer Categories Section'),
+        ];
 
         $categories = Category::all(); // Replace with your actual method to retrieve categories
         foreach ($categories as $category) {

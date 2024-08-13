@@ -32,6 +32,19 @@ class OrderResource extends Resource
         return 'Orders';
     }
 
+    public static function getPluralModelLabel(): string
+    {
+        if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
+            $country = auth()->user()->organizer->country;
+
+            $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
+
+            return "Orders (" . $timezone[0] . ")";
+        }
+
+        return "Orders";
+    }
+
     public static function canViewAny(): bool
     {
         return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_SCANNER']);
@@ -144,6 +157,7 @@ class OrderResource extends Resource
             ->headerActions([
                 Tables\Actions\ExportAction::make()
                     ->exporter(OrderExporter::class)
+                    ->label('Export')
                     ->icon('heroicon-o-arrow-down-tray'),
             ])
             ->actions([

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $event_id
@@ -70,13 +70,23 @@ class EventDate extends Model
         'enddate',
         'recurrent',
         'recurrent_startdate',
-        'recurrent_enddate'
+        'recurrent_enddate',
     ];
 
     public function getTicketSoldAttribute(): float|int
     {
-        if ($this->getOrderElementsQuantitySum() == 0)
+        if ($this->getOrderElementsQuantitySum() == 0) {
             return 0;
+        }
+
+        return round(($this->getScannedTicketsCount() / $this->getOrderElementsQuantitySum()) * 100);
+    }
+
+    public function getTotalCheckInPercentage(): float|int
+    {
+        if ($this->getOrderElementsQuantitySum() == 0) {
+            return 0;
+        }
 
         return round(($this->getScannedTicketsCount() / $this->getOrderElementsQuantitySum()) * 100);
     }
@@ -229,8 +239,12 @@ class EventDate extends Model
         return $this->getSales("all", "all", false, true) - $this->getSales();
     }
 
-    public function getSales($role = "all", $user = "all", $formattedForPayoutApproval = false, $includeFees = false): float|int
-    {
+    public function getSales(
+        $role = "all",
+        $user = "all",
+        $formattedForPayoutApproval = false,
+        $includeFees = false,
+    ): float|int {
         $sum = 0;
 
         foreach ($this->eventDateTickets as $eventDateTicket) {
@@ -298,7 +312,7 @@ class EventDate extends Model
             Scanner::class,
             'eventic_eventdate_scanner',
             'eventdate_id',
-            'scanner_id'
+            'scanner_id',
         );
     }
 

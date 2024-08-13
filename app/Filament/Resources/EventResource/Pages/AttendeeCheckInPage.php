@@ -40,9 +40,12 @@ class AttendeeCheckInPage extends Page implements HasTable
                 OrderTicket::query()
                     ->whereHas(
                         'eventDateTicket.eventDate',
-                        fn(Builder $query) => $query->where('reference', $this->record->eventDates()->first()->reference)
+                        fn(Builder $query) => $query->where(
+                            'reference',
+                            $this->record->eventDates()->first()->reference,
+                        ),
                     )
-                    ->orderByDesc('created_at')
+                    ->orderByDesc('created_at'),
             )
             ->columns([
                 Tables\Columns\TextColumn::make('reference')
@@ -94,12 +97,18 @@ class AttendeeCheckInPage extends Page implements HasTable
 
                         Forms\Components\TextInput::make('password')
                             ->label(__('filament-panels::pages/auth/login.form.password.label'))
-                            ->hint(filament()->hasPasswordReset() ? new HtmlString(Blade::render('<x-filament::link :href="filament()->getRequestPasswordResetUrl()"> {{ __(\'filament-panels::pages/auth/login.actions.request_password_reset.label\') }}</x-filament::link>')) : null)
+                            ->hint(
+                                filament()->hasPasswordReset() ? new HtmlString(
+                                    Blade::render(
+                                        '<x-filament::link :href="filament()->getRequestPasswordResetUrl()"> {{ __(\'filament-panels::pages/auth/login.actions.request_password_reset.label\') }}</x-filament::link>',
+                                    ),
+                                ) : null,
+                            )
                             ->password()
                             ->revealable(filament()->arePasswordsRevealable())
                             ->autocomplete('current-password')
                             ->required()
-                            ->extraInputAttributes(['tabindex' => 2])
+                            ->extraInputAttributes(['tabindex' => 2]),
                     ])
                     ->action(function (array $data, Tables\Actions\Action $component) {
                         $user = User::whereUsername($data['username'])->first();
@@ -115,10 +124,13 @@ class AttendeeCheckInPage extends Page implements HasTable
                             OrderTicket::query()
                                 ->whereHas(
                                     'eventDateTicket.eventDate',
-                                    fn(Builder $query) => $query->where('reference', $this->record->eventDates()->first()->reference)
+                                    fn(Builder $query) => $query->where(
+                                        'reference',
+                                        $this->record->eventDates()->first()->reference,
+                                    ),
                                 )
                                 ->update([
-                                    'scanned' => false
+                                    'scanned' => false,
                                 ]);
 
                             Notification::make()
@@ -126,7 +138,7 @@ class AttendeeCheckInPage extends Page implements HasTable
                                 ->success()
                                 ->send();
                         }
-                    })
+                    }),
             ])
             ->actions([
                 Tables\Actions\Action::make('id')
@@ -149,7 +161,16 @@ class AttendeeCheckInPage extends Page implements HasTable
                                 ->success()
                                 ->send();
                         }
-                    })
+                    }),
             ]);
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            EventResource\Widgets\AttendeeCheckInOverview::class,
+            EventResource\Widgets\AttendeeCheckInChart::class,
+        ];
+    }
+
 }

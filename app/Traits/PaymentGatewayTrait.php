@@ -31,6 +31,14 @@ trait PaymentGatewayTrait
             if ($adminGateway) {
                 $data['gateway_logo_name'] = $adminGateway->gateway_logo_name;
             }
+        } else if ($data['gateway_name'] === 'eseva') {
+            $adminGateway = PaymentGateway::whereGatewayName('eseva')
+                ->whereNotNull('gateway_logo_name')
+                ->first();
+
+            if ($adminGateway) {
+                $data['gateway_logo_name'] = $adminGateway->gateway_logo_name;
+            }
         } else {
             $adminGateway = PaymentGateway::query()
                 ->whereNotNull('gateway_logo_name')
