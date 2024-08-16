@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Components;
 
-use App\Models\Event;
 use App\Models\EventTranslation;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
+
+use function Symfony\Component\String\s;
 
 class SearchEvents extends Component
 {
@@ -12,10 +15,44 @@ class SearchEvents extends Component
 
     public $events;
 
-    public function updatedQuery()
+    public $country;
+
+    public $dates;
+
+    public function submit()
     {
-        $this->events = EventTranslation::query()
-            ->where('name', 'like', '%' . $this->query . '%')
+        $query = EventTranslation::query();
+
+        if ($this->dates) {
+            $pattern = '/(\w{3}-\d{2})/';
+
+            preg_match_all($pattern, $this->dates, $matches);
+
+            if (count($matches) > 0 && count($matches[0]) > 0) {
+                $start = Carbon::make($matches[0][0]);
+                $end = Carbon::make($matches[0][1]);
+
+                $query->whereHas(
+                    'event.eventDates',
+                    fn (Builder $query) => $query
+                        ->whereDate('startdate', '>=', $start)
+                        ->whereDate('enddate', '<=', $end)
+                );
+            }
+        }
+
+        $this->events = $query->when(
+            $this->query,
+            fn (Builder $query) => $query->where('name', 'like', '%' . $this->query . '%')
+        )
+            ->when(
+                $this->country,
+                fn (Builder $query) => $query
+                    ->whereHas(
+                        'event',
+                        fn (Builder $query) => $query->where('country_id', $this->country)
+                    )
+            )
             ->take(5)
             ->get();
     }
