@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Listeners\UserLoginAt;
 use App\Models\Setting;
+use Filament\Support\Assets\Js;
+use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Auth\Events\Login;
@@ -48,6 +50,10 @@ class AppServiceProvider extends ServiceProvider
 //                ));
 //            }
         }
+
+        FilamentAsset::register([
+            Js::make('custom-script', __DIR__ . '/../../resources/js/custom.js'),
+        ]);
 
         Event::listen(
             Login::class,

@@ -28,6 +28,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
+use Pboivin\FilamentPeek\Forms\Actions\InlinePreviewAction;
+use Pboivin\FilamentPeek\Pages\Actions\PreviewAction;
+use Pboivin\FilamentPeek\Pages\Concerns\HasPreviewModal;
+use Pboivin\FilamentPeek\Tables\Actions\ListPreviewAction;
 
 class EventResource extends Resource
 {
@@ -745,6 +749,12 @@ class EventResource extends Resource
 
                 Tables\Actions\Action::make('event-date-and-ticket')
                     ->label(strtoupper('Show event dates and tickets'))
+                    ->extraModalFooterActions([
+                        Tables\Actions\Action::make('toggle-fullscreen')
+                            ->action(function ($livewire) {
+                                $livewire->dispatch('toggleFullscreen');
+                            }),
+                    ])
                     ->form(function ($record) {
                         $form = [];
 
