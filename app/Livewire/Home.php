@@ -6,13 +6,18 @@ use App\Models\Category;
 use App\Models\CountryTranslation;
 use App\Models\Event;
 use App\Models\Setting;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\App;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class Home extends Component
 {
     public $country = 'All';
+
+    #[Url]
+    public $category = '';
 
     public function updateCountry($country)
     {
@@ -23,7 +28,6 @@ class Home extends Component
     public function render()
     {
         $homepage_categories_number = Setting::where('key', 'homepage_categories_number')->first()?->value;
-        $homepage_events_number = Setting::where('key', 'homepage_events_number')->first()?->value;
         $homepage_featured_events_nb = Setting::where('key', 'homepage_featured_events_nb')->first()?->value;
 
         $categories = Category::with([
@@ -32,15 +36,6 @@ class Home extends Component
             },
         ])
             ->take($homepage_categories_number)
-            ->get();
-
-        $events = Event::with([
-            'eventTranslations' => function ($query) {
-                $query->where('locale', App::getLocale());
-            },
-        ])
-            ->where('completed', false)
-            ->take($homepage_events_number)
             ->get();
 
         $featuredEvents = Event::with([
@@ -55,6 +50,75 @@ class Home extends Component
                 ]);
             },
         ])
+            ->when(
+                $this->country !== 'All',
+                function (Builder $query) {
+                    $query->where(
+                        'country_id',
+                        CountryTranslation::where('name', 'like', '%' . $this->country . '%')
+                            ->first()?->id
+                    );
+                }
+            )
+            ->when(
+                $this->category === 'online',
+                function (Builder $query) {
+                    $query->whereHas(
+                        'eventDates',
+                        function ($query) {
+                            $query->where('online', true);
+                        }
+                    );
+                }
+            )
+            ->when(
+                $this->category === 'free',
+                function (Builder $query) {
+                    $query->whereHas(
+                        'eventDates',
+                        function (Builder $query) {
+                            $query->whereHas(
+                                'eventDateTickets',
+                                fn (Builder $query) => $query->where('free', true)
+                            );
+                        }
+                    );
+                }
+            )
+            ->when(
+                $this->category === 'today',
+                function (Builder $query) {
+                    $query->whereHas(
+                        'eventDates',
+                        function (Builder $query) {
+                            $query->whereDate('startdate', '=', now());
+                        }
+                    );
+                }
+            )
+            ->when(
+                $this->category === 'this-weekend',
+                function (Builder $query) {
+                    $query->whereHas(
+                        'eventDates',
+                        function (Builder $query) {
+                            $query->whereDate('startdate', '>=', now()->startOfWeek())
+                                ->whereDate('startdate', '<=', now()->endOfWeek());
+                        }
+                    );
+                }
+            )
+            ->when(
+                $this->category && $this->category !== '',
+                function (Builder $query) {
+                    $query->whereHas(
+                        'category.categoryTranslations',
+                        function (Builder $query) {
+                            $query->where('name', 'LIKE', '%' . $this->category . '%');
+                        }
+                    );
+                }
+            )
             ->where('is_featured', 1)
             ->take($homepage_featured_events_nb)
             ->get();
@@ -69,7 +133,6 @@ class Home extends Component
 
         return view('livewire.home', [
             'categories' => $categories,
-            'events' => $events,
             'featuredEvents' => $featuredEvents,
             'countries' => $countries,
         ]);
