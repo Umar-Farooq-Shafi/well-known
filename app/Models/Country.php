@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $code
@@ -43,6 +43,13 @@ class Country extends Model
     protected $table = 'eventic_country';
 
     protected $fillable = ['code', 'hidden'];
+
+    public function getNameAttribute()
+    {
+        return $this->countryTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->name;
+    }
 
     /**
      * @return HasMany

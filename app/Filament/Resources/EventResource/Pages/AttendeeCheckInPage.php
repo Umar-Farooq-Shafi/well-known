@@ -6,6 +6,7 @@ use App\Filament\Exports\OrderTicketExporter;
 use App\Filament\Resources\EventResource;
 use App\Models\OrderTicket;
 use App\Models\User;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
@@ -40,6 +41,10 @@ class AttendeeCheckInPage extends Page implements HasTable
 
     public function table(Table $table): Table
     {
+        $country = auth()->user()->scanner->organizer->country;
+
+        $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
+
         return $table
             ->query(
                 OrderTicket::query()
@@ -80,9 +85,10 @@ class AttendeeCheckInPage extends Page implements HasTable
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Bought on')
-                    ->date(
-                        'l jS F Y, h:i A'
-                    ),
+                    ->formatStateUsing(function ($state) use ($timezone) {
+                        return Carbon::make($state)->timezone($timezone[0])
+                            ->format('l jS F Y, h:i A');
+                    })
             ])
             ->headerActions([
                 Tables\Actions\ExportAction::make()
@@ -118,11 +124,9 @@ class AttendeeCheckInPage extends Page implements HasTable
                             ->extraInputAttributes(['tabindex' => 2]),
                     ])
                     ->action(function (array $data, Tables\Actions\Action $component) {
-                        $user = User::whereUsername($data['username'])->first();
-
                         $orgUser = User::whereOrganizerId(auth()->user()->scanner->organizer_id)->firstOrFail();
 
-                        if (!$user || $user->id === $orgUser->id || !Hash::check($data['password'], $user->password)) {
+                        if ($orgUser->username !== $data['username'] || !Hash::check($data['password'], $orgUser->password)) {
                             Notification::make()
                                 ->title('Credential does not match')
                                 ->danger()
@@ -156,7 +160,7 @@ class AttendeeCheckInPage extends Page implements HasTable
                     ->icon(fn($record) => $record->scanned ? 'heroicon-o-check' : '')
                     ->tooltip(function ($record) {
                         if ($record->scanned) {
-                            return "Checked In At " . $record->created_at;
+                            return "Checked In At " . Carbon::make($record->updated_at)->format('l jS F Y, h:i A');
                         }
 
                         return null;

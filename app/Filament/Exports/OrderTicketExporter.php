@@ -33,7 +33,7 @@ class OrderTicketExporter extends Exporter
                 ->label('Bought on'),
 
             ExportColumn::make('scanned')
-                ->state(fn ($state) => $state ? "Yes" : "No"),
+                ->formatStateUsing(fn ($state) => $state ? "Yes" : "No"),
 
             ExportColumn::make('updated_at')
                 ->label('Scanned At'),

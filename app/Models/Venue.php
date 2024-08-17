@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -117,13 +117,13 @@ class Venue extends Model
         'lat',
         'lng',
         'listedondirectory',
-        'contactemail'
+        'contactemail',
     ];
 
     protected $casts = [
         'listedondirectory' => 'boolean',
         'quoteform' => 'boolean',
-        'showmap' => 'boolean'
+        'showmap' => 'boolean',
     ];
 
     /**
@@ -136,23 +136,47 @@ class Venue extends Model
 
     public function getSlugAttribute()
     {
-        return $this->venueTranslations()
+        return $this
+            ->venueTranslations()
             ->where('locale', app()->getLocale())
             ->first()?->slug;
     }
 
     public function getNameAttribute()
     {
-        return $this->venueTranslations()
+        return $this
+            ->venueTranslations()
             ->where('locale', app()->getLocale())
             ->first()?->name;
     }
 
     public function getDescriptionAttribute()
     {
-        return $this->venueTranslations()
+        return $this
+            ->venueTranslations()
             ->where('locale', app()->getLocale())
             ->first()?->description;
+    }
+
+    public function getLocalTimezoneBasedOnCountry(): array
+    {
+        // Extract the country name from the entity
+        $countryName = $this->country->name;
+
+        // Define a mapping of countries to timezones (adjust as needed)
+        $timezoneMapping = [
+            'New Zealand' => 'Pacific/Auckland',
+            'Nepal' => 'Asia/Kathmandu',
+        ];
+
+        // Check if the country is in the mapping, otherwise default to a fallback timezone
+        $fallbackTimezone = 'EDT';
+        $timezone = $timezoneMapping[$countryName] ?? $fallbackTimezone;
+
+        return [
+            'country' => $countryName,
+            'timezone' => $timezone,
+        ];
     }
 
     /**
@@ -182,7 +206,7 @@ class Venue extends Model
             'event_id',
             'id',
             'id',
-            'event_id'
+            'event_id',
         );
     }
 
