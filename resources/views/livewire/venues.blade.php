@@ -43,31 +43,24 @@
         </div>
 
         <div class="flex flex-col lg:flex-row justify-between mb-4 mt-8">
-            <aside class="w-full lg:w-1/5 mb-4 lg:mb-0 space-y-2 mx-4">
-                <article class="card-group-item" id="search-open" x-data="{ searchOpen: true }">
-                    <header class="p-3 cursor-pointer bg-gray-200 rounded" @click="searchOpen = ! searchOpen">
-                        <div class="flex items-center justify-between">
-                            <h6 class="text-gray-700">{{ __('Keyword') }}</h6>
+            <div
+                class="w-full lg:w-1/5 mb-4 lg:mb-0 h-fit space-y-2 mx-4 divide-y divide-slate-300 overflow-hidden rounded border border-slate-300 bg-slate-100/40 text-slate-700">
+                <div x-data="{ isExpanded: true }" class="divide-y divide-slate-300 dark:divide-slate-700">
+                    <button id="controlsAccordionItemOne" type="button"
+                            class="flex w-full items-center justify-between gap-4 bg-slate-100 p-4 text-left underline-offset-2 hover:bg-slate-100/75 focus-visible:bg-slate-100/75 focus-visible:underline focus-visible:outline-none dark:bg-slate-800 dark:hover:bg-slate-800/75 dark:focus-visible:bg-slate-800/75"
+                            aria-controls="accordionItemOne" @click="isExpanded = ! isExpanded"
+                            :class="isExpanded ? 'text-onSurfaceStrong dark:text-onSurfaceDarkStrong font-bold'  : 'text-onSurface dark:text-onSurfaceDark font-medium'"
+                            :aria-expanded="isExpanded ? 'true' : 'false'">
+                        {{ __('Keyword') }}
 
-                            <template x-if="searchOpen">
-                                <x-fas-chevron-down class="w-4 h-4"/>
-                            </template>
-
-                            <template x-if="!searchOpen">
-                                <x-fas-chevron-up class="w-4 h-4"/>
-                            </template>
-                        </div>
-                    </header>
-
-                    <div
-                        class="flex flex-row gap-x-2 items-center p-4"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 scale-90"
-                        x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-300"
-                        x-transition:leave-start="opacity-100 scale-100"
-                        x-transition:leave-end="opacity-0 scale-90"
-                        x-show="searchOpen">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2"
+                             stroke="currentColor" class="size-5 shrink-0 transition" aria-hidden="true"
+                             :class="isExpanded  ?  'rotate-180'  :  ''">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                        </svg>
+                    </button>
+                    <div x-cloak x-show="isExpanded" class="p-2" id="accordionItemOne" role="region"
+                         aria-labelledby="controlsAccordionItemOne" x-collapse>
                         <div wire:loading wire:target="name">
                             <x-heroicon-o-arrow-path class="animate-spin h-5 w-5 text-blue-500"/>
                         </div>
@@ -82,32 +75,23 @@
                             />
                         </form>
                     </div>
-                </article>
+                </div>
 
-                <article id="country-open" x-data="{ countryOpen: true }">
-                    <header class="p-3 bg-gray-200 cursor-pointer rounded" @click="countryOpen = ! countryOpen">
-                        <div class="flex items-center justify-between">
-                            <h6 class="text-gray-700">{{ __('Country') }}</h6>
-
-                            <template x-if="countryOpen">
-                                <x-fas-chevron-down class="w-4 h-4"/>
-                            </template>
-
-                            <template x-if="!countryOpen">
-                                <x-fas-chevron-up class="w-4 h-4"/>
-                            </template>
-                        </div>
-                    </header>
-
-                    <div
-                        class="gap-x-2 flex items-center p-4"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 scale-90"
-                        x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-300"
-                        x-transition:leave-start="opacity-100 scale-100"
-                        x-transition:leave-end="opacity-0 scale-90"
-                        x-show="countryOpen">
+                <div x-data="{ isExpanded: true }" class="divide-y divide-slate-300 dark:divide-slate-700">
+                    <button id="controlsAccordionItemTwo" type="button"
+                            class="flex w-full items-center justify-between gap-4 bg-slate-100 p-4 text-left underline-offset-2 hover:bg-slate-100/75 focus-visible:bg-slate-100/75 focus-visible:underline focus-visible:outline-none dark:bg-slate-800 dark:hover:bg-slate-800/75 dark:focus-visible:bg-slate-800/75"
+                            aria-controls="accordionItemTwo" @click="isExpanded = ! isExpanded"
+                            :class="isExpanded ? 'text-onSurfaceStrong dark:text-onSurfaceDarkStrong font-bold'  : 'text-onSurface dark:text-onSurfaceDark font-medium'"
+                            :aria-expanded="isExpanded ? 'true' : 'false'">
+                        {{ __('Country') }}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2"
+                             stroke="currentColor" class="size-5 shrink-0 transition" aria-hidden="true"
+                             :class="isExpanded  ?  'rotate-180'  :  ''">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                        </svg>
+                    </button>
+                    <div x-cloak x-show="isExpanded" class="p-2" id="accordionItemTwo" role="region"
+                         aria-labelledby="controlsAccordionItemTwo" x-collapse>
                         <span wire:loading wire:target="country">
                             <x-heroicon-o-arrow-path class="animate-spin h-5 w-5 text-blue-500"/>
                         </span>
@@ -123,32 +107,23 @@
                             />
                         </form>
                     </div>
-                </article>
+                </div>
 
-                <article id="venue-type-open" x-data="{ venueTypeOpen: true }">
-                    <header class="p-3 bg-gray-200 cursor-pointer rounded" @click="venueTypeOpen = ! venueTypeOpen">
-                        <div class="flex items-center justify-between">
-                            <h6 class="text-gray-700">{{ __('Venu Type') }}</h6>
-
-                            <template x-if="venueTypeOpen">
-                                <x-fas-chevron-down class="w-4 h-4"/>
-                            </template>
-
-                            <template x-if="!venueTypeOpen">
-                                <x-fas-chevron-up class="w-4 h-4"/>
-                            </template>
-                        </div>
-                    </header>
-
-                    <div
-                        class="gap-x-2 p-4"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 scale-90"
-                        x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-300"
-                        x-transition:leave-start="opacity-100 scale-100"
-                        x-transition:leave-end="opacity-0 scale-90"
-                        x-show="venueTypeOpen">
+                <div x-data="{ isExpanded: true }" class="divide-y divide-slate-300 dark:divide-slate-700">
+                    <button id="controlsAccordionItemThree" type="button"
+                            class="flex w-full items-center justify-between gap-4 bg-slate-100 p-4 text-left underline-offset-2 hover:bg-slate-100/75 focus-visible:bg-slate-100/75 focus-visible:underline focus-visible:outline-none dark:bg-slate-800 dark:hover:bg-slate-800/75 dark:focus-visible:bg-slate-800/75"
+                            aria-controls="accordionItemThree" @click="isExpanded = ! isExpanded"
+                            :class="isExpanded ? 'text-onSurfaceStrong dark:text-onSurfaceDarkStrong font-bold'  : 'text-onSurface dark:text-onSurfaceDark font-medium'"
+                            :aria-expanded="isExpanded ? 'true' : 'false'">
+                        {{ __('Venu Type') }}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2"
+                             stroke="currentColor" class="size-5 shrink-0 transition" aria-hidden="true"
+                             :class="isExpanded  ?  'rotate-180'  :  ''">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                        </svg>
+                    </button>
+                    <div x-cloak x-show="isExpanded" class="p-2" id="accordionItemThree" role="region"
+                         aria-labelledby="controlsAccordionItemThree" x-collapse>
                         @if(count($venueTypes))
                             <div>
                                 <div wire:loading wire:target="selectedVenueTypes">
@@ -172,33 +147,23 @@
                             </div>
                         @endif
                     </div>
-                </article>
+                </div>
 
-                <article id="seated-guests-open" x-data="{ seatedGuestsOpen: true }">
-                    <header class="p-3 bg-gray-200 cursor-pointer rounded"
-                            @click="seatedGuestsOpen = ! seatedGuestsOpen">
-                        <div class="flex items-center justify-between">
-                            <h6 class="text-gray-700">{{ __('Seated Guests') }}</h6>
-
-                            <template x-if="seatedGuestsOpen">
-                                <x-fas-chevron-down class="w-4 h-4"/>
-                            </template>
-
-                            <template x-if="!seatedGuestsOpen">
-                                <x-fas-chevron-up class="w-4 h-4"/>
-                            </template>
-                        </div>
-                    </header>
-
-                    <div
-                        class="gap-x-2 p-4"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 scale-90"
-                        x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-300"
-                        x-transition:leave-start="opacity-100 scale-100"
-                        x-transition:leave-end="opacity-0 scale-90"
-                        x-show="seatedGuestsOpen">
+                <div x-data="{ isExpanded: true }" class="divide-y divide-slate-300 dark:divide-slate-700">
+                    <button id="controlsAccordionItemThree" type="button"
+                            class="flex w-full items-center justify-between gap-4 bg-slate-100 p-4 text-left underline-offset-2 hover:bg-slate-100/75 focus-visible:bg-slate-100/75 focus-visible:underline focus-visible:outline-none dark:bg-slate-800 dark:hover:bg-slate-800/75 dark:focus-visible:bg-slate-800/75"
+                            aria-controls="accordionItemThree" @click="isExpanded = ! isExpanded"
+                            :class="isExpanded ? 'text-onSurfaceStrong dark:text-onSurfaceDarkStrong font-bold'  : 'text-onSurface dark:text-onSurfaceDark font-medium'"
+                            :aria-expanded="isExpanded ? 'true' : 'false'">
+                        {{ __('Seated Guests') }}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2"
+                             stroke="currentColor" class="size-5 shrink-0 transition" aria-hidden="true"
+                             :class="isExpanded  ?  'rotate-180'  :  ''">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                        </svg>
+                    </button>
+                    <div x-cloak x-show="isExpanded" class="p-4" id="accordionItemThree" role="region"
+                         aria-labelledby="controlsAccordionItemThree" x-collapse>
                         <form x-data="range()" x-init="mintrigger(); maxtrigger()" class="relative max-w-xl w-full">
                             <div>
                                 <input type="range"
@@ -254,33 +219,23 @@
 
                         </form>
                     </div>
-                </article>
+                </div>
 
-                <article id="standing-guests-open" x-data="{ standingGuestsOpen: true }">
-                    <header class="p-3 bg-gray-200 cursor-pointer rounded"
-                            @click="standingGuestsOpen = ! standingGuestsOpen">
-                        <div class="flex items-center justify-between">
-                            <h6 class="text-gray-700">{{ __('Standing Guests') }}</h6>
-
-                            <template x-if="standingGuestsOpen">
-                                <x-fas-chevron-down class="w-4 h-4"/>
-                            </template>
-
-                            <template x-if="!standingGuestsOpen">
-                                <x-fas-chevron-up class="w-4 h-4"/>
-                            </template>
-                        </div>
-                    </header>
-
-                    <div
-                        class="gap-x-2 p-4"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 scale-90"
-                        x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-300"
-                        x-transition:leave-start="opacity-100 scale-100"
-                        x-transition:leave-end="opacity-0 scale-90"
-                        x-show="standingGuestsOpen">
+                <div x-data="{ isExpanded: true }" class="divide-y divide-slate-300 dark:divide-slate-700">
+                    <button id="controlsAccordionItemThree" type="button"
+                            class="flex w-full items-center justify-between gap-4 bg-slate-100 p-4 text-left underline-offset-2 hover:bg-slate-100/75 focus-visible:bg-slate-100/75 focus-visible:underline focus-visible:outline-none dark:bg-slate-800 dark:hover:bg-slate-800/75 dark:focus-visible:bg-slate-800/75"
+                            aria-controls="accordionItemThree" @click="isExpanded = ! isExpanded"
+                            :class="isExpanded ? 'text-onSurfaceStrong dark:text-onSurfaceDarkStrong font-bold'  : 'text-onSurface dark:text-onSurfaceDark font-medium'"
+                            :aria-expanded="isExpanded ? 'true' : 'false'">
+                        {{ __('Standing Guests') }}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2"
+                             stroke="currentColor" class="size-5 shrink-0 transition" aria-hidden="true"
+                             :class="isExpanded  ?  'rotate-180'  :  ''">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                        </svg>
+                    </button>
+                    <div x-cloak x-show="isExpanded" class="p-4" id="accordionItemThree" role="region"
+                         aria-labelledby="controlsAccordionItemThree" x-collapse>
                         <div x-data="range()" x-init="mintrigger(); maxtrigger()" class="relative max-w-xl w-full">
                             <div>
                                 <input type="range"
@@ -336,8 +291,8 @@
 
                         </div>
                     </div>
-                </article>
-            </aside>
+                </div>
+            </div>
 
             <div class="w-full flex flex-col gap-y-4 lg:w-3/4 order-0 lg:order-1">
                 @foreach($venues as $venue)
