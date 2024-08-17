@@ -183,6 +183,15 @@ class EventDate extends Model
         return false;
     }
 
+    public function isOnSale(): bool
+    {
+        return (
+            $this->event->organizer?->user?->enabled && $this->active && $this->event->published
+                && ($this->startdate > new \Datetime || $this->recurrent == true)
+                && (!$this->isSoldOut()) && $this->hasATicketOnSale() && (!$this->payoutRequested())
+        );
+    }
+
     public function getCurrencyCode()
     {
         $ccys = [];

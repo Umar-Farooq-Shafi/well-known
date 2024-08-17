@@ -13,7 +13,7 @@ use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $category_id
@@ -145,7 +145,7 @@ class Event extends Model implements Feedable
         'showattendees',
         'is_featured',
         'eventtimezone',
-        'completed'
+        'completed',
     ];
 
     protected static function boot(): void
@@ -163,16 +163,29 @@ class Event extends Model implements Feedable
 
     public function getNameAttribute()
     {
-        return $this->eventTranslations()
+        return $this
+            ->eventTranslations()
             ->where('locale', app()->getLocale())
             ->first()?->name;
     }
 
     public function getSlugAttribute()
     {
-        return $this->eventTranslations()
+        return $this
+            ->eventTranslations()
             ->where('locale', app()->getLocale())
             ->first()?->slug;
+    }
+
+    public function getFirstOnSaleEventDate()
+    {
+        foreach ($this->eventDates as $eventuate) {
+            if ($eventuate->isOnSale()) {
+                return $eventuate;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -256,7 +269,7 @@ class Event extends Model implements Feedable
             User::class,
             'eventic_favorites',
             'Event_id',
-            'User_id'
+            'User_id',
         );
     }
 
