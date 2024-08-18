@@ -22,7 +22,7 @@
                     />
 
                     <div class="absolute inset-0 flex flex-col items-start mx-40 justify-center text-white">
-                        <h1 class="text-3xl font-bold mb-4 text-center">{{ $trans->name }}</h1>
+                        <h1 class="text-3xl font-bold mb-4 text-center drop-shadow-md text-shadow:_0_2px_4px_rgb(99_102_241_/_0.8)] leading-snug">{{ $trans->name }}</h1>
 
                         @if($saleEvent = $sliderContent->getFirstOnSaleEventDate())
                             <p class="text-lg mb-4 flex items-center text-center gap-x-2">

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MenuResource\Pages;
 
 use App\Filament\Resources\MenuResource;
+use App\Models\MenuElement;
 use App\Models\MenuElementTranslation;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -66,28 +67,6 @@ class EditMenu extends EditRecord
                 $translation->header = $data['header-es'];
                 $translation->save();
             }
-        }
-
-        foreach ($data['menuElements'] as $k => $menuElement) {
-            $menuElementTrans = MenuElementTranslation::find($menuElement['id']);
-
-            if ($menuElementTrans->locale === 'ar') {
-                $menuElementTrans->label = $menuElement['label-ar'];
-            }
-
-            if ($menuElementTrans->locale === 'en') {
-                $menuElementTrans->label = $menuElement['label-en'];
-            }
-
-            if ($menuElementTrans->locale === 'fr') {
-                $menuElementTrans->label = $menuElement['label-fr'];
-            }
-
-            if ($menuElementTrans->locale === 'es') {
-                $menuElementTrans->label = $menuElement['label-es'];
-            }
-
-            $menuElementTrans->save();
         }
     }
 

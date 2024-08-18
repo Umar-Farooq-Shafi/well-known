@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Guava\FilamentIconPicker\Forms\IconPicker;
+use Illuminate\Support\Str;
 
 class MenuResource extends Resource
 {
@@ -103,9 +104,56 @@ class MenuResource extends Resource
 
                                 return $data;
                             })
+                            ->mutateRelationshipDataBeforeSaveUsing(function ($data, $record) {
+                                $trans = [
+                                    'ar', 'en', 'fr', 'es'
+                                ];
+
+                                foreach ($trans as $tran) {
+                                    if (
+                                        !$record->menuElementTranslations()
+                                            ->where('locale', $tran)
+                                            ->exists() &&
+                                        $data['label-' . $tran] !== null
+                                    ) {
+                                        MenuElementTranslation::create([
+                                            'translatable_id' => $record->id,
+                                            'label' => $data['label-' . $tran],
+                                            'slug' => Str::slug($data['label-' . $tran]),
+                                            'locale' => $tran,
+                                        ]);
+                                    }
+                                }
+
+                                foreach ($record->menuElementTranslations as $menuElementTrans) {
+                                    if ($menuElementTrans->locale === 'ar') {
+                                        $menuElementTrans->label = $data['label-ar'];
+                                    }
+
+                                    if ($menuElementTrans->locale === 'en') {
+                                        $menuElementTrans->label = $data['label-en'];
+                                    }
+
+                                    if ($menuElementTrans->locale === 'fr') {
+                                        $menuElementTrans->label = $data['label-fr'];
+                                    }
+
+                                    if ($menuElementTrans->locale === 'es') {
+                                        $menuElementTrans->label = $data['label-es'];
+                                    }
+
+                                    $menuElementTrans->save();
+                                }
+
+                                return $data;
+                            })
+                            ->mutateRelationshipDataBeforeCreateUsing(function ($data) {
+                                $data['position'] = 0;
+
+                                return $data;
+                            })
                             ->schema([
                                 IconPicker::make('icon')
-                                    ->required()
                                     ->sets(['fontawesome-solid'])
                                     ->preload(),
 

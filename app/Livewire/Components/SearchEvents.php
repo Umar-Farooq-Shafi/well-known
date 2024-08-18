@@ -7,8 +7,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
-use function Symfony\Component\String\s;
-
 class SearchEvents extends Component
 {
     public $query;

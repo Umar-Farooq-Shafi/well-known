@@ -123,9 +123,18 @@ class Home extends Component
             ->take($homepage_featured_events_nb)
             ->get();
 
-        $countries = CountryTranslation::with('country')
-            ->get()
+        $countries = CountryTranslation::query()
+            ->whereHas(
+                'country',
+                fn (Builder $query) => $query->whereIn(
+                    'id',
+                    Event::query()->select('country_id')
+                        ->pluck('country_id')
+                        ->toArray()
+                )
+            )
             ->where('locale', App::getLocale())
+            ->get()
             ->mapWithKeys(function ($translation) {
                 return [$translation->country->id => $translation->name];
             })

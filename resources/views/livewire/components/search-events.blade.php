@@ -9,7 +9,7 @@
                 option-value="id"
                 wire:loading.attr="disabled"
                 class="w-[180px]"
-                :async-data="route('api.events.categories')"
+                :async-data="route('api.events.country')"
             />
 
             <input

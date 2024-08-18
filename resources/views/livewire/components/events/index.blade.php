@@ -260,6 +260,22 @@
                                 </p>
                             </a>
                         </div>
+
+                        <div class="flex justify-between items-center mb-2 mx-4">
+                            <p class="ml-2">
+                                @if($venue = $event->eventDates?->first()?->venue)
+                                    {{ $venue->stringifyAddress }}
+                                @endif
+                            </p>
+
+                            <p class="text-nowrap">
+                                @if($eventDate = $event->eventDates?->first())
+                                    {{ $eventDate->getCurrencyCode() }}
+
+                                    {{ $eventDate->getTotalTicketFees() }}
+                                @endif
+                            </p>
+                        </div>
                     </div>
 
                 @endforeach

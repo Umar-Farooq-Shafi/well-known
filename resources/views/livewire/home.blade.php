@@ -157,13 +157,13 @@
                                             <p class="font-medium text-base">{{ $event->eventTranslations->first()->name }}</p>
 
                                             <div class="flex justify-between items-center">
-                                                <p class="w-[90%]">
+                                                <p class="ml-2">
                                                     @if($venue = $event->eventDates?->first()?->venue)
                                                         {{ $venue->stringifyAddress }}
                                                     @endif
                                                 </p>
 
-                                                <p class="w-[16%]">
+                                                <p class="text-nowrap">
                                                     @if($eventDate = $event->eventDates?->first())
                                                         {{ $eventDate->getCurrencyCode() }}
 
