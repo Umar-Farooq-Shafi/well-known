@@ -186,14 +186,6 @@ class EventDate extends Model
 
     public function isOnSale(): bool
     {
-        dump($this->event->organizer?->user?->enabled);
-        dump($this->active);
-        dump($this->event->published);
-        dump(($this->startdate > new \Datetime || $this->recurrent == true));
-        dump((!$this->isSoldOut()));
-        dump($this->hasATicketOnSale());
-        dump(!$this->payoutRequested());
-        die();
         return (
             $this->event->organizer?->user?->enabled && $this->active && $this->event->published
                 && (Carbon::make($this->startdate)->greaterThan(now()) || $this->recurrent == true)

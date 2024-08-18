@@ -220,6 +220,20 @@ class EventDateTicket extends Model
             return false;
         }
 
+        dump(Carbon::make($this->eventDate->startdate)->greaterThanOrEqualTo(now()));
+        dump($this->eventDate->recurrent == true && Carbon::make(
+                $this->eventDate->recurrent_startdate,
+            )->greaterThan(now()));
+        dump($this->salesstartdate);
+        dump(Carbon::make($this->salesstartdate)->lessThan(
+            now(),
+        ));
+        dump($this->salesenddate);
+        dump(Carbon::make($this->salesenddate)->greaterThan(
+                now(),
+            ));
+        die();
+
         return $this->eventDate->event->organizer->user->enabled
             && $this->eventDate->event->published && $this->eventDate->active
             && (Carbon::make($this->eventDate->startdate)->greaterThanOrEqualTo(now())
