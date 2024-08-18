@@ -1,6 +1,5 @@
 @php
-    use App\Models\CategoryTranslation;
-    use Illuminate\Support\Facades\Storage;
+    use App\Models\CategoryTranslation;use Illuminate\Support\Facades\Storage;
 
     $eventCategoryTranslation = CategoryTranslation::whereTranslatableId($eventTranslation->event->category_id)
         ->where('locale', app()->getLocale())
@@ -173,7 +172,9 @@
             <div class="flex gap-x-2 items-center bg-[#31708f] p-2 rounded text-white px-4">
                 <x-fas-info-circle class="w-4 h-4"/>
 
-                <p>No tickets on sale at this moment</p>
+                @if(!$event->getFirstOnSaleEventDate())
+                    <p>No tickets on sale at this moment</p>
+                @endif
             </div>
 
             <hr class="my-8 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
