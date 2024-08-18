@@ -226,14 +226,14 @@ class EventDateTicket extends Model
                 || ($this->eventDate->recurrent == true && Carbon::make(
                         $this->eventDate->recurrent_startdate,
                     )->greaterThan(now())))
-            && $this->active && !$this->isSoldOut() && ($this->salesstartdate && Carbon::make(
-                    $this->salesstartdate,
-                )->lessThan(
+            && $this->active && !$this->isSoldOut() && (
+                $this->salesstartdate && Carbon::make($this->salesstartdate)->lessThan(
                     now(),
                 ))
-            && (Carbon::make($this->salesenddate)->greaterThan(
+            && (
+                $this->salesenddate && Carbon::make($this->salesenddate)->greaterThan(
                     now(),
-                ) || !$this->salesenddate) && (!$this->eventDate->payoutRequested());
+                )) && (!$this->eventDate->payoutRequested());
     }
 
     /**
