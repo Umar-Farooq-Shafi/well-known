@@ -23,7 +23,7 @@
         </div>
 
         <div class="mt-2 font-medium">
-            <p>When: {{ $eventDate->startdate }}</p>
+            <p>When: {{ $eventDate?->startdate ? \Carbon\Carbon::make($eventDate->startdate)->format('l jS F Y, h:i A') : '' }}</p>
             <p>
                 Where: {{ $venue?->street }} {{ $venue?->street2 }} {{ $venue?->city }} {{ $venue?->state }} {{ $countryTrans?->name }}</p>
         </div>

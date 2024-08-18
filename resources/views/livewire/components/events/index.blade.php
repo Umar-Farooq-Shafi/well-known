@@ -233,7 +233,7 @@
                                 class="w-full h-64 rounded"
                                 src="{{ Storage::url('events/' . $event->image_name) }}"
                                 loading="lazy"
-                                alt="{{ $event->eventTranslations->first()?->name }}    "
+                                alt="{{ $event->eventTranslations->first()?->name }}"
                             />
 
                             @if(auth()->check())
