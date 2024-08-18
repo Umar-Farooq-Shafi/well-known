@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $eventdate_id
@@ -82,7 +83,7 @@ class EventDateTicket extends Model
         'position',
         'currency_code_id',
         'ticket_fee',
-        'currency_symbol_position'
+        'currency_symbol_position',
     ];
 
     public function getOrderElementsQuantitySum($status = 1, $user = "all", $role = "all"): int
@@ -160,16 +161,21 @@ class EventDateTicket extends Model
 
         foreach ($this->orderElements as $orderElement) {
             foreach ($orderElement->orderTickets as $ticket) {
-                if ($ticket->scanned)
+                if ($ticket->scanned) {
                     $count++;
+                }
             }
         }
 
         return $count;
     }
 
-    public function getSales($role = "all", $user = "all", $formattedForPayoutApproval = false, $includeFees = false): float|int
-    {
+    public function getSales(
+        $role = "all",
+        $user = "all",
+        $formattedForPayoutApproval = false,
+        $includeFees = false,
+    ): float|int {
         $sum = 0;
         foreach ($this->orderElements as $orderElement) {
             if ($orderElement->order?->status === 1 &&
@@ -216,10 +222,14 @@ class EventDateTicket extends Model
 
         return $this->eventDate->event->organizer->user->enabled
             && $this->eventDate->event->published && $this->eventDate->active
-            && ($this->eventDate->startdate >= new \Datetime
-                || ($this->eventDate->recurrent == true && $this->eventDate->recurrent_startdate > new \DateTime()))
-            && $this->active && !$this->isSoldOut() && ($this->salesstartdate < new \Datetime || !$this->salesstartdate)
-            && ($this->salesenddate > new \Datetime || !$this->salesenddate) && (!$this->eventDate->payoutRequested());
+            && (Carbon::make($this->eventDate->startdate)->greaterThanOrEqualTo(now())
+                || ($this->eventDate->recurrent == true && Carbon::make(
+                        $this->eventDate->recurrent_startdate,
+                    )->greaterThan(now())))
+            && $this->active && !$this->isSoldOut() && (Carbon::make($this->salesstartdate)->lessThan(
+                    now(),
+                ) || !$this->salesstartdate)
+            && (Carbon::make($this->salesenddate)->greaterThan(now()) || !$this->salesenddate) && (!$this->eventDate->payoutRequested());
     }
 
     /**
@@ -262,7 +272,7 @@ class EventDateTicket extends Model
             'orderelement_id',      // Foreign key on the intermediate model (OrderElement)
             'id',                   // Foreign key on the final model (EventDateTicket)
             'id',                   // Local key on this model (OrderTicket)
-            'eventticket_id'        // Local key on the intermediate model (OrderElement)
+            'eventticket_id',        // Local key on the intermediate model (OrderElement)
         );
     }
 

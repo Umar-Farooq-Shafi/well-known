@@ -189,7 +189,6 @@ class EventDate extends Model
         dump($this->event->organizer?->user?->enabled);
         dump($this->active);
         dump($this->event->published);
-        dump(Carbon::make($this->startdate)->greaterThan(now()), new \Datetime);
         dump(($this->startdate > new \Datetime || $this->recurrent == true));
         dump((!$this->isSoldOut()));
         dump($this->hasATicketOnSale());
@@ -197,7 +196,7 @@ class EventDate extends Model
         die();
         return (
             $this->event->organizer?->user?->enabled && $this->active && $this->event->published
-                && ($this->startdate > new \Datetime || $this->recurrent == true)
+                && (Carbon::make($this->startdate)->greaterThan(now()) || $this->recurrent == true)
                 && (!$this->isSoldOut()) && $this->hasATicketOnSale() && (!$this->payoutRequested())
         );
     }
