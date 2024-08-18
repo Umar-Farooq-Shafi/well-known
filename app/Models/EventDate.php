@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -188,7 +189,7 @@ class EventDate extends Model
         dump($this->event->organizer?->user?->enabled);
         dump($this->active);
         dump($this->event->published);
-        dump($this->startdate, new \Datetime);
+        dump(Carbon::make($this->startdate)->greaterThan(now()), new \Datetime);
         dump(($this->startdate > new \Datetime || $this->recurrent == true));
         dump((!$this->isSoldOut()));
         dump($this->hasATicketOnSale());
