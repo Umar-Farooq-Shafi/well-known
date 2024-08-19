@@ -46,7 +46,7 @@ class POSPage extends Page implements HasForms
     {
         $schema = [];
         $eventDateTickets = [];
-        $country = auth()->user()->scanner->organizer->country;
+        $country = auth()->user()->pointOfSale->organizer->country;
 
         $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
 
