@@ -51,6 +51,10 @@ class SearchEvents extends Component
                         fn (Builder $query) => $query->where('country_id', $this->country)
                     )
             )
+            ->whereHas(
+                'event',
+                fn (Builder $query) => $query->where('completed', false)
+            )
             ->take(5)
             ->get();
     }

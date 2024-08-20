@@ -74,6 +74,13 @@ class EventDate extends Model
         'recurrent_enddate',
     ];
 
+    protected $casts = [
+        'startdate' => 'datetime',
+        'enddate' => 'datetime',
+        'recurrent_startdate' => 'datetime',
+        'recurrent_enddate' => 'datetime',
+    ];
+
     public function getTicketSoldAttribute(): float|int
     {
         if ($this->getOrderElementsQuantitySum() == 0) {

@@ -102,6 +102,90 @@ class EventDateTicket extends Model
         return $sum;
     }
 
+    public function stringifyStatus(): string
+    {
+        if (!$this->eventDate?->event?->organizer?->user->enabled) {
+            return "Organizer is disabled";
+        }
+
+        if (!$this->eventDate?->event->published) {
+            return "Event is not published";
+        }
+
+        if (!$this->eventDate->active) {
+            return "Event date is disabled";
+        }
+
+        if (Carbon::make($this->eventDate->startdate)->lessThan(now()) && !$this->eventDate->recurrent) {
+            return "Event already started";
+        }
+
+        if (!$this->active) {
+            return "Event ticket is disabled";
+        }
+
+        if ($this->isSoldOut()) {
+            return "Sold out";
+        }
+
+        if (Carbon::make($this->salesstartdate)->greaterThan(now()) && $this->salesstartdate) {
+            return "Sale didn't start yet";
+        }
+
+        if (Carbon::make($this->salesenddate)->lessThan(now()) && $this->salesstartdate) {
+            return "Sale ended";
+        }
+
+        if ($this->eventDate->payoutRequests()) {
+            return "Locked (Payout request " . strtolower(
+                    $this->eventDate->payoutRequestStatus(),
+                ) . ")";
+        }
+
+        return "On sale";
+    }
+
+    public function stringifyStatusClass(): string
+    {
+        if (!$this->eventDate->event->organizer->user->enabled) {
+            return "danger";
+        }
+
+        if (!$this->eventDate->event->published) {
+            return "danger";
+        }
+
+        if (!$this->eventDate->active) {
+            return "danger";
+        }
+
+        if (Carbon::make($this->eventDate->startdate)->lessThan(now())) {
+            return "info";
+        }
+
+        if (!$this->active) {
+            return "danger";
+        }
+
+        if ($this->isSoldOut()) {
+            return "warning";
+        }
+
+        if (Carbon::make($this->salesstartdate)->greaterThan(now()) && $this->salesstartdate) {
+            return "info";
+        }
+
+        if (Carbon::make($this->salesenddate)->lessThan(now()) && $this->salesstartdate) {
+            return "warning";
+        }
+
+        if ($this->eventDate->payoutRequested()) {
+            return "warning";
+        }
+
+        return "success";
+    }
+
     public function getTicketPricePercentageCutSum($role = "all"): float|int
     {
         $sum = 0;

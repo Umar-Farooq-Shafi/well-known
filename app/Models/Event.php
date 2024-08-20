@@ -188,6 +188,30 @@ class Event extends Model implements Feedable
         return null;
     }
 
+    public function hasAnEventDateOnSale(): bool
+    {
+        foreach ($this->eventDates as $eventuate) {
+            if ($eventuate->isOnSale()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasTwoOrMoreEventDatesOnSale(): bool
+    {
+        $count = 0;
+
+        foreach ($this->eventDates as $eventuate) {
+            if ($eventuate->isOnSale()) {
+                $count++;
+            }
+        }
+
+        return $count >= 2;
+    }
+
     /**
      * @return BelongsTo
      */

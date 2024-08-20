@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\EventTranslation;
 use App\Models\Organizer;
 use App\Traits\RatingTrait;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
 
@@ -13,11 +14,19 @@ class Event extends Component
     use WireUiActions;
     use RatingTrait;
 
+    #[Validate('required')]
+    public $eventDatePick;
+
     public ?EventTranslation $eventTranslation = null;
 
     public function mount(string $slug)
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
+    }
+
+    public function submit()
+    {
+        $this->validate();
     }
 
     public function followOrganization(): void

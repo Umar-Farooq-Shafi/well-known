@@ -1,5 +1,5 @@
 @php
-    use App\Models\CategoryTranslation;use Illuminate\Support\Facades\Storage;
+    use App\Models\CategoryTranslation;use Illuminate\Support\Carbon;use Illuminate\Support\Facades\Storage;
 
     $eventCategoryTranslation = CategoryTranslation::whereTranslatableId($eventTranslation->event->category_id)
         ->where('locale', app()->getLocale())
@@ -169,13 +169,308 @@
             class="inline-block h-screen w-0.5 self-stretch bg-neutral-100 dark:bg-white/10"></div>
 
         <div class="w-[30%] p-8">
-            <div class="flex gap-x-2 items-center bg-[#31708f] p-2 rounded text-white px-4">
-                <x-fas-info-circle class="w-4 h-4"/>
+            @if($event->hasAnEventDateOnSale())
+                @if ($event->hasTwoOrMoreEventDatesOnSale())
+                    @php
+                        $eventDatesCalendar = [];
+                    @endphp
 
-                @if(!$event->getFirstOnSaleEventDate())
-                    <p>No tickets on sale at this moment</p>
+                    @foreach ($event->eventDates as $eventDate)
+                        @if ($eventDate->isOnSale())
+                            @php
+                                $eventDatesCalendar[] = [
+                                    'Date' => $eventDate->startdate,
+                                    'Title' => $eventDate->startdate,
+                                    'Link' => $eventDate->reference,
+                                ];
+                            @endphp
+                        @endif
+                    @endforeach
+
+                    <div class="flex gap-x-2 items-center bg-[#31708f] p-2 rounded text-white px-4">
+                        <x-fas-info-circle class="w-4 h-4"/>
+
+                        <p>Click on a date to view tickets</p>
+                    </div>
+
+                    <div id="event-dates-calendar" class="mt-5"
+                         data-event-dates="{{ json_encode($eventDatesCalendar) }}"></div>
+
+                    @if(auth()->check() && auth()->user()?->hasRole('ROLE_ATTENDEE'))
+                        <button id="add-to-cart-button" type="button" class="btn btn-primary w-full mt-3 mb-3"><i
+                                class="fas fa-cart-plus"></i> {{ __('Add to cart') }}</button>
+                    @endif
                 @endif
-            </div>
+
+                <form wire:submit="submit">
+
+                    @foreach ($event->eventDates as $eventDate)
+                        @if ($eventDate->isOnSale())
+                            <div id="eventDate-{{ $eventDate->reference }}-wrapper" class="event-eventDate-wrapper">
+                                <dl class="mb-4">
+                                    <dt class="text-gray-500">
+                                        <span>{{ __('Dates') }}</span>
+                                    </dt>
+                                    <dd>
+                                        <div class="text-center">
+                                            {{-- For the add to calendar link --}}
+                                            @php
+                                                $eventstartdate = '';
+                                                $eventenddate = '';
+                                                $eventlocation = $eventDate->venue ? $eventDate->venue->name . ': ' . $eventDate->venue->stringifyAddress : __('Online');
+                                            @endphp
+                                            @if ($eventDate->startdate)
+                                                <div class="inline-block">
+                                                    <div class="inline-block">
+                                                        <span class="text-5xl">
+                                                            {{ Carbon::make($eventDate->startdate)->format('d') }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="inline-block mr-3">
+                                                        <div>
+                                                            <span
+                                                                class="text-sm">{{ ucfirst(Carbon::make($eventDate->startdate)->format('M')) }}</span>
+                                                        </div>
+                                                        <div>
+                                                            <span class="text-sm">
+                                                                {{ $eventDate->startdate->format('Y') }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                    <span class="text-gray-500 font-bold">
+                                                        {{ strtoupper(Carbon::make($eventDate->startdate)->format('g:i a')) }}
+                                                        @if ($eventDate->enddate && Carbon::make($eventDate->enddate)->equalTo($eventDate->startdate))
+                                                            - {{ strtoupper(Carbon::make($eventDate->enddate)->format('g:i a')) }}
+                                                        @endif
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                                @php
+                                                    $eventstartdate = Carbon::make($eventDate->startdate)->format('F d, Y H:i');
+                                                @endphp
+                                            @endif
+                                            @if ($eventDate->enddate && Carbon::make($eventDate->enddate)->equalTo($eventDate->startdate))
+                                                <div class="inline-block">
+                                                    <div class="inline-block">
+                                                        <span
+                                                            class="text-3xl">{{ $eventDate->enddate->format('d') }}</span>
+                                                    </div>
+                                                    <div class="inline-block">
+                                                        <div><span
+                                                                class="text-xl">{{ ucfirst($eventDate->enddate->format('M')) }}</span>
+                                                        </div>
+                                                        <div><span>{{ $eventDate->enddate->format('Y') }}</span></div>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <span
+                                                            class="text-gray-500 font-bold">
+                                                            {{ strtoupper($eventDate->enddate->format('g:i a')) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                @php
+                                                    $eventenddate = $eventDate->enddate->format('F d, Y H:i');
+                                                @endphp
+                                            @endif
+
+                                            <div x-data="{modalIsOpen: false}">
+                                                <button @click="modalIsOpen = true" type="button"
+                                                        class="cursor-pointer whitespace-nowrap rounded-md bg-sky-700 px-4 py-2 text-center text-sm font-medium tracking-wide text-white transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 active:opacity-100 active:outline-offset-0 dark:bg-sky-600 dark:text-white dark:focus-visible:outline-sky-600">
+                                                    {{ __('Add to calendar') }}
+                                                </button>
+                                                <div x-cloak x-show="modalIsOpen" x-transition.opacity.duration.200ms
+                                                     x-trap.inert.noscroll="modalIsOpen"
+                                                     @keydown.esc.window="modalIsOpen = false"
+                                                     @click.self="modalIsOpen = false"
+                                                     class="fixed inset-0 z-30 flex items-end justify-center bg-black/20 p-4 pb-8 backdrop-blur-md sm:items-center lg:p-8"
+                                                     role="dialog" aria-modal="true"
+                                                     aria-labelledby="defaultModalTitle">
+                                                    <!-- Modal Dialog -->
+                                                    <div x-show="modalIsOpen"
+                                                         x-transition:enter="transition ease-out duration-200 delay-100 motion-reduce:transition-opacity"
+                                                         x-transition:enter-start="opacity-0 scale-50"
+                                                         x-transition:enter-end="opacity-100 scale-100"
+                                                         class="flex max-w-lg min-w-96 flex-col gap-4 overflow-hidden rounded-md border border-zinc-300 bg-red-50 text-neutral-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+                                                        <!-- Dialog Header -->
+                                                        <div
+                                                            class="flex items-center justify-between border-b border-zinc-300 bg-zinc-100/60 p-4 dark:border-zinc-700 dark:bg-zinc-900/20">
+                                                            <h3 id="defaultModalTitle"
+                                                                class="font-semibold flex gap-x-2 items-center tracking-wide text-neutral-900 dark:text-zinc-50">
+                                                                <x-fas-calendar-plus class="w-4 h-4"/>
+
+                                                                {{ __('Add to calendar') }}
+                                                            </h3>
+                                                            <button @click="modalIsOpen = false"
+                                                                    aria-label="close modal">
+                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                     viewBox="0 0 24 24" aria-hidden="true"
+                                                                     stroke="currentColor" fill="none"
+                                                                     stroke-width="1.4" class="w-5 h-5">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                          d="M6 18L18 6M6 6l12 12"/>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+
+                                                        <div
+                                                            class="flex flex-col gap-y-2 px-4 justify-center items-center py-8">
+                                                            <div
+                                                                class="flex items-center gap-2 text-zinc-800 hover:bg-zinc-50 px-4 py-2 whitespace-nowrap">
+                                                                <x-fab-google class="h-4 w-4"/>
+
+                                                                Google Calendar
+                                                            </div>
+
+                                                            <div
+                                                                class="flex items-center gap-2 text-zinc-800 hover:bg-zinc-50 px-4 py-2 whitespace-nowrap">
+                                                                <x-fab-yahoo class="h-4 w-4"/>
+
+                                                                Yahoo Calendar
+                                                            </div>
+
+                                                            <div
+                                                                class="flex items-center gap-2 text-zinc-800 hover:bg-zinc-50 px-4 py-2 whitespace-nowrap">
+                                                                <x-fab-apple class="h-4 w-4"/>
+
+                                                                iCal Calendar
+                                                            </div>
+
+                                                            <div
+                                                                class="flex items-center gap-2 text-zinc-800 hover:bg-zinc-50 px-4 py-2 whitespace-nowrap">
+                                                                <x-fab-yahoo class="h-4 w-4"/>
+
+                                                                Outlook Calendar
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            class="flex flex-col-reverse justify-between gap-2 border-t border-zinc-300 bg-zinc-100/60 p-4 dark:border-zinc-700 dark:bg-zinc-900/20 sm:flex-row sm:items-center md:justify-end">
+                                                            <button @click="modalIsOpen = false" type="button"
+                                                                    class="cursor-pointer whitespace-nowrap rounded-md bg-sky-700 px-4 py-2 text-center text-sm font-medium tracking-wide text-white transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 active:opacity-100 active:outline-offset-0 dark:bg-sky-600 dark:text-white dark:focus-visible:outline-sky-600">
+                                                                Close
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <hr class="border-gray-300">
+
+                                <dl class="mt-4">
+                                    <dt class="text-gray-500">{{ __('Tickets') }}</dt>
+
+                                    <dd class="mr-0 my-2">
+                                        <div class="overflow-x-auto">
+                                            <table class="table-auto w-full">
+                                                <tbody>
+                                                @foreach ($eventDate->eventDateTickets as $ticket)
+                                                    @if ($ticket->active)
+                                                        <tr class="bg-gray-200 my-0.5 px-1">
+                                                            <td class="border-t-0" style="width: 75%;">
+                                                                {{ $ticket->name }}
+                                                            </td>
+                                                            <td>
+                                                                {{ $ticket->currency->ccy }}
+                                                            </td>
+                                                            <td class="border-t-0 text-right">
+                                                                @if (!$ticket->isOnSale())
+                                                                    <span
+                                                                        class="badge {{ $ticket->stringifyStatusClass() }}">{{ __($ticket->stringifyStatus()) }}</span>
+                                                                @else
+                                                                    {{ $ticket->free ? __('Free') :  $ticket->currency->symbol }}
+                                                                    @if ($ticket->promotionalprice && !$ticket->free)
+                                                                        <del
+                                                                            class="text-gray-500">{{ $ticket->currency->symbol . $ticket->price }}</del>
+                                                                    @endif
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endif
+                                                @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        @if ($eventDate->recurrent)
+                                            <div class="form-group my-2">
+                                                <x-datetime-picker
+                                                    wire:model.live="eventDatePick"
+                                                    label="Event Date"
+                                                    placeholder="Select Event Date"
+                                                    without-timezone
+                                                    without-time
+                                                    :min="$eventDate->recurrent_startdate->format('Y-m-d') "
+                                                    :max="$eventDate->recurrent_enddate->format('Y-m-d')"
+                                                />
+                                            </div>
+                                        @endif
+
+                                        @auth
+                                            <a href="#" class="btn btn-primary w-full mb-2 buy-tickets-modal-button"
+                                               data-target="#buy-tickets-modal-eventDate-{{ $eventDate->reference }}"
+                                               data-reference="{{ $eventDate->reference }}"><i
+                                                    class="fas fa-ticket-alt"></i> {{ __('Buy Tickets') }}</a>
+                                            {{--                                            @include('dashboard.attendee.cart.add-to-cart-modal', ['eventdate' => $eventDate])--}}
+                                        @else
+                                            <a href="{{ route('filament.admin.auth.login') . '?_target_path=' . request()->getPathInfo() }}"
+                                               class="btn btn-primary w-full"><i
+                                                    class="fas fa-ticket-alt"></i> {{ __('Buy Tickets') }}</a>
+                                        @endauth
+                                    </dd>
+                                </dl>
+
+                                <hr class="border-gray-300">
+
+                                @if ($eventDate->venue)
+                                    <div class="text-gray-500 mt-2">
+                                            <span
+                                                class="{{ app()->getLocale() == 'ar' ? 'float-right' : 'float-left' }}">{{ __('Venue') }}</span>
+                                        @if ($eventDate->venue->listedondirectory)
+                                            <a href="{{ route('venue', ['slug' => $eventDate->venue->slug]) }}"
+                                               class="{{ app()->getLocale() == 'ar' ? 'float-left' : 'float-right' }}">{{ __('More details') }}
+                                                <i class="fas fa-chevron-right"></i></a>
+                                        @endif
+                                    </div>
+
+                                    <div class="text-center">
+                                        <a href="{{ $eventDate->venue->url }}" target="_blank">
+                                            <p class="font-bold">{{ $eventDate->venue->name }}</p>
+                                            <p>{{ $eventDate->venue->stringifyAddress }}</p>
+                                        </a>
+                                        @if ($eventDate->venue->listedondirectory)
+                                            <p class="text-center">
+                                                <a href="{{ route('venue', ['slug' => $eventDate->venue->slug]) }}"
+                                                   class="text-center">
+                                                    {{ __('More details') }}
+                                                    <x-fas-chevron-right class="w-2 h-2"/>
+                                                </a>
+                                            </p>
+                                        @endif
+                                    </div>
+                                @else
+                                    <dl>
+                                        <dt class="text-gray-500">{{ __('Venue') }}</dt>
+                                        <dd class="text-center">
+                                            <p>{{ __('Online event') }}</p>
+                                        </dd>
+                                    </dl>
+                                @endif
+                            </div>
+                        @endif
+                    @endforeach
+                </form>
+
+            @else
+                <div class="flex gap-x-2 items-center bg-[#31708f] p-2 rounded text-white px-4">
+                    <x-fas-info-circle class="w-4 h-4"/>
+
+                    <p>No tickets on sale at this moment</p>
+                </div>
+            @endif
 
             <hr class="my-8 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
 
