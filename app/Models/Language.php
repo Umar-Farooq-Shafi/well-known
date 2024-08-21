@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $code
@@ -45,6 +45,17 @@ class Language extends Model
         'code',
         'hidden'
     ];
+
+    protected $casts = [
+        'hidden' => 'boolean'
+    ];
+
+    public function getNameAttribute()
+    {
+        return $this->languageTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->name;
+    }
 
     /**
      * @return HasMany

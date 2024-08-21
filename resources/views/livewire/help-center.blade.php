@@ -1,4 +1,4 @@
-<div class="bg-gray-100 mt-16 h-screen">
+<div class="bg-gray-100 mt-36 h-screen">
     <div class="bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 py-16">
         <div class="container mx-auto text-center">
             <h1 class="text-4xl font-bold text-white mb-4">How can we help?</h1>
@@ -78,7 +78,7 @@
                 <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20"><path d="M13 7h-1V4a3 3 0 10-6 0v3H5a2 2 0 00-2 2v6a2 2 0 002 2h8a2 2 0 002-2v-6a2 2 0 00-2-2zm-2 0H9V4a1 1 0 112 0v3z"></path></svg>
             </div>
             <p class="text-gray-600">You did not find an answer to your inquiry? Let us know and we will be glad to give you further help</p>
-            <button class="mt-4 bg-gray-800 text-white font-semibold rounded-full px-6 py-2 transition duration-300 hover:bg-gray-900">CONTACT US</button>
+            <a href="{{ route('contact-us') }}" class="mt-4 bg-gray-800 text-white font-semibold rounded-full px-6 py-2 transition duration-300 hover:bg-gray-900">CONTACT US</a>
         </div>
     </div>
 </div>

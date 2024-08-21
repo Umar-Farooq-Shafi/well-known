@@ -199,6 +199,17 @@ class Event extends Model implements Feedable
         return false;
     }
 
+    public function displaySubtitles(): string
+    {
+        $subtitles = '';
+
+        foreach ($this->subtitles as $subtitle) {
+            $subtitles .= $subtitle->name . ', ';
+        }
+
+        return rtrim($subtitles, ', ');
+    }
+
     public function hasTwoOrMoreEventDatesOnSale(): bool
     {
         $count = 0;
@@ -210,6 +221,12 @@ class Event extends Model implements Feedable
         }
 
         return $count >= 2;
+    }
+
+    public function hasContactAndSocialMedia(): bool
+    {
+        return ($this->externallink || $this->phonenumber || $this->twitter
+            || $this->instagram || $this->email || $this->facebook || $this->googleplus || $this->linkedin);
     }
 
     /**

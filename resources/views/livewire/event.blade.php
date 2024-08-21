@@ -56,26 +56,181 @@
 
                 <hr class="my-4 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
 
-                <div class="flex justify-between items-center">
-                    <div class="text-gray-700 font-semibold">
-                        Category:
+                @if($eventCategoryTranslation)
+                    <div class="flex justify-between items-center">
+                        <div class="text-gray-700 font-semibold">
+                            Category:
+                        </div>
+
+                        <div>{{ $eventCategoryTranslation?->name }}</div>
                     </div>
+                @endif
 
-                    <div>{{ $eventCategoryTranslation?->name }}</div>
-                </div>
+                @if($country)
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700 font-semibold mr-2">Country:</span>
 
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-700 font-semibold mr-2">Country:</span>
+                        <div class="flex items-center gap-x-2">
+                            <x-dynamic-component :component="$componentName" class="inline-block h-8 w-8 rounded-md"/>
 
-                    <div class="flex items-center gap-x-2">
-                        <x-dynamic-component :component="$componentName" class="inline-block h-8 w-8 rounded-md"/>
-
-                        {{ $country }}
+                            {{ $country }}
+                        </div>
                     </div>
-                </div>
+                @endif
+
+                @if(count($event->languages))
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700 font-semibold mr-2">Languages:</span>
+
+                        <div class="flex items-center gap-x-2">
+                            @foreach($event->languages as $language)
+                                <p>{{ $language->name }}</p>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                @if(count($event->subtitles))
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700 font-semibold mr-2">Subtitles:</span>
+
+                        <p class="text-gray-500">
+                            {{ $event->displaySubtitles() }}
+                        </p>
+                    </div>
+                @endif
+
+                @if($event->artists)
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700 font-semibold mr-2">Artists:</span>
+
+                        <p class="text-gray-500">
+                            {{ $event->artists }}
+                        </p>
+                    </div>
+                @endif
+
+                @if($event->year)
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700 font-semibold mr-2">Year:</span>
+
+                        <p class="text-gray-500">
+                            {{ $event->year }}
+                        </p>
+                    </div>
+                @endif
+
+                @if(count($event->audiences))
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700 font-semibold mr-2">Audiences:</span>
+
+                        <div class="flex gap-x-1">
+                            @foreach($event->audiences as $audience)
+                                <img
+                                    class="h-4 w-4"
+                                    src="{{ Storage::url('audiences/' . $audience->image_name) }}"
+                                    alt="{{ $audience->image_name }}"
+                                />
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
 
                 <hr class="my-4 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
             </div>
+
+            @if(count($event->eventImages))
+
+            @endif
+
+            @if($event->youtubeurl)
+                <div class="mt-5">
+                    <p class="text-muted">{{__('Video')}}</p>
+
+                    <div class="mr-8">
+                        <iframe class="w-full border-0" height="500"
+                                src="https://www.youtube.com/embed/{{$event->youtubeurl}}"
+                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                    </div>
+                </div>
+            @endif
+
+            @if($event->hasContactAndSocialMedia())
+                <div class="mt-8 p-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-bold mb-4">Contact & Social media</h2>
+                    </div>
+
+                    <ul class="flex flex-wrap">
+                        @if ($event->externallink)
+                            <li class="w-full md:w-1/2">
+                                <a href="{{ Str::startsWith($event->externallink, ['http://', 'https://']) ? $event->externallink : 'http://' . $event->externallink }}" class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fas-globe class="mr-2 w-4 h-4" />
+                                    <span>{{ $event->externallink }}</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if ($event->email)
+                            <li class="w-full md:w-1/2">
+                                <a href="mailto:{{ $event->email }}" class="pl-4 inline-flex items-center">
+                                    <x-fas-at class="mr-2 w-4 h-4" />
+                                    <span>{{ $event->email }}</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if ($event->phonenumber)
+                            <li class="w-full md:w-1/2">
+                                <a href="tel:{{ $event->phonenumber }}" class="pl-4 inline-flex items-center">
+                                    <x-fas-phone class="w-4 h-4 mr-2" />
+                                    <span>{{ $event->phonenumber }}</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if ($event->facebook)
+                            <li class="w-full md:w-1/2">
+                                <a href="{{ Str::startsWith($event->facebook, ['http://', 'https://']) ? $event->facebook : 'http://' . $event->facebook }}" class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fab-facebook class="w-4 h-4 mr-2" />
+                                    <span>{{ $event->facebook }}</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if ($event->twitter)
+                            <li class="w-full md:w-1/2">
+                                <a href="{{ Str::startsWith($event->twitter, ['http://', 'https://']) ? $event->twitter : 'http://' . $event->twitter }}" class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fab-twitter class="w-4 h-4 mr-2" />
+                                    <span>{{ $event->twitter }}</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if ($event->googleplus)
+                            <li class="w-full md:w-1/2">
+                                <a href="{{ Str::startsWith($event->googleplus, ['http://', 'https://']) ? $event->googleplus : 'http://' . $event->googleplus }}" class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fab-google-plus class="w-4 h-4 mr-2" />
+                                    <span>{{ $event->googleplus }}</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if ($event->instagram)
+                            <li class="w-full md:w-1/2">
+                                <a href="{{ Str::startsWith($event->instagram, ['http://', 'https://']) ? $event->instagram : 'http://' . $event->instagram }}" class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fab-instagram class="w-4 h-4 mr-2" />
+                                    <span>{{ $event->instagram }}</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if ($event->linkedin)
+                            <li class="w-full md:w-1/2">
+                                <a href="{{ Str::startsWith($event->linkedin, ['http://', 'https://']) ? $event->linkedin : 'http://' . $event->linkedin }}" class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fab-linkedin class="w-4 h-4 mr-2" />
+                                    <span>{{ $event->linkedin }}</span>
+                                </a>
+                            </li>
+                        @endif
+                    </ul>
+
+                </div>
+            @endif
 
             <div class="mt-8 p-6">
                 <div class="flex justify-between items-center">
@@ -431,8 +586,10 @@
                                                 class="{{ app()->getLocale() == 'ar' ? 'float-right' : 'float-left' }}">{{ __('Venue') }}</span>
                                         @if ($eventDate->venue->listedondirectory)
                                             <a href="{{ route('venue', ['slug' => $eventDate->venue->slug]) }}"
-                                               class="{{ app()->getLocale() == 'ar' ? 'float-left' : 'float-right' }}">{{ __('More details') }}
-                                                <i class="fas fa-chevron-right"></i></a>
+                                               class="{{ app()->getLocale() == 'ar' ? 'float-left' : 'float-right' }} flex items-center gap-x-1">
+                                                {{ __('More details') }}
+                                                <x-fas-chevron-right class="w-3 h-3"/>
+                                            </a>
                                         @endif
                                     </div>
 
@@ -441,12 +598,12 @@
                                             <p class="font-bold">{{ $eventDate->venue->name }}</p>
                                             <p>{{ $eventDate->venue->stringifyAddress }}</p>
                                         </a>
+
                                         @if ($eventDate->venue->listedondirectory)
                                             <p class="text-center">
                                                 <a href="{{ route('venue', ['slug' => $eventDate->venue->slug]) }}"
                                                    class="text-center">
                                                     {{ __('More details') }}
-                                                    <x-fas-chevron-right class="w-2 h-2"/>
                                                 </a>
                                             </p>
                                         @endif
