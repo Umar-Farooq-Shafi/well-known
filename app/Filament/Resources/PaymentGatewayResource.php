@@ -53,7 +53,7 @@ class PaymentGatewayResource extends Resource
                     ->required(),
 
                 Forms\Components\Select::make('gateway_name')
-                    ->options(function () {
+                    ->options(function ($context, $record) {
                         $options = [
                             'offline' => 'Cash / Check / Offline',
                         ];
@@ -61,20 +61,28 @@ class PaymentGatewayResource extends Resource
                         $exists = [
                             'paypal_express_checkout' => 'Paypal Express Checkout',
                             'stripe_checkout' => 'Stripe Checkout',
-                            'eseva' => 'ESeva'
+                            'eseva' => 'ESeva',
                         ];
 
-                        foreach ($exists as $key => $value) {
-                            if (
-                                !PaymentGateway::whereGatewayName($key)
-                                    ->when(
-                                        auth()->user()->hasRole('ROLE_ORGANIZER'),
-                                        fn (Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
-                                    )
-                                    ->exists()
-                            ) {
-                                $options[$key] = $value;
+                        if ($context && !array_key_exists($record->gateway_name, $options)) {
+                            $options[$record->gateway_name] = $exists[$record->gateway_name];
+                        }
+
+                        if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
+                            foreach ($exists as $key => $value) {
+                                if (
+                                    !PaymentGateway::whereGatewayName($key)
+                                        ->where(
+                                            'organizer_id',
+                                            auth()->user()->organizer_id,
+                                        )
+                                        ->exists()
+                                ) {
+                                    $options[$key] = $value;
+                                }
                             }
+                        } else {
+                            $options = [...$options, ...$exists];
                         }
 
                         return $options;
@@ -112,44 +120,44 @@ class PaymentGatewayResource extends Resource
                 Forms\Components\Radio::make('config.sandbox')
                     ->label('Sandbox')
                     ->boolean()
-                    ->visible(fn (Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
+                    ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
                     ->required(),
 
                 Forms\Components\TextInput::make('config.username')
                     ->label('Username')
-                    ->visible(fn (Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
+                    ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
                     ->required(),
 
                 Forms\Components\TextInput::make('config.password')
                     ->label('Password')
                     ->password()
-                    ->visible(fn (Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
+                    ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
                     ->required(),
 
                 Forms\Components\TextInput::make('config.signature')
                     ->label('Signature')
-                    ->visible(fn (Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
+                    ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
                     ->required(),
 
                 Forms\Components\TextInput::make('config.publishable_key')
                     ->label('Stripe publishable key')
-                    ->visible(fn (Forms\Get $get) => $get('gateway_name') === 'stripe_checkout')
+                    ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'stripe_checkout')
                     ->required(),
 
                 Forms\Components\TextInput::make('config.secret_key')
                     ->label('Stripe secret key')
-                    ->visible(fn (Forms\Get $get) => $get('gateway_name') === 'stripe_checkout')
+                    ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'stripe_checkout')
                     ->required(),
 
                 Forms\Components\Radio::make('config.production')
                     ->label('Is Production')
                     ->boolean()
-                    ->visible(fn (Forms\Get $get) => $get('gateway_name') === 'eseva')
+                    ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'eseva')
                     ->required(),
 
                 Forms\Components\TextInput::make('config.merchant_code')
                     ->label('Merchant code')
-                    ->visible(fn (Forms\Get $get) => $get('gateway_name') === 'eseva')
+                    ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'eseva')
                     ->required(),
             ]);
     }
@@ -166,7 +174,10 @@ class PaymentGatewayResource extends Resource
                     ->label('Image')
                     ->extraImgAttributes(['loading' => 'lazy'])
                     ->square()
-                    ->getStateUsing(fn($record) => $record->gateway_logo_name ? ['payment/gateways/' . $record->gateway_logo_name] : null)
+                    ->getStateUsing(
+                        fn($record,
+                        ) => $record->gateway_logo_name ? ['payment/gateways/' . $record->gateway_logo_name] : null,
+                    )
                     ->disk('public'),
 
                 Tables\Columns\TextColumn::make('number')
@@ -176,9 +187,9 @@ class PaymentGatewayResource extends Resource
 
                 Tables\Columns\TextColumn::make('enabled')
                     ->label('Status')
-                    ->formatStateUsing(fn($state) => $state ? 'Disabled' : 'Enabled')
-                    ->color(fn($state) => $state ? 'danger' : 'primary')
-                    ->icon(fn($state) => $state ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->formatStateUsing(fn($state) => $state ? 'Enabled' : 'Disabled')
+                    ->color(fn($state) => $state ? 'primary' : 'danger')
+                    ->icon(fn($state) => $state ? 'heroicon-o-eye' : 'heroicon-o-eye-slash')
                     ->badge(),
 
                 Tables\Columns\CheckboxColumn::make('membership_types')
@@ -236,7 +247,7 @@ class PaymentGatewayResource extends Resource
     public static function getWidgets(): array
     {
         return [
-            Widgets\SettingPaymentWidget::class
+            Widgets\SettingPaymentWidget::class,
         ];
     }
 
@@ -247,11 +258,11 @@ class PaymentGatewayResource extends Resource
         return parent::getEloquentQuery()
             ->when(
                 str_contains($role, 'ORGANIZER'),
-                fn ($query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                fn($query) => $query->where('organizer_id', auth()->user()->organizer_id),
             )
             ->when(
                 str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR'),
-                fn (Builder $query) => $query->whereNull('organizer_id')
+                fn(Builder $query) => $query->whereNull('organizer_id'),
             );
     }
 
