@@ -45,7 +45,13 @@ class ViewOrder extends ViewRecord
 
                     Infolists\Components\TextEntry::make('sub_total')
                         ->state($orderElement->unitprice * $orderElement->quantity)
-                        ->label('Subtotal')
+                        ->label('Subtotal'),
+
+                    Infolists\Components\TextEntry::make('orderElements.eventDateTicket.name')
+                        ->label('Ticket Type'),
+
+                    Infolists\Components\TextEntry::make('orderElements.quantity')
+                        ->label('Ticket sales number'),
                 ]);
         }
 

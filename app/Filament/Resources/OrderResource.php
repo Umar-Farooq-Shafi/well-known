@@ -7,6 +7,7 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Mail\OrderConfirmation;
 use App\Models\EventTranslation;
 use App\Models\Order;
+use App\Models\OrderElement;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Notifications\Notification;
@@ -15,6 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class OrderResource extends Resource
@@ -70,12 +72,18 @@ class OrderResource extends Resource
                         $state = '';
 
                         foreach ($record->orderElements as $orderElement) {
-                            $state .= $orderElement?->eventDateTicket?->eventDate?->event?->name ?? '';
+                            $state .= ' ' . $orderElement?->eventDateTicket?->eventDate?->event?->name ?? '';
                         }
 
                         return $state;
                     })
                     ->label('Event'),
+
+                Tables\Columns\TextColumn::make('orderElements.eventDateTicket.name')
+                    ->label('Ticket Type'),
+
+                Tables\Columns\TextColumn::make('orderElements.quantity')
+                    ->label('Ticket sales number'),
 
                 Tables\Columns\TextColumn::make('user.fullName')
                     ->label('Attendee / POS')
@@ -207,12 +215,32 @@ class OrderResource extends Resource
 
                     Tables\Actions\DeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),
-                    Tables\Actions\ForceDeleteAction::make(),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->before(function($record) {
+                            DB::transaction(function() use ($record) {
+                                DB::table('eventic_ticket_reservation')
+                                    ->whereIn('orderelement_id', function($query) use ($record) {
+                                        $query->select('id')
+                                            ->from('eventic_order_element')
+                                            ->where('order_id', $record->id);
+                                    })
+                                    ->delete();
+
+                                DB::table('eventic_order_element')->where('order_id', $record->id)->delete();
+
+                                $record->payment?->delete();
+
+                                $record->delete();
+                            });
+
+                        }),
                 ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }

@@ -558,7 +558,7 @@
                                                     placeholder="Select Event Date"
                                                     without-timezone
                                                     without-time
-                                                    :min="$eventDate->recurrent_startdate->format('Y-m-d') "
+                                                    :min="$eventDate->recurrent_startdate->format('Y-m-d')"
                                                     :max="$eventDate->recurrent_enddate->format('Y-m-d')"
                                                 />
                                             </div>
