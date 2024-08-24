@@ -19,6 +19,7 @@ use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
@@ -32,6 +33,7 @@ use Pboivin\FilamentPeek\Forms\Actions\InlinePreviewAction;
 use Pboivin\FilamentPeek\Pages\Actions\PreviewAction;
 use Pboivin\FilamentPeek\Pages\Concerns\HasPreviewModal;
 use Pboivin\FilamentPeek\Tables\Actions\ListPreviewAction;
+use RyanChandler\FilamentProgressColumn\ProgressColumn;
 
 class EventResource extends Resource
 {
@@ -514,10 +516,27 @@ class EventResource extends Resource
                     ->searchable(isIndividual: true)
                     ->sortable(),
 
+                ProgressColumn::make('progress')
+                    ->progress(fn ($record) => $record->getTotalSalesPercentage()),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->state(fn ($record) => $record->getTotalOrderElementsQuantitySum())
+                    ->label('Tickets sold'),
+
+                Tables\Columns\TextColumn::make('published')
+                    ->badge()
+                    ->color(fn ($record) => $record->stringifyStatusClass())
+                    ->state(fn ($record) => $record->stringifyStatus())
+                    ->label('Status'),
+
                 Tables\Columns\TextColumn::make('is_featured')
                     ->label('Is Feathered')
                     ->formatStateUsing(fn($state) => $state ? 'Yes' : 'No')
                     ->searchable(),
+
+                ProgressColumn::make('updated_at')
+                    ->label('Attendee')
+                    ->progress(fn ($record) => $record->getTotalCheckInPercentage()),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('event')

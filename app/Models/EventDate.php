@@ -99,6 +99,26 @@ class EventDate extends Model
         return round(($this->getScannedTicketsCount() / $this->getOrderElementsQuantitySum()) * 100);
     }
 
+    public function getTotalSalesPercentage(): float|int
+    {
+        if ($this->getTicketsQuantitySum() == 0) {
+            return 0;
+        }
+
+        return round(($this->getOrderElementsQuantitySum() / $this->getTicketsQuantitySum()) * 100);
+    }
+
+    public function getTicketsQuantitySum(): ?int
+    {
+        $sum = 0;
+
+        foreach ($this->eventDateTickets as $eventDateTicket) {
+            $sum += $eventDateTicket->quantity;
+        }
+
+        return $sum;
+    }
+
     public function getOrganizerPayoutAmountAttribute()
     {
         return $this->getSales() - $this->getTicketPricePercentageCutSum() - $this->getSales("ROLE_POINTOFSALE");
@@ -195,8 +215,8 @@ class EventDate extends Model
     {
         return (
             $this->event->organizer?->user?->enabled && $this->active && $this->event->published
-                && (Carbon::make($this->startdate)->greaterThan(now()) || $this->recurrent == true)
-                && (!$this->isSoldOut()) && $this->hasATicketOnSale() && (!$this->payoutRequested())
+            && (Carbon::make($this->startdate)->greaterThan(now()) || $this->recurrent == true)
+            && (!$this->isSoldOut()) && $this->hasATicketOnSale() && (!$this->payoutRequested())
         );
     }
 

@@ -160,6 +160,9 @@ class AttendeeCheckInPage extends Page implements HasTable
                     ->icon(fn($record) => $record->scanned ? 'heroicon-o-check' : '')
                     ->tooltip(function ($record) use ($timezone) {
                         if ($record->scanned) {
+//                            dump($timezone[0]);
+//                            dd(Carbon::make(now())
+//                                ->timezone($timezone[0]));
                             return "Checked In At " . Carbon::make($record->updated_at)
                                     ->timezone($timezone[0])
                                     ->format('l jS F Y, h:i A');

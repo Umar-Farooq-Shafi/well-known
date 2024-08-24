@@ -99,7 +99,7 @@ class PaymentGatewayResource extends Resource
                     ->required(),
 
                 Forms\Components\Radio::make('enabled')
-                    ->label('Status')
+                    ->label('Enabled/Disabled')
                     ->boolean()
                     ->inlineLabel()
                     ->required(),
@@ -176,7 +176,7 @@ class PaymentGatewayResource extends Resource
 
                 Tables\Columns\TextColumn::make('enabled')
                     ->label('Status')
-                    ->formatStateUsing(fn($state) => $state ? 'Hidden' : 'Visible')
+                    ->formatStateUsing(fn($state) => $state ? 'Disabled' : 'Enabled')
                     ->color(fn($state) => $state ? 'danger' : 'primary')
                     ->icon(fn($state) => $state ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->badge(),

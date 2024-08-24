@@ -199,6 +199,81 @@ class Event extends Model implements Feedable
         return false;
     }
 
+    public function getTotalSalesPercentage(): float|int
+    {
+        if (count($this->eventDates) == 0) {
+            return 0;
+        }
+
+        $eventDatesSalesPercentageSum = 0;
+
+        foreach ($this->eventDates as $eventDate) {
+            $eventDatesSalesPercentageSum += $eventDate->getTotalSalesPercentage();
+        }
+
+        return round($eventDatesSalesPercentageSum / count($this->eventDates));
+    }
+
+    public function getTotalOrderElementsQuantitySum($status = 1, $user = "all", $role = "all"): int
+    {
+        $sum = 0;
+
+        foreach ($this->eventDates as $eventDate) {
+            $sum += $eventDate->getOrderElementsQuantitySum($status, $user, $role);
+        }
+
+        return $sum;
+    }
+
+    public function stringifyStatus(): string
+    {
+        if (!$this->organizer->user->enabled) {
+            return "Organizer is disabled";
+        }
+
+        if (!$this->published) {
+            return "Event is not published";
+        }
+
+        if (!$this->hasAnEventDateOnSale()) {
+            return "No events on sale";
+        }
+
+        return "On sale";
+    }
+
+    public function stringifyStatusClass(): string
+    {
+        if (!$this->organizer->user->enabled) {
+            return "danger";
+        }
+
+        if (!$this->published) {
+            return "warning";
+        }
+
+        if (!$this->hasAnEventDateOnSale()) {
+            return "info";
+        }
+
+        return "success";
+    }
+
+    public function getTotalCheckInPercentage(): float|int
+    {
+        if (count($this->eventDates) == 0) {
+            return 0;
+        }
+
+        $eventDatesCheckInPercentageSum = 0;
+
+        foreach ($this->eventDates as $eventDate) {
+            $eventDatesCheckInPercentageSum += $eventDate->getTotalCheckInPercentage();
+        }
+
+        return round($eventDatesCheckInPercentageSum / count($this->eventDates));
+    }
+
     public function displaySubtitles(): string
     {
         $subtitles = '';
@@ -223,7 +298,8 @@ class Event extends Model implements Feedable
         return $count >= 2;
     }
 
-    public function hasContactAndSocialMedia(): bool
+    public
+    function hasContactAndSocialMedia(): bool
     {
         return ($this->externallink || $this->phonenumber || $this->twitter
             || $this->instagram || $this->email || $this->facebook || $this->googleplus || $this->linkedin);
@@ -232,7 +308,8 @@ class Event extends Model implements Feedable
     /**
      * @return BelongsTo
      */
-    public function category(): BelongsTo
+    public
+    function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
@@ -240,7 +317,8 @@ class Event extends Model implements Feedable
     /**
      * @return BelongsTo
      */
-    public function organizer(): BelongsTo
+    public
+    function organizer(): BelongsTo
     {
         return $this->belongsTo(Organizer::class);
     }
@@ -248,7 +326,8 @@ class Event extends Model implements Feedable
     /**
      * @return HasMany
      */
-    public function eventTranslations(): HasMany
+    public
+    function eventTranslations(): HasMany
     {
         return $this->hasMany(EventTranslation::class, 'translatable_id');
     }
@@ -256,7 +335,8 @@ class Event extends Model implements Feedable
     /**
      * @return HasMany
      */
-    public function eventDates(): HasMany
+    public
+    function eventDates(): HasMany
     {
         return $this->hasMany(EventDate::class);
     }
@@ -264,7 +344,8 @@ class Event extends Model implements Feedable
     /**
      * @return HasMany
      */
-    public function reviews(): HasMany
+    public
+    function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
@@ -272,7 +353,8 @@ class Event extends Model implements Feedable
     /**
      * @return BelongsToMany
      */
-    public function audiences(): BelongsToMany
+    public
+    function audiences(): BelongsToMany
     {
         return $this->belongsToMany(Audience::class, 'eventic_event_audience');
     }
@@ -280,7 +362,8 @@ class Event extends Model implements Feedable
     /**
      * @return BelongsToMany
      */
-    public function languages(): BelongsToMany
+    public
+    function languages(): BelongsToMany
     {
         return $this->belongsToMany(Language::class, 'eventic_event_language');
     }
@@ -288,7 +371,8 @@ class Event extends Model implements Feedable
     /**
      * @return BelongsToMany
      */
-    public function subtitles(): BelongsToMany
+    public
+    function subtitles(): BelongsToMany
     {
         return $this->belongsToMany(Language::class, 'eventic_event_subtitle');
     }
@@ -296,7 +380,8 @@ class Event extends Model implements Feedable
     /**
      * @return HasMany
      */
-    public function eventImages(): HasMany
+    public
+    function eventImages(): HasMany
     {
         return $this->hasMany(EventImage::class);
     }
@@ -304,7 +389,8 @@ class Event extends Model implements Feedable
     /**
      * @return BelongsToMany
      */
-    public function favourites(): BelongsToMany
+    public
+    function favourites(): BelongsToMany
     {
         return $this->belongsToMany(
             User::class,
@@ -317,12 +403,14 @@ class Event extends Model implements Feedable
     /**
      * @return BelongsTo
      */
-    public function country(): BelongsTo
+    public
+    function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
     }
 
-    public function toFeedItem(): FeedItem
+    public
+    function toFeedItem(): FeedItem
     {
         return FeedItem::create()
             ->id($this->id)

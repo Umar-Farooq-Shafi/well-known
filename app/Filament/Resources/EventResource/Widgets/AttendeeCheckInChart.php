@@ -77,6 +77,7 @@ class AttendeeCheckInChart extends ApexChartWidget
 
         if ($venue = $eventDate?->venue) {
             $countryAndTimeZone = $venue->getLocalTimezoneBasedOnCountry();
+
         } else {
             $country = auth()->user()->scanner->organizer->country;
 

@@ -23,6 +23,7 @@
         "malzariey/filament-daterangepicker-filter": "^2.8",
         "owenvoke/blade-fontawesome": "^2.6",
         "ralphjsmit/livewire-urls": "^1.4",
+        "ryangjchandler/filament-progress-column": "^1.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-feed": "^4.4",
         "spatie/laravel-pdf": "^1.5",
