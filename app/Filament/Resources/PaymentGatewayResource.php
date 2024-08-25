@@ -175,8 +175,7 @@ class PaymentGatewayResource extends Resource
                     ->extraImgAttributes(['loading' => 'lazy'])
                     ->square()
                     ->getStateUsing(
-                        fn($record,
-                        ) => $record->gateway_logo_name ? ['payment/gateways/' . $record->gateway_logo_name] : null,
+                        fn($record) => $record->gateway_logo_name ? ['payment/gateways/' . $record->gateway_logo_name] : null,
                     )
                     ->disk('public'),
 

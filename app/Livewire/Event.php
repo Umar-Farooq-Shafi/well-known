@@ -17,6 +17,9 @@ class Event extends Component
     #[Validate('required')]
     public $eventDatePick;
 
+    #[Validate('required')]
+    public $quantity = [];
+
     public ?EventTranslation $eventTranslation = null;
 
     public function mount(string $slug)
@@ -26,6 +29,7 @@ class Event extends Component
 
     public function submit()
     {
+        dd($this->quantity);
         $this->validate();
     }
 

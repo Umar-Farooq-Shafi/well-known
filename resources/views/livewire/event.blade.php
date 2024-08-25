@@ -22,15 +22,15 @@
     <div class="w-full">
         <img src="{{ Storage::url('events/' . $event->image_name) }}" alt="Canyon Swing"
              loading="lazy"
-             class="object-contain z-10 w-full relative opacity-100 p-8 h-[50rem]"/>
+             class="object-contain z-10 w-full relative opacity-100 p-8 h-[40rem]"/>
 
-        <div class="absolute top-[13rem] opacity-75 bg-gradient-to-b blur-xl bg-cover h-[40rem] bg-no-repeat w-full"
+        <div class="absolute top-[13rem] opacity-75 bg-gradient-to-b blur-xl bg-cover h-[35rem] bg-no-repeat w-full"
              style="background-image: url({{ Storage::url('events/' . $event->image_name) }})"
         >
         </div>
     </div>
 
-    <div class="flex justify-center rounded-lg shadow-lg bg-white mx-28 lg:mx-44 my-8">
+    <div class="flex justify-center rounded-lg shadow-lg bg-white mx-8 md:mx-16 lg:mx-44 my-8">
         <div class="container w-[65%]">
             <div class="mt-8 p-6">
                 <h1 class="text-2xl font-bold mb-4">{{ $eventTranslation->name }}</h1>
@@ -165,8 +165,9 @@
                     <ul class="flex flex-wrap">
                         @if ($event->externallink)
                             <li class="w-full md:w-1/2">
-                                <a href="{{ Str::startsWith($event->externallink, ['http://', 'https://']) ? $event->externallink : 'http://' . $event->externallink }}" class="pl-4 inline-flex items-center" target="_blank">
-                                    <x-fas-globe class="mr-2 w-4 h-4" />
+                                <a href="{{ Str::startsWith($event->externallink, ['http://', 'https://']) ? $event->externallink : 'http://' . $event->externallink }}"
+                                   class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fas-globe class="mr-2 w-4 h-4"/>
                                     <span>{{ $event->externallink }}</span>
                                 </a>
                             </li>
@@ -174,7 +175,7 @@
                         @if ($event->email)
                             <li class="w-full md:w-1/2">
                                 <a href="mailto:{{ $event->email }}" class="pl-4 inline-flex items-center">
-                                    <x-fas-at class="mr-2 w-4 h-4" />
+                                    <x-fas-at class="mr-2 w-4 h-4"/>
                                     <span>{{ $event->email }}</span>
                                 </a>
                             </li>
@@ -182,47 +183,52 @@
                         @if ($event->phonenumber)
                             <li class="w-full md:w-1/2">
                                 <a href="tel:{{ $event->phonenumber }}" class="pl-4 inline-flex items-center">
-                                    <x-fas-phone class="w-4 h-4 mr-2" />
+                                    <x-fas-phone class="w-4 h-4 mr-2"/>
                                     <span>{{ $event->phonenumber }}</span>
                                 </a>
                             </li>
                         @endif
                         @if ($event->facebook)
                             <li class="w-full md:w-1/2">
-                                <a href="{{ Str::startsWith($event->facebook, ['http://', 'https://']) ? $event->facebook : 'http://' . $event->facebook }}" class="pl-4 inline-flex items-center" target="_blank">
-                                    <x-fab-facebook class="w-4 h-4 mr-2" />
+                                <a href="{{ Str::startsWith($event->facebook, ['http://', 'https://']) ? $event->facebook : 'http://' . $event->facebook }}"
+                                   class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fab-facebook class="w-4 h-4 mr-2"/>
                                     <span>{{ $event->facebook }}</span>
                                 </a>
                             </li>
                         @endif
                         @if ($event->twitter)
                             <li class="w-full md:w-1/2">
-                                <a href="{{ Str::startsWith($event->twitter, ['http://', 'https://']) ? $event->twitter : 'http://' . $event->twitter }}" class="pl-4 inline-flex items-center" target="_blank">
-                                    <x-fab-twitter class="w-4 h-4 mr-2" />
+                                <a href="{{ Str::startsWith($event->twitter, ['http://', 'https://']) ? $event->twitter : 'http://' . $event->twitter }}"
+                                   class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fab-twitter class="w-4 h-4 mr-2"/>
                                     <span>{{ $event->twitter }}</span>
                                 </a>
                             </li>
                         @endif
                         @if ($event->googleplus)
                             <li class="w-full md:w-1/2">
-                                <a href="{{ Str::startsWith($event->googleplus, ['http://', 'https://']) ? $event->googleplus : 'http://' . $event->googleplus }}" class="pl-4 inline-flex items-center" target="_blank">
-                                    <x-fab-google-plus class="w-4 h-4 mr-2" />
+                                <a href="{{ Str::startsWith($event->googleplus, ['http://', 'https://']) ? $event->googleplus : 'http://' . $event->googleplus }}"
+                                   class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fab-google-plus class="w-4 h-4 mr-2"/>
                                     <span>{{ $event->googleplus }}</span>
                                 </a>
                             </li>
                         @endif
                         @if ($event->instagram)
                             <li class="w-full md:w-1/2">
-                                <a href="{{ Str::startsWith($event->instagram, ['http://', 'https://']) ? $event->instagram : 'http://' . $event->instagram }}" class="pl-4 inline-flex items-center" target="_blank">
-                                    <x-fab-instagram class="w-4 h-4 mr-2" />
+                                <a href="{{ Str::startsWith($event->instagram, ['http://', 'https://']) ? $event->instagram : 'http://' . $event->instagram }}"
+                                   class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fab-instagram class="w-4 h-4 mr-2"/>
                                     <span>{{ $event->instagram }}</span>
                                 </a>
                             </li>
                         @endif
                         @if ($event->linkedin)
                             <li class="w-full md:w-1/2">
-                                <a href="{{ Str::startsWith($event->linkedin, ['http://', 'https://']) ? $event->linkedin : 'http://' . $event->linkedin }}" class="pl-4 inline-flex items-center" target="_blank">
-                                    <x-fab-linkedin class="w-4 h-4 mr-2" />
+                                <a href="{{ Str::startsWith($event->linkedin, ['http://', 'https://']) ? $event->linkedin : 'http://' . $event->linkedin }}"
+                                   class="pl-4 inline-flex items-center" target="_blank">
+                                    <x-fab-linkedin class="w-4 h-4 mr-2"/>
                                     <span>{{ $event->linkedin }}</span>
                                 </a>
                             </li>
@@ -357,7 +363,7 @@
                     @endif
                 @endif
 
-                <form wire:submit="submit">
+                <div>
 
                     @foreach ($event->eventDates as $eventDate)
                         @if ($eventDate->isOnSale())
@@ -564,19 +570,97 @@
                                             </div>
                                         @endif
 
-                                        @auth
-                                            <a href="#" class="btn btn-primary w-full mb-2 buy-tickets-modal-button"
-                                               data-target="#buy-tickets-modal-eventDate-{{ $eventDate->reference }}"
-                                               data-reference="{{ $eventDate->reference }}"><i
-                                                    class="fas fa-ticket-alt"></i> {{ __('Buy Tickets') }}</a>
-                                            {{--                                            @include('dashboard.attendee.cart.add-to-cart-modal', ['eventdate' => $eventDate])--}}
-                                        @else
-                                            <a href="{{ route('filament.admin.auth.login') . '?_target_path=' . request()->getPathInfo() }}"
-                                               class="btn btn-primary w-full"><i
-                                                    class="fas fa-ticket-alt"></i> {{ __('Buy Tickets') }}</a>
-                                        @endauth
+                                        <div class="flex items-center justify-center w-full py-2">
+                                            <x-button x-on:click="$openModal('cardModal')" primary label="Buy Tickets"/>
+                                        </div>
+
                                     </dd>
                                 </dl>
+
+                                <x-modal-card :title="$eventTranslation->name" name="cardModal" blur="md" width="5xl">
+                                    <div class="grid grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-4">
+                                        <div class="md:col-span-2 lg:col-span-5">
+                                            <div class="flex flex-col gap-y-1 font-medium text-base">
+                                                <p>{{ $eventTranslation->name }}</p>
+
+                                                <p>{{ $eventDate->startdate->format('F d, Y H:i') }}
+                                                    - {{ $eventDate->enddate->format('F d, Y H:i') }}</p>
+                                            </div>
+
+                                            <div class="px-8 py-4">
+                                                <x-input label="Promo Code" placeholder="Promo Code"/>
+                                            </div>
+
+                                            <div class="flex flex-col gap-y-2 divide-y-2 my-4 mx-2">
+                                                @foreach($event->eventDates as $ed)
+                                                    @if ($ed->isOnSale())
+                                                        @foreach ($ed->eventDateTickets as $eventTicket)
+                                                            @if ($eventTicket->active)
+                                                                <div class="p-1 flex justify-between">
+                                                                    <div>
+                                                                        <p class="border-t-0" style="width: 75%;">
+                                                                            {{ $ticket->name }} {{ $eventTicket->currency->ccy }}
+                                                                        </p>
+
+                                                                        <div class="font-semibold">
+                                                                            @if (!$eventTicket->isOnSale())
+                                                                                <span
+                                                                                    class="badge {{ $eventTicket->stringifyStatusClass() }}">{{ __($eventTicket->stringifyStatus()) }}</span>
+                                                                            @elseif(!$eventTicket->free && $eventTicket->promotionalprice === null)
+                                                                                <p class="text-gray-500">
+                                                                                    {{ $eventTicket->currency->symbol }}
+                                                                                    : {{ $eventTicket->price }}
+                                                                                </p>
+                                                                            @else
+                                                                                {{ $eventTicket->free ? __('Free') :  $eventTicket->currency->symbol }}
+                                                                                @if ($eventTicket->promotionalprice && !$eventTicket->free)
+                                                                                    <del
+                                                                                        class="text-gray-500">{{ $eventTicket->currency->symbol . $eventTicket->price }}</del>
+                                                                                @endif
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="w-20">
+                                                                        <x-native-select
+                                                                            label="Quantity"
+                                                                            placeholder=""
+                                                                            wire:model="quantity.{{ $eventTicket->id }}"
+                                                                            :options="['0', '1', '2', '3', '4', '5', '6', '7', '8']"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <div class="lg:col-span-3 md:cols-span-2">
+                                            <img
+                                                src="{{ Storage::url('events/' . $event->image_name) }}"
+                                                alt="{{ $eventTranslation->name }}"
+                                                loading="lazy"
+                                                class="w-full opacity-100 h-40"
+                                            />
+
+                                            <div class="mt-1">
+                                                <h1 class="font-semibold">Order Summary</h1>
+
+                                                @if(count($quantity))
+
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <x-slot name="footer" class="flex justify-end gap-x-4">
+                                        <x-button flat label="Cancel" x-on:click="close"/>
+
+                                        <x-button primary label="Checkout" wire:click="submit"/>
+                                    </x-slot>
+                                </x-modal-card>
 
                                 <hr class="border-gray-300">
 
@@ -619,7 +703,7 @@
                             </div>
                         @endif
                     @endforeach
-                </form>
+                </div>
 
             @else
                 <div class="flex gap-x-2 items-center bg-[#31708f] p-2 rounded text-white px-4">
