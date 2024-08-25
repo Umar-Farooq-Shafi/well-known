@@ -588,7 +588,7 @@
                                             </div>
 
                                             <div class="px-8 py-4">
-                                                <x-input label="Promo Code" placeholder="Promo Code"/>
+                                                <x-input label="Promo Code" wire:model="promoCode" placeholder="Promo Code"/>
                                             </div>
 
                                             <div class="flex flex-col gap-y-2 divide-y-2 my-4 mx-2">
@@ -625,8 +625,9 @@
                                                                         <x-native-select
                                                                             label="Quantity"
                                                                             placeholder=""
-                                                                            wire:model="quantity.{{ $eventTicket->id }}"
-                                                                            :options="['0', '1', '2', '3', '4', '5', '6', '7', '8']"
+                                                                            wire:model.live="quantity.{{ $eventTicket->id }}"
+                                                                            :disabled="$ccy !== null && $ccy !== $eventTicket->currency->ccy"
+                                                                            :options="['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']"
                                                                         />
                                                                     </div>
                                                                 </div>
@@ -649,7 +650,44 @@
                                                 <h1 class="font-semibold">Order Summary</h1>
 
                                                 @if(count($quantity))
+                                                    @php $subtotal = 0; $fee = 0; @endphp
 
+                                                    @foreach($quantity as $id => $value)
+                                                        @php
+                                                            $eventDateTicket = \App\Models\EventDateTicket::find($id);
+
+                                                            $subtotal += $eventDateTicket->price * $value;
+                                                            $fee += $eventDateTicket->ticket_fee * $value;
+                                                        @endphp
+
+                                                        <div class="flex justify-between items-center m-2">
+                                                            <p>{{ $value }} x {{ $eventDateTicket->name }}</p>
+
+                                                            <p class="font-semibold">{{ $eventDateTicket->currency->ccy }} {{ $eventDateTicket->price * $value }}</p>
+                                                        </div>
+                                                    @endforeach
+
+                                                    <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
+
+                                                    <div class="flex justify-between items-center m-2">
+                                                        <p>Subtotal</p>
+
+                                                        <p class="font-semibold">{{ $ccy }} {{ $subtotal }}</p>
+                                                    </div>
+
+                                                    <div class="flex justify-between items-center m-2">
+                                                        <p>Fees</p>
+
+                                                        <p class="font-semibold">{{ $ccy }} {{ $fee }}</p>
+                                                    </div>
+
+                                                    <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
+
+                                                    <div class="flex justify-between items-center m-2">
+                                                        <p class="font-bold">Total</p>
+
+                                                        <p class="font-bold">{{ $ccy }} {{ $fee + $subtotal }}</p>
+                                                    </div>
                                                 @endif
                                             </div>
                                         </div>

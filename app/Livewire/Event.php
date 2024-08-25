@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\EventDateTicket;
 use App\Models\EventTranslation;
 use App\Models\Organizer;
 use App\Traits\RatingTrait;
@@ -20,11 +21,27 @@ class Event extends Component
     #[Validate('required')]
     public $quantity = [];
 
+    public $ccy;
+
+    public $promoCode;
+
+
     public ?EventTranslation $eventTranslation = null;
 
     public function mount(string $slug)
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
+    }
+
+    public function updatedQuantity($value, $key)
+    {
+        if ($key) {
+            $this->ccy = EventDateTicket::find($key)?->currency?->ccy;
+        }
+
+        if ($value === '0') {
+            $this->reset('ccy');
+        }
     }
 
     public function submit()
