@@ -217,7 +217,21 @@ class OrderResource extends Resource
                     Tables\Actions\RestoreAction::make(),
                     Tables\Actions\ForceDeleteAction::make()
                         ->before(function($record) {
+
                             DB::transaction(function() use ($record) {
+                                // Nullify the payment_id in eventic_order to break the foreign key constraint
+                                DB::table('eventic_order')
+                                    ->where('payment_id', function($query) use ($record) {
+                                        $query->select('id')
+                                            ->from('eventic_payment')
+                                            ->where('order_id', $record->id);
+                                    })
+                                    ->update(['payment_id' => null]);
+
+                                // Now delete from eventic_payment
+                                DB::table('eventic_payment')->where('order_id', $record->id)->delete();
+
+                                // Delete from eventic_ticket_reservation
                                 DB::table('eventic_ticket_reservation')
                                     ->whereIn('orderelement_id', function($query) use ($record) {
                                         $query->select('id')
@@ -226,11 +240,8 @@ class OrderResource extends Resource
                                     })
                                     ->delete();
 
+                                // Delete from eventic_order_element
                                 DB::table('eventic_order_element')->where('order_id', $record->id)->delete();
-
-                                $record->payment?->delete();
-
-                                $record->delete();
                             });
 
                         }),
@@ -239,7 +250,36 @@ class OrderResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->before(function ($livewire) {
+                            foreach ($livewire->getSelectedTableRecords() as $record) {
+                                DB::transaction(function() use ($record) {
+                                    // Nullify the payment_id in eventic_order to break the foreign key constraint
+                                    DB::table('eventic_order')
+                                        ->where('payment_id', function($query) use ($record) {
+                                            $query->select('id')
+                                                ->from('eventic_payment')
+                                                ->where('order_id', $record->id);
+                                        })
+                                        ->update(['payment_id' => null]);
+
+                                    // Now delete from eventic_payment
+                                    DB::table('eventic_payment')->where('order_id', $record->id)->delete();
+
+                                    // Delete from eventic_ticket_reservation
+                                    DB::table('eventic_ticket_reservation')
+                                        ->whereIn('orderelement_id', function($query) use ($record) {
+                                            $query->select('id')
+                                                ->from('eventic_order_element')
+                                                ->where('order_id', $record->id);
+                                        })
+                                        ->delete();
+
+                                    // Delete from eventic_order_element
+                                    DB::table('eventic_order_element')->where('order_id', $record->id)->delete();
+                                });
+                            }
+                        }),
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
