@@ -128,11 +128,11 @@ class EventDateTicket extends Model
             return "Sold out";
         }
 
-        if (Carbon::make($this->salesstartdate)->greaterThan(now()) && $this->salesstartdate) {
+        if ($this->salesstartdate && Carbon::make($this->salesstartdate)->greaterThan(now())) {
             return "Sale didn't start yet";
         }
 
-        if (Carbon::make($this->salesenddate)->lessThan(now()) && $this->salesstartdate) {
+        if ($this->salesstartdate && Carbon::make($this->salesenddate)->lessThan(now())) {
             return "Sale ended";
         }
 
@@ -171,11 +171,11 @@ class EventDateTicket extends Model
             return "warning";
         }
 
-        if (Carbon::make($this->salesstartdate)->greaterThan(now()) && $this->salesstartdate) {
+        if ($this->salesstartdate && Carbon::make($this->salesstartdate)->greaterThan(now())) {
             return "info";
         }
 
-        if (Carbon::make($this->salesenddate)->lessThan(now()) && $this->salesstartdate) {
+        if ($this->salesstartdate && Carbon::make($this->salesenddate)->lessThan(now())) {
             return "warning";
         }
 
@@ -307,8 +307,8 @@ class EventDateTicket extends Model
         return $this->eventDate->event->organizer->user->enabled
             && $this->eventDate->event->published
             && $this->eventDate->active
-            && (Carbon::make($this->eventDate->startdate)->greaterThanOrEqualTo(now())
-                || ($this->eventDate->recurrent == true && Carbon::make(
+            && ($this->eventDate->startdate && Carbon::make($this->eventDate->startdate)->greaterThanOrEqualTo(now())
+                || ($this->eventDate->recurrent == true && $this->eventDate->recurrent_enddate && Carbon::make(
                         $this->eventDate->recurrent_enddate,
                     )->greaterThan(now())))
             && $this->active
