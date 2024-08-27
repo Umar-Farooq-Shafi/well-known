@@ -10,7 +10,7 @@ class Events extends Component
 {
     public $categoryTrans;
 
-    public function mount(?int $category = null)
+    public function mount(?string $category = null)
     {
         $this->categoryTrans = CategoryTranslation::whereName($category)->first();
     }
