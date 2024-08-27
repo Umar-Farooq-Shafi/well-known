@@ -41,7 +41,7 @@ class AttendeeCheckInPage extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        $country = auth()->user()->scanner->organizer->country;
+        $country = $this->record->country;
 
         $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
 
@@ -160,9 +160,6 @@ class AttendeeCheckInPage extends Page implements HasTable
                     ->icon(fn($record) => $record->scanned ? 'heroicon-o-check' : '')
                     ->tooltip(function ($record) use ($timezone) {
                         if ($record->scanned) {
-//                            dump($timezone[0]);
-//                            dd(Carbon::make(now())
-//                                ->timezone($timezone[0]));
                             return "Checked In At " . Carbon::make($record->updated_at)
                                     ->timezone($timezone[0])
                                     ->format('l jS F Y, h:i A');

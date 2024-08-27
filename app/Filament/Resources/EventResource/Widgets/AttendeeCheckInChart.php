@@ -73,21 +73,14 @@ class AttendeeCheckInChart extends ApexChartWidget
 
     protected function getFooter(): null|string|View
     {
-        $eventDate = $this->record->eventDates->first();
+        $country = $this->record->country;
 
-        if ($venue = $eventDate?->venue) {
-            $countryAndTimeZone = $venue->getLocalTimezoneBasedOnCountry();
+        $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
 
-        } else {
-            $country = auth()->user()->scanner->organizer->country;
-
-            $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
-
-            $countryAndTimeZone = [
-                'country' => $country->name,
-                'timezone' => $timezone[0],
-            ];
-        }
+        $countryAndTimeZone = [
+            'country' => $country->name,
+            'timezone' => $timezone[0],
+        ];
 
         return view('filament.resources.event-resource.pages.footer', $countryAndTimeZone);
     }
