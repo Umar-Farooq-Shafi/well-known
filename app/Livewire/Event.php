@@ -32,6 +32,8 @@ class Event extends Component
 
     public $phone;
 
+    public $paymentMethod;
+
     public ?EventTranslation $eventTranslation = null;
 
     public function mount(string $slug)
@@ -136,6 +138,15 @@ class Event extends Component
                 'icon' => 'error',
                 'title' => 'Error',
                 'description' => 'Phone is required',
+            ]);
+            return;
+        }
+
+        if (empty($this->paymentMethod)) {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => 'Payment method is required',
             ]);
             return;
         }

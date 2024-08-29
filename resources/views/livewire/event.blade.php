@@ -608,30 +608,38 @@
                                                         @foreach ($ed->eventDateTickets as $eventTicket)
                                                             @if ($eventTicket->active)
                                                                 <div class="p-1 flex justify-between">
-                                                                    <div>
-                                                                        <p class="border-t-0" style="width: 75%;">
-                                                                            {{ $ticket->name }} {{ $eventTicket->currency->ccy }}
-                                                                        </p>
+                                                                    <div class="flex gap-x-8">
+                                                                        <div>
+                                                                            <p class="border-t-0" style="width: 75%;">
+                                                                                {{ $ticket->name }} {{ $eventTicket->currency->ccy }}
+                                                                            </p>
 
-                                                                        <div class="font-semibold">
-                                                                            @if (!$eventTicket->isOnSale())
-                                                                                <span
-                                                                                    class="badge {{ $eventTicket->stringifyStatusClass() }}">{{ __($eventTicket->stringifyStatus()) }}</span>
-                                                                            @elseif($eventTicket->free)
-                                                                                {{ __('Free') }}
-                                                                            @else
-                                                                                <p class="text-gray-500">
-                                                                                    @if($eventTicket->currency_symbol_position === 'left')
-                                                                                        {{ $eventTicket->currency->symbol }}
-                                                                                        :
-                                                                                    @endif
-                                                                                    {{ $eventTicket->price }}
-                                                                                    @if($eventTicket->currency_symbol_position === 'right')
-                                                                                        {{ $eventTicket->currency->symbol }}
-                                                                                    @endif
-                                                                                </p>
-                                                                            @endif
+                                                                            <div class="font-semibold">
+                                                                                @if (!$eventTicket->isOnSale())
+                                                                                    <span
+                                                                                        class="badge {{ $eventTicket->stringifyStatusClass() }}">{{ __($eventTicket->stringifyStatus()) }}</span>
+                                                                                @elseif($eventTicket->free)
+                                                                                    {{ __('Free') }}
+                                                                                @else
+                                                                                    <p class="text-gray-500">
+                                                                                        @if($eventTicket->currency_symbol_position === 'left')
+                                                                                            {{ $eventTicket->currency->symbol }}
+                                                                                            :
+                                                                                        @endif
+                                                                                        {{ $eventTicket->price }}
+                                                                                        @if($eventTicket->currency_symbol_position === 'right')
+                                                                                            {{ $eventTicket->currency->symbol }}
+                                                                                        @endif
+                                                                                    </p>
+                                                                                @endif
+                                                                            </div>
                                                                         </div>
+
+                                                                        <p class="align-content-end">
+                                                                            @if($eventTicket->salesstartdate?->greaterThanOrEqualTo(now()) && $eventTicket->salesenddate?->lessThanOrEqualTo(now()))
+                                                                                {{ $eventTicket->promotionalprice }}
+                                                                            @endif
+                                                                        </p>
                                                                     </div>
 
                                                                     <div class="w-20">
@@ -816,7 +824,42 @@
                                             </x-card>
 
                                             <x-card title="Pay With" class="mt-2">
+                                                <div class="flex flex-col gap-y-2">
+                                                    @foreach($eventDate->eventDateTickets as $eventTicket)
+                                                        @foreach($eventTicket->paymentGateways as $paymentGateway)
+                                                            <div
+                                                                class="rounded-lg border border-gray-200 bg-gray-50 p-4 ps-4 dark:border-gray-700 dark:bg-gray-800">
+                                                                <div class="flex items-center">
+                                                                    <div class="flex h-5 items-center">
+                                                                        <input id="credit-card"
+                                                                               aria-describedby="credit-card-text"
+                                                                               type="radio"
+                                                                               value="{{ $paymentGateway->id }}"
+                                                                               wire:model="paymentMethod"
+                                                                               class="h-4 w-4 border-gray-300 bg-white text-primary-600 focus:ring-2 focus:ring-primary-600 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
+                                                                        />
+                                                                    </div>
 
+                                                                    <div
+                                                                        class="ms-4 text-sm flex justify-between items-center w-full">
+                                                                        <label for="credit-card"
+                                                                               class="font-medium leading-none text-gray-900 dark:text-white">
+                                                                            {{ $paymentGateway->name }}
+                                                                        </label>
+
+                                                                        <div>
+                                                                            <img
+                                                                                src="{{ Storage::url('payment/gateways/' . $paymentGateway->gateway_logo_name) }}"
+                                                                                alt="{{ $paymentGateway->name }}"
+                                                                                class="w-8 h-8"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    @endforeach
+                                                </div>
                                             </x-card>
                                         </div>
 
@@ -1000,6 +1043,7 @@
         });
 
         $wire.on('openOrderModal', () => {
+            $closeModal('cardModal');
             $openModal('orderModal');
         });
     </script>

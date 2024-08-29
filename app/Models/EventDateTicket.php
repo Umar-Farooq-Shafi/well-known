@@ -87,6 +87,11 @@ class EventDateTicket extends Model
         'currency_symbol_position',
     ];
 
+    protected $casts = [
+        'salesstartdate' => 'datetime',
+        'salesenddate' => 'datetime',
+    ];
+
     public function getOrderElementsQuantitySum($status = 1, $user = "all", $role = "all"): int
     {
         $sum = 0;
