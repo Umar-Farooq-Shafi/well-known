@@ -6,7 +6,6 @@ use App\Models\EventDateTicket;
 use App\Models\EventTranslation;
 use App\Models\Organizer;
 use App\Traits\RatingTrait;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
 
@@ -15,22 +14,37 @@ class Event extends Component
     use WireUiActions;
     use RatingTrait;
 
-    #[Validate('required')]
     public $eventDatePick;
 
-    #[Validate('required')]
     public $quantity = [];
 
     public $ccy;
 
     public $promoCode;
 
+    public $firstName;
+
+    public $lastName;
+
+    public $email;
+
+    public $confirmEmail;
+
+    public $phone;
 
     public ?EventTranslation $eventTranslation = null;
 
     public function mount(string $slug)
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
+
+        if (auth()->check()) {
+            $this->firstName = auth()->user()->firstname;
+            $this->lastName = auth()->user()->lastname;
+            $this->email = auth()->user()->email;
+            $this->confirmEmail = auth()->user()->email;
+            $this->phone = auth()->user()->phone;
+        }
     }
 
     public function updatedQuantity($value, $key)
@@ -44,10 +58,87 @@ class Event extends Component
         }
     }
 
+    public function buyTicket()
+    {
+        if (empty($this->eventDatePick)) {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => 'Please select an event date before proceeding.',
+            ]);
+        } else {
+            $this->dispatch('openModal');
+        }
+    }
+
     public function submit()
     {
-        dd($this->quantity);
-        $this->validate();
+        if (count($this->quantity) === 0) {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => 'Please select a ticket!',
+            ]);
+        } else {
+            $this->dispatch('openOrderModal');
+        }
+    }
+
+    public function placeOrder()
+    {
+        if (empty($this->firstName)) {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => 'First name is required',
+            ]);
+            return;
+        }
+
+        if (empty($this->lastName)) {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => 'Last name is required',
+            ]);
+            return;
+        }
+
+        if (empty($this->email)) {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => 'Email is required',
+            ]);
+            return;
+        }
+
+        if (empty($this->confirmEmail)) {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => 'Confirm email is required',
+            ]);
+            return;
+        }
+
+        if ($this->email !== $this->confirmEmail) {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => 'Confirm email is not same as confirmEmail',
+            ]);
+            return;
+        }
+
+        if (empty($this->phone)) {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => 'Phone is required',
+            ]);
+            return;
+        }
     }
 
     public function followOrganization(): void

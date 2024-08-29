@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
@@ -363,6 +364,19 @@ class EventDateTicket extends Model
             'id',                   // Foreign key on the final model (EventDateTicket)
             'id',                   // Local key on this model (OrderTicket)
             'eventticket_id',        // Local key on the intermediate model (OrderElement)
+        );
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function paymentGateways(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            PaymentGateway::class,
+            'eventic_event_payment_gateway',
+            'Ticket_id',
+            'Payment_Gateway_id',
         );
     }
 

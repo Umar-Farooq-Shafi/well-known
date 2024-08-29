@@ -5,9 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -71,6 +72,19 @@ class PaymentGateway extends Model
     public function organizer(): BelongsTo
     {
         return $this->belongsTo(Organizer::class, 'organizer_id');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function eventDateTickets(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            EventDateTicket::class,
+            'eventic_event_payment_gateway',
+            'Payment_Gateway_id',
+            'Ticket_id',
+        );
     }
 
 }

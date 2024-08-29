@@ -542,10 +542,19 @@
                                                                     <span
                                                                         class="badge {{ $ticket->stringifyStatusClass() }}">{{ __($ticket->stringifyStatus()) }}</span>
                                                                 @else
+
                                                                     {{ $ticket->free ? __('Free') :  $ticket->currency->symbol }}
                                                                     @if ($ticket->promotionalprice && !$ticket->free)
                                                                         <del
-                                                                            class="text-gray-500">{{ $ticket->currency->symbol . $ticket->price }}</del>
+                                                                            class="text-gray-500">
+                                                                            @if($ticket->currency_symbol_position === 'left')
+                                                                                {{ $ticket->currency->symbol }}
+                                                                            @endif
+                                                                            {{ $ticket->price }}
+                                                                            @if($ticket->currency_symbol_position === 'right')
+                                                                                {{ $ticket->currency->symbol }}
+                                                                            @endif
+                                                                        </del>
                                                                     @endif
                                                                 @endif
                                                             </td>
@@ -571,7 +580,8 @@
                                         @endif
 
                                         <div class="flex items-center justify-center w-full py-2">
-                                            <x-button x-on:click="$openModal('cardModal')" primary label="Buy Tickets"/>
+                                            <x-button wire:click="buyTicket" spinner="buyTicket" primary
+                                                      label="Buy Tickets"/>
                                         </div>
 
                                     </dd>
@@ -588,7 +598,8 @@
                                             </div>
 
                                             <div class="px-8 py-4">
-                                                <x-input label="Promo Code" wire:model="promoCode" placeholder="Promo Code"/>
+                                                <x-input label="Promo Code" wire:model="promoCode"
+                                                         placeholder="Promo Code"/>
                                             </div>
 
                                             <div class="flex flex-col gap-y-2 divide-y-2 my-4 mx-2">
@@ -606,17 +617,19 @@
                                                                             @if (!$eventTicket->isOnSale())
                                                                                 <span
                                                                                     class="badge {{ $eventTicket->stringifyStatusClass() }}">{{ __($eventTicket->stringifyStatus()) }}</span>
-                                                                            @elseif(!$eventTicket->free && $eventTicket->promotionalprice === null)
-                                                                                <p class="text-gray-500">
-                                                                                    {{ $eventTicket->currency->symbol }}
-                                                                                    : {{ $eventTicket->price }}
-                                                                                </p>
+                                                                            @elseif($eventTicket->free)
+                                                                                {{ __('Free') }}
                                                                             @else
-                                                                                {{ $eventTicket->free ? __('Free') :  $eventTicket->currency->symbol }}
-                                                                                @if ($eventTicket->promotionalprice && !$eventTicket->free)
-                                                                                    <del
-                                                                                        class="text-gray-500">{{ $eventTicket->currency->symbol . $eventTicket->price }}</del>
-                                                                                @endif
+                                                                                <p class="text-gray-500">
+                                                                                    @if($eventTicket->currency_symbol_position === 'left')
+                                                                                        {{ $eventTicket->currency->symbol }}
+                                                                                        :
+                                                                                    @endif
+                                                                                    {{ $eventTicket->price }}
+                                                                                    @if($eventTicket->currency_symbol_position === 'right')
+                                                                                        {{ $eventTicket->currency->symbol }}
+                                                                                    @endif
+                                                                                </p>
                                                                             @endif
                                                                         </div>
                                                                     </div>
@@ -653,6 +666,175 @@
                                                     @php $subtotal = 0; $fee = 0; @endphp
 
                                                     @foreach($quantity as $id => $value)
+                                                        @if($value > 0)
+                                                            @php
+                                                                $eventDateTicket = \App\Models\EventDateTicket::find($id);
+
+                                                                $subtotal += $eventDateTicket->price * $value;
+                                                                $fee += $eventDateTicket->ticket_fee * $value;
+                                                            @endphp
+
+                                                            <div class="flex justify-between items-center m-2">
+                                                                <p>{{ $value }} x {{ $eventDateTicket->name }}</p>
+
+                                                                <p class="font-semibold">
+                                                                    @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                        {{ $eventDateTicket->currency->ccy }}
+                                                                    @endif
+                                                                    {{ $eventDateTicket->price * $value }}
+                                                                    @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                        {{ $eventDateTicket->currency->ccy }}
+                                                                    @endif
+                                                                </p>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+
+                                                    @if($subtotal > 0)
+                                                        <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
+
+                                                        <div class="flex justify-between items-center m-2">
+                                                            <p>Subtotal</p>
+
+                                                            <p class="font-semibold">
+                                                                @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                    {{ $ccy }}
+                                                                @endif
+                                                                @if($eventDateTicket->currency_symbol_position === 'right')
+                                                                    {{ $subtotal }}
+                                                                @endif
+                                                            </p>
+                                                        </div>
+                                                    @endif
+
+                                                    @if($fee > 0)
+                                                        <div class="flex justify-between items-center m-2">
+                                                            <p>Fees</p>
+
+                                                            <p class="font-semibold">
+                                                                @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                    {{ $ccy }}
+                                                                @endif
+                                                                {{ $fee }}
+                                                                @if($eventDateTicket->currency_symbol_position === 'right')
+                                                                    {{ $ccy }}
+                                                                @endif
+                                                            </p>
+                                                        </div>
+                                                    @endif
+
+                                                    @if($subtotal > 0)
+                                                        <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
+
+                                                        <div class="flex justify-between items-center m-2">
+                                                            <p class="font-bold">Total</p>
+
+                                                            <p class="font-bold">
+                                                                @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                    {{ $ccy }}
+                                                                @endif
+                                                                {{ $fee + $subtotal }}
+                                                                @if($eventDateTicket->currency_symbol_position === 'right')
+                                                                    {{ $ccy }}
+                                                                @endif
+                                                            </p>
+                                                        </div>
+                                                    @endif
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <x-slot name="footer" class="flex justify-end gap-x-4">
+                                        <x-button flat label="Cancel" x-on:click="close"/>
+
+                                        <x-button primary label="Checkout" spinner="submit" wire:click="submit"/>
+                                    </x-slot>
+                                </x-modal-card>
+
+                                <x-modal-card :title="$eventTranslation->name" name="orderModal" blur="md" width="5xl">
+                                    <div class="grid grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-4">
+                                        <div class="md:col-span-2 lg:col-span-5">
+                                            <div class="flex flex-col gap-y-1 font-medium text-base">
+                                                <p>{{ $eventTranslation->name }}</p>
+
+                                                <p>{{ $eventDate->startdate->format('F d, Y H:i') }}
+                                                    - {{ $eventDate->enddate->format('F d, Y H:i') }}</p>
+                                            </div>
+
+                                            <x-card title="Billing Information" class="mt-2">
+                                                @guest
+                                                    <h1>
+                                                        <a href="{{ route('filament.admin.auth.login') }}"
+                                                           class="text-blue-500">Login</a> for
+                                                        a fast experience.
+                                                    </h1>
+                                                @endguest
+
+                                                <div class="flex gap-x-2 my-2">
+                                                    <x-input
+                                                        icon="user"
+                                                        label="First Name"
+                                                        wire:model="firstName"
+                                                        placeholder="Enter First Name"
+                                                    />
+
+                                                    <x-input
+                                                        icon="user"
+                                                        label="Last Name"
+                                                        wire:model="lastName"
+                                                        placeholder="Enter Last Name"
+                                                    />
+                                                </div>
+
+                                                <div class="flex gap-x-2 my-2">
+                                                    <x-input
+                                                        icon="envelope"
+                                                        label="Email address"
+                                                        wire:model="email"
+                                                        placeholder="Enter Email Address"
+                                                    />
+
+                                                    <x-input
+                                                        icon="envelope"
+                                                        label="Confirm email"
+                                                        wire:model="confirmEmail"
+                                                        placeholder="Enter Confirm email"
+                                                    />
+                                                </div>
+
+                                                <div class="flex gap-x-2 my-2">
+                                                    <x-input
+                                                        icon="phone"
+                                                        label="Phone No"
+                                                        wire:model="phone"
+                                                        placeholder="Enter Phone No"
+                                                    />
+
+                                                    <div></div>
+                                                </div>
+                                            </x-card>
+
+                                            <x-card title="Pay With" class="mt-2">
+
+                                            </x-card>
+                                        </div>
+
+                                        <div class="lg:col-span-3 md:cols-span-2">
+                                            <img
+                                                src="{{ Storage::url('events/' . $event->image_name) }}"
+                                                alt="{{ $eventTranslation->name }}"
+                                                loading="lazy"
+                                                class="w-full opacity-100 h-40"
+                                            />
+
+                                            <div class="mt-1">
+                                                <h1 class="font-semibold">Order Summary</h1>
+
+                                                @if(count($quantity))
+                                                    @php $subtotal = 0; $fee = 0; @endphp
+
+                                                    @foreach($quantity as $id => $value)
                                                         @php
                                                             $eventDateTicket = \App\Models\EventDateTicket::find($id);
 
@@ -672,13 +854,29 @@
                                                     <div class="flex justify-between items-center m-2">
                                                         <p>Subtotal</p>
 
-                                                        <p class="font-semibold">{{ $ccy }} {{ $subtotal }}</p>
+                                                        <p class="font-semibold">
+                                                            @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                            {{ $subtotal }}
+                                                            @if($eventDateTicket->currency_symbol_position === 'right')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                        </p>
                                                     </div>
 
                                                     <div class="flex justify-between items-center m-2">
                                                         <p>Fees</p>
 
-                                                        <p class="font-semibold">{{ $ccy }} {{ $fee }}</p>
+                                                        <p class="font-semibold">
+                                                            @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                            {{ $ccy }}
+                                                            @if($eventDateTicket->currency_symbol_position === 'right')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                        </p>
                                                     </div>
 
                                                     <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
@@ -686,7 +884,15 @@
                                                     <div class="flex justify-between items-center m-2">
                                                         <p class="font-bold">Total</p>
 
-                                                        <p class="font-bold">{{ $ccy }} {{ $fee + $subtotal }}</p>
+                                                        <p class="font-bold">
+                                                            @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                            {{ $fee + $subtotal }}
+                                                            @if($eventDateTicket->currency_symbol_position === 'right')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                        </p>
                                                     </div>
                                                 @endif
                                             </div>
@@ -696,7 +902,8 @@
                                     <x-slot name="footer" class="flex justify-end gap-x-4">
                                         <x-button flat label="Cancel" x-on:click="close"/>
 
-                                        <x-button primary label="Checkout" wire:click="submit"/>
+                                        <x-button primary label="Place Order" spinner="placeOrder"
+                                                  wire:click="placeOrder"/>
                                     </x-slot>
                                 </x-modal-card>
 
@@ -785,4 +992,16 @@
             </div>
         </div>
     </div>
+
+    @script
+    <script>
+        $wire.on('openModal', () => {
+            $openModal('cardModal');
+        });
+
+        $wire.on('openOrderModal', () => {
+            $openModal('orderModal');
+        });
+    </script>
+    @endscript
 </div>

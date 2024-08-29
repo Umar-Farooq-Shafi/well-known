@@ -412,6 +412,24 @@ class EventResource extends Resource
                                         'right' => 'Right',
                                     ]),
 
+                                Forms\Components\Select::make('paymentGateways')
+                                    ->multiple()
+                                    ->relationship(
+                                        'paymentGateways',
+                                        'name',
+                                        function (Builder $query) {
+                                            $query
+                                                ->when(
+                                                    auth()->user()->membership_type === 'Membership',
+                                                    fn (Builder $query) => $query
+                                                        ->where(
+                                                            'organizer_id',
+                                                            auth()->user()->organizer_id
+                                                        )
+                                                );
+                                        }
+                                    ),
+
                                 Forms\Components\TextInput::make('price')
                                     ->integer()
                                     ->prefix(function (Forms\Get $get) {
@@ -462,11 +480,11 @@ class EventResource extends Resource
                                     ->helperText('Set the number of tickets that an attendee can buy for this ticket type')
                                     ->integer(),
 
-                                Forms\Components\DatePicker::make('salesstartdate')
+                                Forms\Components\DateTimePicker::make('salesstartdate')
                                     ->label('Sale starts On')
                                     ->native(false),
 
-                                Forms\Components\DatePicker::make('salesenddate')
+                                Forms\Components\DateTimePicker::make('salesenddate')
                                     ->label('Sale ends On')
                                     ->native(false),
                             ])
