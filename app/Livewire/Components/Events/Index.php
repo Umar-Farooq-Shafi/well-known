@@ -206,6 +206,7 @@ class Index extends Component
                         });
                 }
             )
+            ->where('completed', false)
             ->with([
                 'category.categoryTranslations' => function ($query) {
                     $query->where('locale', App::getLocale());
