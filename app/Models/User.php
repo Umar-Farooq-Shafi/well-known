@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
@@ -16,9 +15,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Cashier\Billable;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -133,7 +133,7 @@ use Illuminate\Support\Facades\Storage;
  */
 class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, Billable;
 
     protected $table = 'eventic_user';
 

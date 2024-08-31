@@ -5,6 +5,7 @@ use App\Livewire\AddReview;
 use App\Livewire\AllCategories;
 use App\Livewire\Blog;
 use App\Livewire\BlogArticle;
+use App\Livewire\Checkout;
 use App\Livewire\ConcertMusic;
 use App\Livewire\Event;
 use App\Livewire\Events;
@@ -29,6 +30,8 @@ Route::redirect('/login', '/admin/login')->name('login');
 Route::get('/', Home::class)->name('home');
 
 Route::get('/event/{slug}', Event::class)->name('event');
+
+Route::get('/event/{slug}/checkout/{eventDate}/{ccy}', Checkout::class)->name('event-checkout');
 
 Route::get('/events/{category?}', Events::class)->name('events');
 

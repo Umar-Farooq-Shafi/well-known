@@ -4,22 +4,17 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EventResource\Pages;
 use App\Models\Audience;
-use App\Models\CartElement;
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Event;
-use App\Models\EventDateTicket;
 use App\Models\EventTranslation;
 use App\Models\Language;
 use App\Models\PointsOfSale;
 use App\Models\Scanner;
 use App\Models\Venue;
-use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
@@ -27,12 +22,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
-use Pboivin\FilamentPeek\Forms\Actions\InlinePreviewAction;
-use Pboivin\FilamentPeek\Pages\Actions\PreviewAction;
-use Pboivin\FilamentPeek\Pages\Concerns\HasPreviewModal;
-use Pboivin\FilamentPeek\Tables\Actions\ListPreviewAction;
 use RyanChandler\FilamentProgressColumn\ProgressColumn;
 
 class EventResource extends Resource
@@ -91,7 +81,8 @@ class EventResource extends Resource
                         $options = [];
 
                         foreach ($categories as $category) {
-                            $options[$category->id] = $category->categoryTranslations()
+                            $options[$category->id] = $category
+                                ->categoryTranslations()
                                 ->where('locale', App::getLocale())->first()?->name;
                         }
 
@@ -144,7 +135,7 @@ class EventResource extends Resource
                     ->label('Show the attendees number and list in the event page')
                     ->options([
                         1 => 'Show',
-                        0 => 'Hide'
+                        0 => 'Hide',
                     ])
                     ->required(),
 
@@ -152,7 +143,7 @@ class EventResource extends Resource
                     ->label('Enable reviews')
                     ->options([
                         1 => 'Enable',
-                        0 => 'Disable'
+                        0 => 'Disable',
                     ])
                     ->required(),
 
@@ -160,12 +151,19 @@ class EventResource extends Resource
                     ->label('Language')
                     ->multiple()
                     ->relationship('languages')
+                    ->saveRelationshipsUsing(function ($record, $state) {
+                        $record->languages()->detach();
+
+                        $record->languages()->attach($state);
+                        $record->save();
+                    })
                     ->options(function () {
                         $languages = Language::all();
                         $options = [];
 
                         foreach ($languages as $language) {
-                            $options[$language->id] = $language->languageTranslations()
+                            $options[$language->id] = $language
+                                ->languageTranslations()
                                 ->where('locale', App::getLocale())->first()?->name;
                         }
 
@@ -181,7 +179,8 @@ class EventResource extends Resource
                         $options = [];
 
                         foreach ($languages as $language) {
-                            $options[$language->id] = $language->languageTranslations()
+                            $options[$language->id] = $language
+                                ->languageTranslations()
                                 ->where('locale', App::getLocale())->first()?->name;
                         }
 
@@ -200,7 +199,8 @@ class EventResource extends Resource
                         $options = [];
 
                         foreach ($audiences as $audience) {
-                            $options[$audience->id] = $audience->audienceTranslations()
+                            $options[$audience->id] = $audience
+                                ->audienceTranslations()
                                 ->where('locale', App::getLocale())->first()->name;
                         }
 
@@ -209,7 +209,9 @@ class EventResource extends Resource
 
                 Forms\Components\TextInput::make('youtubeurl')
                     ->label('Youtube video url')
-                    ->helperText('If you have an Youtube video that represents your activities as an event organizer, add it in the standard format: https://www.youtube.com/watch?v=FzG4uDgje3M'),
+                    ->helperText(
+                        'If you have an Youtube video that represents your activities as an event organizer, add it in the standard format: https://www.youtube.com/watch?v=FzG4uDgje3M',
+                    ),
 
                 Forms\Components\TextInput::make('externallink')
                     ->label('External link')
@@ -239,7 +241,9 @@ class EventResource extends Resource
 
                 Forms\Components\FileUpload::make('image_name')
                     ->label('Main event image')
-                    ->helperText('Choose the right image to represent your event (We recommend using at least a 1200x600px (2:1 ratio) image )')
+                    ->helperText(
+                        'Choose the right image to represent your event (We recommend using at least a 1200x600px (2:1 ratio) image )',
+                    )
                     ->required()
                     ->columnSpanFull()
                     ->disk('public')
@@ -272,7 +276,8 @@ class EventResource extends Resource
                         $options = [];
 
                         foreach ($countries as $country) {
-                            $options[$country->id] = $country->countryTranslations()
+                            $options[$country->id] = $country
+                                ->countryTranslations()
                                 ->where('locale', App::getLocale())->first()->name;
                         }
 
@@ -307,7 +312,9 @@ class EventResource extends Resource
                             ->label('Enable sales for this event date ?')
                             ->required()
                             ->boolean()
-                            ->helperText('Enabling sales for an event date does not affect the tickets individual sale status'),
+                            ->helperText(
+                                'Enabling sales for an event date does not affect the tickets individual sale status',
+                            ),
 
                         Forms\Components\DatePicker::make('startdate')
                             ->label('Starts On')
@@ -340,7 +347,8 @@ class EventResource extends Resource
                                 $options = [];
 
                                 foreach ($venues as $venue) {
-                                    $options[$venue->id] = $venue->venueTranslations()
+                                    $options[$venue->id] = $venue
+                                        ->venueTranslations()
                                         ->where('locale', App::getLocale())->first()->name;
                                 }
 
@@ -352,13 +360,14 @@ class EventResource extends Resource
                             ->multiple()
                             ->relationship('scanners')
                             ->getSearchResultsUsing(
-                                fn(string $query) => Scanner::whereOrganizerId(auth()->user()->organizer_id)
+                                fn(string $query)
+                                    => Scanner::whereOrganizerId(auth()->user()->organizer_id)
                                     ->where('name', 'like', "%{$query}%")
-                                    ->pluck('name', 'id')
+                                    ->pluck('name', 'id'),
                             )
                             ->options(
                                 Scanner::whereOrganizerId(auth()->user()->organizer_id)
-                                    ->pluck('name', 'id')
+                                    ->pluck('name', 'id'),
                             ),
 
                         Forms\Components\Select::make('pointOfSales')
@@ -366,13 +375,14 @@ class EventResource extends Resource
                             ->multiple()
                             ->relationship('pointOfSales')
                             ->getSearchResultsUsing(
-                                fn(string $query) => PointsOfSale::whereOrganizerId(auth()->user()->organizer_id)
+                                fn(string $query)
+                                    => PointsOfSale::whereOrganizerId(auth()->user()->organizer_id)
                                     ->where('name', 'like', "%{$query}%")
-                                    ->pluck('name', 'id')
+                                    ->pluck('name', 'id'),
                             )
                             ->options(
                                 PointsOfSale::whereOrganizerId(auth()->user()->organizer_id)
-                                    ->pluck('name', 'id')
+                                    ->pluck('name', 'id'),
                             ),
 
                         Forms\Components\Repeater::make('eventDateTickets')
@@ -421,14 +431,21 @@ class EventResource extends Resource
                                             $query
                                                 ->when(
                                                     auth()->user()->membership_type === 'Membership',
-                                                    fn (Builder $query) => $query
+                                                    fn(Builder $query)
+                                                        => $query
                                                         ->where(
                                                             'organizer_id',
-                                                            auth()->user()->organizer_id
-                                                        )
+                                                            auth()->user()->organizer_id,
+                                                        ),
                                                 );
-                                        }
-                                    ),
+                                        },
+                                    )
+                                    ->saveRelationshipsUsing(function ($record, $state) {
+                                        $record->paymentGateways()->detach();
+
+                                        $record->paymentGateways()->attach($state);
+                                        $record->save();
+                                    }),
 
                                 Forms\Components\TextInput::make('price')
                                     ->numeric()
@@ -445,8 +462,10 @@ class EventResource extends Resource
                                 Forms\Components\TextInput::make('ticket_fee')
                                     ->label('Ticket fee (Online)')
                                     ->required()
-                                    ->numeric()
-                                    ->helperText('This fee will be added to the ticket sale price which are bought online, put 0 to disable additional fees for tickets which are bought online, does not apply for free tickets, will be applied to future orders')
+                                    ->integer()
+                                    ->helperText(
+                                        'This fee will be added to the ticket sale price which are bought online, put 0 to disable additional fees for tickets which are bought online, does not apply for free tickets, will be applied to future orders',
+                                    )
                                     ->prefix(function (Forms\Get $get) {
                                         $currencyCode = $get('currency_code_id');
 
@@ -459,7 +478,9 @@ class EventResource extends Resource
 
                                 Forms\Components\TextInput::make('promotionalprice')
                                     ->label('Promotional price')
-                                    ->helperText('Set a price lesser than than the original price to indicate a promotion (this price will be the SALE price)')
+                                    ->helperText(
+                                        'Set a price lesser than than the original price to indicate a promotion (this price will be the SALE price)',
+                                    )
                                     ->numeric()
                                     ->prefix(function (Forms\Get $get) {
                                         $currencyCode = $get('currency_code_id');
@@ -477,7 +498,9 @@ class EventResource extends Resource
 
                                 Forms\Components\TextInput::make('ticketsperattendee')
                                     ->label('Tickets per attendee')
-                                    ->helperText('Set the number of tickets that an attendee can buy for this ticket type')
+                                    ->helperText(
+                                        'Set the number of tickets that an attendee can buy for this ticket type',
+                                    )
                                     ->integer(),
 
                                 Forms\Components\DateTimePicker::make('salesstartdate')
@@ -487,7 +510,7 @@ class EventResource extends Resource
                                 Forms\Components\DateTimePicker::make('salesenddate')
                                     ->label('Sale ends On')
                                     ->native(false),
-                            ])
+                            ]),
                     ]),
 
             ]);
@@ -506,28 +529,35 @@ class EventResource extends Resource
 
                 Tables\Columns\TextColumn::make('id')
                     ->label('Name')
-                    ->formatStateUsing(fn($record) => $record->eventTranslations()->where('locale', App::getLocale())->first()?->name)
+                    ->formatStateUsing(
+                        fn($record) => $record->eventTranslations()->where('locale', App::getLocale())->first()?->name,
+                    )
                     ->searchable(
                         query: function (Builder $query, $search) {
                             $query->whereHas(
                                 'eventTranslations',
-                                fn(Builder $query) => $query->where('name', 'LIKE', "%{$search}%")
+                                fn(Builder $query) => $query->where('name', 'LIKE', "%{$search}%"),
                             );
                         },
-                        isIndividual: true
+                        isIndividual: true,
                     )
                     ->sortable(
                         query: function (Builder $query, string $direction) {
-                            $query->whereHas('eventTranslations')
-                                ->with(['eventTranslations' => function ($query) use ($direction) {
-                                    $query->orderBy('name', $direction);
-                                }])
-                                ->orderBy(EventTranslation::select('name')
-                                    ->whereColumn('eventic_event_translation.translatable_id', 'eventic_event.id')
-                                    ->orderBy('name', $direction)
-                                    ->limit(1),
-                                    $direction);
-                        }
+                            $query
+                                ->whereHas('eventTranslations')
+                                ->with([
+                                    'eventTranslations' => function ($query) use ($direction) {
+                                        $query->orderBy('name', $direction);
+                                    },
+                                ])
+                                ->orderBy(
+                                    EventTranslation::select('name')
+                                        ->whereColumn('eventic_event_translation.translatable_id', 'eventic_event.id')
+                                        ->orderBy('name', $direction)
+                                        ->limit(1),
+                                    $direction,
+                                );
+                        },
                     ),
 
                 Tables\Columns\TextColumn::make('organizer.name')
@@ -535,16 +565,16 @@ class EventResource extends Resource
                     ->sortable(),
 
                 ProgressColumn::make('progress')
-                    ->progress(fn ($record) => $record->getTotalSalesPercentage()),
+                    ->progress(fn($record) => $record->getTotalSalesPercentage()),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->state(fn ($record) => $record->getTotalOrderElementsQuantitySum())
+                    ->state(fn($record) => $record->getTotalOrderElementsQuantitySum())
                     ->label('Tickets sold'),
 
                 Tables\Columns\TextColumn::make('published')
                     ->badge()
-                    ->color(fn ($record) => $record->stringifyStatusClass())
-                    ->state(fn ($record) => $record->stringifyStatus())
+                    ->color(fn($record) => $record->stringifyStatusClass())
+                    ->state(fn($record) => $record->stringifyStatus())
                     ->label('Status'),
 
                 Tables\Columns\TextColumn::make('is_featured')
@@ -554,7 +584,7 @@ class EventResource extends Resource
 
                 ProgressColumn::make('updated_at')
                     ->label('Attendee')
-                    ->progress(fn ($record) => $record->getTotalCheckInPercentage()),
+                    ->progress(fn($record) => $record->getTotalCheckInPercentage()),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('event')
@@ -563,18 +593,20 @@ class EventResource extends Resource
                         return EventTranslation::query()
                             ->when(
                                 auth()->user()->hasRole('ROLE_ORGANIZER'),
-                                fn(Builder $query) => $query->whereHas(
+                                fn(Builder $query)
+                                    => $query->whereHas(
                                     'event',
-                                    fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
-                                )
+                                    fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id),
+                                ),
                             )
                             ->pluck('name', 'translatable_id');
                     })
                     ->query(
-                        fn(Builder $query, array $data) => $query->when(
+                        fn(Builder $query, array $data)
+                            => $query->when(
                             $data['value'],
-                            fn(Builder $query, $value) => $query->where('id', $value)
-                        )
+                            fn(Builder $query, $value) => $query->where('id', $value),
+                        ),
                     ),
             ])
             ->actions([
@@ -583,14 +615,20 @@ class EventResource extends Resource
                         ->label('Statistics')
                         ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->modalHeading(
-                            fn($record) => $record->eventTranslations()
-                                    ->where('locale', App::getLocale())->first()?->name . ' : Event dates'
+                            fn($record) => $record
+                                    ->eventTranslations()
+                                    ->where('locale', App::getLocale())->first()?->name . ' : Event dates',
                         )
                         ->modalSubmitActionLabel('View stats')
                         ->modalContent(
-                            fn($record) => new HtmlString("<h1>" . $record->eventDates()->first()->startdate . "</h1>")
+                            fn($record) => new HtmlString("<h1>" . $record->eventDates()->first()->startdate . "</h1>"),
                         )
-                        ->action(fn($record) => redirect()->route('filament.admin.resources.events.view-stats', ['record' => $record]))
+                        ->action(
+                            fn($record) => redirect()->route(
+                                'filament.admin.resources.events.view-stats',
+                                ['record' => $record],
+                            ),
+                        )
                         ->icon('heroicon-o-presentation-chart-bar'),
 
                     Tables\Actions\Action::make('payout-request')
@@ -598,10 +636,12 @@ class EventResource extends Resource
                         ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->icon('fas-file-invoice-dollar')
                         ->modalHeading(
-                            fn($record) => $record->eventTranslations()
-                                    ->where('locale', App::getLocale())->first()?->name . ' : Payout request'
+                            fn($record) => $record
+                                    ->eventTranslations()
+                                    ->where('locale', App::getLocale())->first()?->name . ' : Payout request',
                         )
-                        ->modalContent(fn(Event $record) => view(
+                        ->modalContent(fn(Event $record)
+                            => view(
                             'filament.resources.event-resource.payout-request',
                             ['record' => $record],
                         ))
@@ -619,13 +659,15 @@ class EventResource extends Resource
                             $audiences = [];
 
                             foreach ($event->languages as $language) {
-                                $languages[] = $language->languageTranslations()
+                                $languages[] = $language
+                                    ->languageTranslations()
                                     ->where('locale', App::getLocale())
                                     ->first()?->name;
                             }
 
                             foreach ($event->audiences as $audience) {
-                                $audiences[] = $audience->audienceTranslations()
+                                $audiences[] = $audience
+                                    ->audienceTranslations()
                                     ->where('locale', App::getLocale())
                                     ->first()?->name;
                             }
@@ -633,7 +675,8 @@ class EventResource extends Resource
                             return [
                                 'event' => $event,
                                 'image_name' => $event->image_name,
-                                'title' => $event->eventTranslations()
+                                'title' => $event
+                                    ->eventTranslations()
                                     ->where('locale', App::getLocale())->first()?->name,
                                 'organizer' => $event->organizer->name,
                                 'reference' => $event->reference,
@@ -641,11 +684,13 @@ class EventResource extends Resource
                                 'update_date' => $event->updated_at,
                                 'views' => $event->views,
                                 'added_to_favorites_by' => $event->favourites()->count(),
-                                'category' => $event->category->categoryTranslations()
+                                'category' => $event->category
+                                    ->categoryTranslations()
                                     ->where('locale', App::getLocale())->first()?->name,
                                 'language' => implode(', ', $languages),
                                 'audiences' => implode(', ', $audiences),
-                                'country' => $event->country->countryTranslations()
+                                'country' => $event->country
+                                    ->countryTranslations()
                                     ->where('locale', App::getLocale())->first()?->name,
                                 'publicly_show_attendees' => $event->showattendees,
                                 'allow_attendees_to_leave_reviews' => $event->enablereviews,
@@ -671,7 +716,7 @@ class EventResource extends Resource
                                                 ->required()
                                                 ->disk('public')
                                                 ->formatStateUsing(fn($state) => $state ? ["events/" . $state] : null)
-                                                ->directory('events')
+                                                ->directory('events'),
                                         ])
                                         ->addable(false)
                                         ->deletable(false),
@@ -708,9 +753,9 @@ class EventResource extends Resource
                                     Forms\Components\TextInput::make('venue')
                                         ->formatStateUsing(
                                             fn($record) => $record->venue?->venueTranslations()
-                                                ?->where('locale', App::getLocale())?->first()?->name
-                                        )
-                                ])
+                                                ?->where('locale', App::getLocale())?->first()?->name,
+                                        ),
+                                ]),
                         ])
                         ->modalWidth(MaxWidth::Full)
                         ->modalHeading('')
@@ -722,7 +767,7 @@ class EventResource extends Resource
                         ->label('Attendees')
                         ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->url(
-                            fn($record) => route('filament.admin.resources.orders.index')
+                            fn($record) => route('filament.admin.resources.orders.index'),
                         )
                         ->icon('heroicon-o-user-group'),
 
@@ -730,15 +775,21 @@ class EventResource extends Resource
                         ->label('Reviews')
                         ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->url(
-                            fn($record) => route('filament.admin.resources.reviews.index')
+                            fn($record) => route('filament.admin.resources.reviews.index'),
                         )
                         ->icon('heroicon-o-star'),
 
                     Tables\Actions\Action::make('Mark as featured')
                         ->icon('heroicon-o-eye-slash')
-                        ->hidden(fn($record) => $record->featured || auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
+                        ->hidden(
+                            fn($record) => $record->featured || auth()->user()->hasAnyRole(
+                                    ['ROLE_SCANNER', 'ROLE_POINTOFSALE'],
+                                ),
+                        )
                         ->visible(function () {
-                            $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+                            $role = ucwords(
+                                str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))),
+                            );
 
                             return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
                         })
@@ -746,9 +797,15 @@ class EventResource extends Resource
 
                     Tables\Actions\Action::make('Mark as not featured')
                         ->icon('heroicon-o-eye')
-                        ->hidden(fn($record) => !$record->featured || auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
+                        ->hidden(
+                            fn($record) => !$record->featured || auth()->user()->hasAnyRole(
+                                    ['ROLE_SCANNER', 'ROLE_POINTOFSALE'],
+                                ),
+                        )
                         ->visible(function () {
-                            $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
+                            $role = ucwords(
+                                str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))),
+                            );
 
                             return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
                         })
@@ -757,10 +814,14 @@ class EventResource extends Resource
                     Tables\Actions\Action::make('completed')
                         ->label('Completed')
                         ->icon('heroicon-o-check')
-                        ->hidden(fn($record) => $record->completed || auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
+                        ->hidden(
+                            fn($record) => $record->completed || auth()->user()->hasAnyRole(
+                                    ['ROLE_SCANNER', 'ROLE_POINTOFSALE'],
+                                ),
+                        )
                         ->action(fn($record) => $record->update([
                             'completed' => 1,
-                            'is_featured' => false
+                            'is_featured' => false,
                         ])),
 
                     Tables\Actions\Action::make('not-completed')
@@ -769,14 +830,14 @@ class EventResource extends Resource
                         ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
                         ->visible(fn($record) => $record->completed)
                         ->action(fn($record) => $record->update([
-                            'completed' => false
+                            'completed' => false,
                         ])),
 
                     Tables\Actions\EditAction::make()
                         ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE'])),
 
                     Tables\Actions\DeleteAction::make()
-                        ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE']))
+                        ->hidden(auth()->user()->hasAnyRole(['ROLE_SCANNER', 'ROLE_POINTOFSALE'])),
                 ]),
 
                 Tables\Actions\Action::make('check-in')
@@ -786,7 +847,7 @@ class EventResource extends Resource
 
                 Tables\Actions\Action::make('event-date-and-ticket')
                     ->label(strtoupper('Show event dates and tickets'))
-                    ->url(fn ($record) => Pages\POSPage::getUrl(['record' => $record]))
+                    ->url(fn($record) => Pages\POSPage::getUrl(['record' => $record]))
                     ->visible(auth()->user()->hasRole('ROLE_POINTOFSALE')),
             ])
             ->bulkActions([
@@ -801,21 +862,23 @@ class EventResource extends Resource
         return parent::getEloquentQuery()
             ->when(
                 auth()->user()->hasRole('ROLE_ORGANIZER'),
-                fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id),
             )
             ->when(
                 auth()->user()->hasRole('ROLE_SCANNER'),
-                fn(Builder $query) => $query->whereHas(
+                fn(Builder $query)
+                    => $query->whereHas(
                     'eventDates.scanners',
-                    fn(Builder $query) => $query->where('scanner_id', auth()->user()->scanner->id)
-                )
+                    fn(Builder $query) => $query->where('scanner_id', auth()->user()->scanner->id),
+                ),
             )
             ->when(
                 auth()->user()->hasRole('ROLE_POINTOFSALE'),
-                fn(Builder $query) => $query->whereHas(
+                fn(Builder $query)
+                    => $query->whereHas(
                     'eventDates.pointOfSales',
-                    fn(Builder $query) => $query->where('pointofsale_id', auth()->user()->pointOfSale->id)
-                )
+                    fn(Builder $query) => $query->where('pointofsale_id', auth()->user()->pointOfSale->id),
+                ),
             );
     }
 
@@ -827,7 +890,7 @@ class EventResource extends Resource
             'edit' => Pages\EditEvent::route('/{record}/edit'),
             'view-stats' => Pages\ViewStatsPage::route('/{record}/stats'),
             'attendee-checkin' => Pages\AttendeeCheckInPage::route('/{record}/attendee-check-in'),
-            'pos' => Pages\POSPage::route('/{record}/pos')
+            'pos' => Pages\POSPage::route('/{record}/pos'),
         ];
     }
 

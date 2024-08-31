@@ -22,31 +22,11 @@ class Event extends Component
 
     public $promoCode;
 
-    public $firstName;
-
-    public $lastName;
-
-    public $email;
-
-    public $confirmEmail;
-
-    public $phone;
-
-    public $paymentMethod;
-
     public ?EventTranslation $eventTranslation = null;
 
     public function mount(string $slug)
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
-
-        if (auth()->check()) {
-            $this->firstName = auth()->user()->firstname;
-            $this->lastName = auth()->user()->lastname;
-            $this->email = auth()->user()->email;
-            $this->confirmEmail = auth()->user()->email;
-            $this->phone = auth()->user()->phone;
-        }
     }
 
     public function updatedQuantity($value, $key)
@@ -73,7 +53,7 @@ class Event extends Component
         }
     }
 
-    public function submit()
+    public function submit($eventDate)
     {
         if (count($this->quantity) === 0) {
             $this->notification()->send([
@@ -82,73 +62,12 @@ class Event extends Component
                 'description' => 'Please select a ticket!',
             ]);
         } else {
-            $this->dispatch('openOrderModal');
-        }
-    }
-
-    public function placeOrder()
-    {
-        if (empty($this->firstName)) {
-            $this->notification()->send([
-                'icon' => 'error',
-                'title' => 'Error',
-                'description' => 'First name is required',
+            $this->redirectRoute('event-checkout', [
+                'slug' => $this->eventTranslation->slug,
+                'eventDate' => $eventDate,
+                'quantity' => json_encode($this->quantity),
+                'ccy' => $this->ccy
             ]);
-            return;
-        }
-
-        if (empty($this->lastName)) {
-            $this->notification()->send([
-                'icon' => 'error',
-                'title' => 'Error',
-                'description' => 'Last name is required',
-            ]);
-            return;
-        }
-
-        if (empty($this->email)) {
-            $this->notification()->send([
-                'icon' => 'error',
-                'title' => 'Error',
-                'description' => 'Email is required',
-            ]);
-            return;
-        }
-
-        if (empty($this->confirmEmail)) {
-            $this->notification()->send([
-                'icon' => 'error',
-                'title' => 'Error',
-                'description' => 'Confirm email is required',
-            ]);
-            return;
-        }
-
-        if ($this->email !== $this->confirmEmail) {
-            $this->notification()->send([
-                'icon' => 'error',
-                'title' => 'Error',
-                'description' => 'Confirm email is not same as confirmEmail',
-            ]);
-            return;
-        }
-
-        if (empty($this->phone)) {
-            $this->notification()->send([
-                'icon' => 'error',
-                'title' => 'Error',
-                'description' => 'Phone is required',
-            ]);
-            return;
-        }
-
-        if (empty($this->paymentMethod)) {
-            $this->notification()->send([
-                'icon' => 'error',
-                'title' => 'Error',
-                'description' => 'Payment method is required',
-            ]);
-            return;
         }
     }
 

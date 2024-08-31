@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,33 +32,33 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property int|null $currency_code_id
  * @property int|null $ticket_fee
  * @property string $currency_symbol_position
- * @property-read \App\Models\EventDate|null $eventDate
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderElement> $orderElements
+ * @property-read EventDate|null $eventDate
+ * @property-read Collection<int, OrderElement> $orderElements
  * @property-read int|null $order_elements_count
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket query()
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereCurrencyCodeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereCurrencySymbolPosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereEventdateId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereFree($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket wherePosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket wherePromotionalprice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereQuantity($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereReference($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereSalesenddate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereSalesstartdate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereTicketFee($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDateTicket whereTicketsperattendee($value)
+ * @method static Builder|EventDateTicket newModelQuery()
+ * @method static Builder|EventDateTicket newQuery()
+ * @method static Builder|EventDateTicket query()
+ * @method static Builder|EventDateTicket whereActive($value)
+ * @method static Builder|EventDateTicket whereCurrencyCodeId($value)
+ * @method static Builder|EventDateTicket whereCurrencySymbolPosition($value)
+ * @method static Builder|EventDateTicket whereDescription($value)
+ * @method static Builder|EventDateTicket whereEventdateId($value)
+ * @method static Builder|EventDateTicket whereFree($value)
+ * @method static Builder|EventDateTicket whereId($value)
+ * @method static Builder|EventDateTicket whereName($value)
+ * @method static Builder|EventDateTicket wherePosition($value)
+ * @method static Builder|EventDateTicket wherePrice($value)
+ * @method static Builder|EventDateTicket wherePromotionalprice($value)
+ * @method static Builder|EventDateTicket whereQuantity($value)
+ * @method static Builder|EventDateTicket whereReference($value)
+ * @method static Builder|EventDateTicket whereSalesenddate($value)
+ * @method static Builder|EventDateTicket whereSalesstartdate($value)
+ * @method static Builder|EventDateTicket whereTicketFee($value)
+ * @method static Builder|EventDateTicket whereTicketsperattendee($value)
  * @property-read \App\Models\Currency|null $currency
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TicketReservation> $ticketReservations
+ * @property-read Collection<int, \App\Models\TicketReservation> $ticketReservations
  * @property-read int|null $ticket_reservations_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderTicket> $eventDateTickets
+ * @property-read Collection<int, \App\Models\OrderTicket> $eventDateTickets
  * @property-read int|null $event_date_tickets_count
  * @mixin \Eloquent
  */
