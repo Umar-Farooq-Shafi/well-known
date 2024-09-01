@@ -45,7 +45,15 @@ class Checkout extends Component
 
         foreach ($this->eventDate->eventDateTickets as $eventDateTicket) {
             foreach ($eventDateTicket->paymentGateways as $paymentGateway) {
-                if (!in_array($paymentGateway, $this->paymentGateways ?? [], true)) {
+                $found = false;
+
+                foreach ($this->paymentGateways ?? [] as $gt) {
+                    if ($gt->id == $paymentGateway->id) {
+                        $found = true;
+                    }
+                }
+
+                if (!$found) {
                     $this->paymentGateways[] = $paymentGateway;
                 }
             }
