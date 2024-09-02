@@ -98,8 +98,8 @@
 
                     @if($menuElement->link !== 'categories_dropdown')
                         <li>
-                            <a href="{{ $menuElement->link }}"
-                               class="flex items-center gap-x-1 my-2 py-4 px-2 text-base {{ Request::url() === $menuElement->link ? 'text-white' : 'text-gray-900' }} rounded md:bg-transparent md:p-0 md:dark:text-blue-500"
+                            <a href="{{ $menuElement->link ?? $menuElement->custom_link }}"
+                               class="flex items-center gap-x-1 my-2 py-4 px-2 text-base {{ Request::url() === ($menuElement->link ?? $menuElement->custom_link) ? 'text-white' : 'text-gray-900' }} rounded md:bg-transparent md:p-0 md:dark:text-blue-500"
                                aria-current="page">
                                 <x-dynamic-component :component="$menuElement->icon" class="h-5 w-5"/>
                                 {{ $trans->label }}

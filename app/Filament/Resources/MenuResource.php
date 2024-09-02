@@ -186,8 +186,7 @@ class MenuResource extends Resource
                                 Forms\Components\Select::make('link')
                                     ->label('Choose the link destination page')
                                     ->searchable()
-                                    ->options(static::getLinks())
-                                    ->required(),
+                                    ->options(static::getLinks()),
 
                                 Forms\Components\TextInput::make('custom_link')
                                     ->label('Custom link')
