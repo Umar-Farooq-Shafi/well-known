@@ -9,6 +9,8 @@
     $country = $event?->country?->code;
 
     $componentName = 'flag-4x3-' . strtolower($country);
+
+    $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country);
 @endphp
 
 <div class="mt-24">
@@ -340,9 +342,9 @@
                         @if ($eventDate->isOnSale())
                             @php
                                 $eventDatesCalendar[] = [
-                                    'Date' => $eventDate->startdate,
-                                    'Title' => $eventDate->startdate,
-                                    'Link' => $eventDate->reference,
+                                    'Date' => $eventDate->timezone($timezone[0])->startdate,
+                                    'Title' => $eventDate->timezone($timezone[0])->startdate,
+                                    'Link' => $eventDate->timezone($timezone[0])->reference,
                                 ];
                             @endphp
                         @endif
@@ -384,54 +386,54 @@
                                                 <div class="inline-block">
                                                     <div class="inline-block">
                                                         <span class="text-5xl">
-                                                            {{ Carbon::make($eventDate->startdate)->format('d') }}
+                                                            {{ $eventDate->startdate->timezone($timezone[0])->format('d') }}
                                                         </span>
                                                     </div>
                                                     <div class="inline-block mr-3">
                                                         <div>
                                                             <span
-                                                                class="text-sm">{{ ucfirst(Carbon::make($eventDate->startdate)->format('M')) }}</span>
+                                                                class="text-sm">{{ ucfirst($eventDate->startdate->timezone($timezone[0])->format('M')) }}</span>
                                                         </div>
                                                         <div>
                                                             <span class="text-sm">
-                                                                {{ $eventDate->startdate->format('Y') }}
+                                                                {{ $eventDate->startdate->timezone($timezone[0])->format('Y') }}
                                                             </span>
                                                         </div>
                                                     </div>
                                                     <div class="mb-2">
                                                     <span class="text-gray-500 font-bold">
-                                                        {{ strtoupper(Carbon::make($eventDate->startdate)->format('g:i a')) }}
-                                                        @if ($eventDate->enddate && Carbon::make($eventDate->enddate)->equalTo($eventDate->startdate))
-                                                            - {{ strtoupper(Carbon::make($eventDate->enddate)->format('g:i a')) }}
+                                                        {{ strtoupper($eventDate->startdate->timezone($timezone[0])->format('g:i a')) }}
+                                                        @if ($eventDate->enddate && Carbon::make($eventDate->enddate)->timezone($timezone[0])->equalTo($eventDate->startdate->timezone($timezone[0])))
+                                                            - {{ strtoupper($eventDate->enddate->timezone($timezone[0])->format('g:i a')) }}
                                                         @endif
                                                     </span>
                                                     </div>
                                                 </div>
                                                 @php
-                                                    $eventstartdate = Carbon::make($eventDate->startdate)->format('F d, Y H:i');
+                                                    $eventstartdate = $eventDate->startdate->timezone($timezone[0])->format('F d, Y H:i');
                                                 @endphp
                                             @endif
-                                            @if ($eventDate->enddate && Carbon::make($eventDate->enddate)->equalTo($eventDate->startdate))
+                                            @if ($eventDate->enddate && $eventDate->enddate->timezone($timezone[0])->equalTo($eventDate->startdate->timezone($timezone[0])))
                                                 <div class="inline-block">
                                                     <div class="inline-block">
                                                         <span
-                                                            class="text-3xl">{{ $eventDate->enddate->format('d') }}</span>
+                                                            class="text-3xl">{{ $eventDate->enddate->timezone($timezone[0])->format('d') }}</span>
                                                     </div>
                                                     <div class="inline-block">
                                                         <div><span
-                                                                class="text-xl">{{ ucfirst($eventDate->enddate->format('M')) }}</span>
+                                                                class="text-xl">{{ ucfirst($eventDate->enddate->timezone($timezone[0])->format('M')) }}</span>
                                                         </div>
-                                                        <div><span>{{ $eventDate->enddate->format('Y') }}</span></div>
+                                                        <div><span>{{ $eventDate->enddate->timezone($timezone[0])->format('Y') }}</span></div>
                                                     </div>
                                                     <div class="mb-2">
                                                         <span
                                                             class="text-gray-500 font-bold">
-                                                            {{ strtoupper($eventDate->enddate->format('g:i a')) }}
+                                                            {{ strtoupper($eventDate->enddate->timezone($timezone[0])->format('g:i a')) }}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 @php
-                                                    $eventenddate = $eventDate->enddate->format('F d, Y H:i');
+                                                    $eventenddate = $eventDate->enddate->timezone($timezone[0])->format('F d, Y H:i');
                                                 @endphp
                                             @endif
 
@@ -573,8 +575,8 @@
                                                     placeholder="Select Event Date"
                                                     without-timezone
                                                     without-time
-                                                    :min="$eventDate->recurrent_startdate->format('Y-m-d')"
-                                                    :max="$eventDate->recurrent_enddate->format('Y-m-d')"
+                                                    :min="$eventDate->recurrent_startdate->timezone($timezone[0])->format('Y-m-d')"
+                                                    :max="$eventDate->recurrent_enddate->timezone($timezone[0])->format('Y-m-d')"
                                                 />
                                             </div>
                                         @endif
@@ -593,8 +595,8 @@
                                             <div class="flex flex-col gap-y-1 font-medium text-base">
                                                 <p>{{ $eventTranslation->name }}</p>
 
-                                                <p>{{ $eventDate->startdate->format('F d, Y H:i') }}
-                                                    - {{ $eventDate->enddate->format('F d, Y H:i') }}</p>
+                                                <p>{{ $eventDate->startdate->timezone($timezone[0])->format('F d, Y H:i') }}
+                                                    - {{ $eventDate->enddate->timezone($timezone[0])->format('F d, Y H:i') }}</p>
                                             </div>
 
                                             <div class="px-8 py-4">
@@ -636,7 +638,7 @@
                                                                         </div>
 
                                                                         <p class="align-content-end">
-                                                                            @if($eventTicket->salesstartdate?->greaterThanOrEqualTo(now()) && $eventTicket->salesenddate?->lessThanOrEqualTo(now()))
+                                                                            @if($eventTicket->salesstartdate?->timezone($timezone[0])?->greaterThanOrEqualTo(now()) && $eventTicket->salesenddate?->timezone($timezone[0])?->lessThanOrEqualTo(now()))
                                                                                 {{ $eventTicket->promotionalprice }}
                                                                             @endif
                                                                         </p>
@@ -756,7 +758,8 @@
                                     <x-slot name="footer" class="flex justify-end gap-x-4">
                                         <x-button flat label="Cancel" x-on:click="close"/>
 
-                                        <x-button primary label="Checkout" spinner="submit" wire:click="submit('{{ $eventDate->id }}')"/>
+                                        <x-button primary label="Checkout" spinner="submit"
+                                                  wire:click="submit('{{ $eventDate->id }}')"/>
                                     </x-slot>
                                 </x-modal-card>
 

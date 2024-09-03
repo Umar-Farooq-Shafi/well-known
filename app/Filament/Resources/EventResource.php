@@ -462,7 +462,7 @@ class EventResource extends Resource
                                 Forms\Components\TextInput::make('ticket_fee')
                                     ->label('Ticket fee (Online)')
                                     ->required()
-                                    ->integer()
+                                    ->numeric()
                                     ->helperText(
                                         'This fee will be added to the ticket sale price which are bought online, put 0 to disable additional fees for tickets which are bought online, does not apply for free tickets, will be applied to future orders',
                                     )

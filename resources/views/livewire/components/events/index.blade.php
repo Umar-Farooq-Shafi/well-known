@@ -225,6 +225,11 @@
         <div class="w-full lg:w-3/4 flex flex-col gap-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 @foreach($events as $event)
+                    @php
+                        $country = $event->country;
+
+                        $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
+                    @endphp
 
                     <div class="bg-white border border-gray-200 rounded shadow dark:bg-gray-800 dark:border-gray-700">
                         <a class="relative"
@@ -261,12 +266,26 @@
                             </a>
                         </div>
 
-                        <div class="flex justify-between items-center mb-2 mx-4">
-                            <p class="ml-2">
-                                @if($venue = $event->eventDates?->first()?->venue)
-                                    {{ $venue->stringifyAddress }}
-                                @endif
-                            </p>
+                        <div class="flex justify-between items-center mb-2 mx-2">
+                            <div class="flex flex-col gap-y-2">
+                                <p class="ml-2 flex items-center gap-x-1">
+                                    <x-fas-location-dot class="w-5 h-5 text-red-500"/>
+
+                                    @if($venue = $event->eventDates?->first()?->venue)
+                                        {{ $venue->name }}
+                                    @endif
+                                </p>
+
+                                <p class="ml-2 flex items-center gap-x-1">
+                                    <x-fas-clock class="w-4 h-4 text-red-500"/>
+
+                                    @if($eventDate = $event->eventDates?->first())
+                                        {{ $eventDate->startdate->timezone($timezone[0])->format('l') }},
+                                        Start {{ $eventDate->startdate->timezone($timezone[0])->format('g:i a') }}
+                                        (Timezone: {{ $timezone[0] }})
+                                    @endif
+                                </p>
+                            </div>
 
                             <p class="text-nowrap">
                                 @if($eventDate = $event->eventDates?->first())

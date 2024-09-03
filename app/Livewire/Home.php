@@ -56,7 +56,7 @@ class Home extends Component
                     $query->where(
                         'country_id',
                         CountryTranslation::where('name', 'like', '%' . $this->country . '%')
-                            ->first()?->id
+                            ->first()?->translatable_id
                     );
                 }
             )
