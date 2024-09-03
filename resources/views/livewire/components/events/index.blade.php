@@ -228,7 +228,11 @@
                     @php
                         $country = $event->country;
 
-                        $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
+                        if ($country) {
+                            $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
+                        } else {
+                            $timezone[] = 'UTC';
+                        }
                     @endphp
 
                     <div class="bg-white border border-gray-200 rounded shadow dark:bg-gray-800 dark:border-gray-700">
@@ -287,13 +291,36 @@
                                 </p>
                             </div>
 
-                            <p class="text-nowrap">
-                                @if($eventDate = $event->eventDates?->first())
-                                    {{ $eventDate->getCurrencyCode() }}
+                            @if($countEventDates = count($event->eventDates))
+                                @php
+                                    $ccy = $event->eventDates->first()->getCurrencyCode();
+                                    $mixed = false;
 
-                                    {{ $eventDate->getTotalTicketFees() }}
+                                    foreach ($event->eventDates as $ed) {
+                                        if ($ccy !== $ed->getCurrencyCode()) {
+                                            $mixed = true;
+                                        }
+                                    }
+                                @endphp
+                                @if($mixed)
+                                    <p class="text-nowrap font-bold">Mixed</p>
+                                @else
+                                    <p class="text-nowrap">
+
+                                        @if($ed = $event->eventDates->first()->getCurrencyCode())
+                                            <span
+                                                class="font-bold">From</span> {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
+                                        @endif
+
+                                        @if($countEventDates > 1)
+                                            @foreach($event->eventDates as $eventDate)
+                                                <span
+                                                    class="font-bold">Lowest</span> {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
+                                            @endforeach
+                                        @endif
+                                    </p>
                                 @endif
-                            </p>
+                            @endif
                         </div>
                     </div>
 
