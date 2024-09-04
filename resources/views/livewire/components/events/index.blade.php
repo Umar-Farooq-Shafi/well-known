@@ -270,6 +270,32 @@
                             </a>
                         </div>
 
+                        @foreach($event->eventDates as $eventDate)
+                            @if($eventDate->recurrent === 1)
+                                <div
+                                    class="absolute w-[50px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
+                                    <p class="bg-sky-300 w-full text-center">
+                                        Multiple Event Dates
+                                    </p>
+                                </div>
+
+                                @break
+                            @elseif($eventDate->isOnSale())
+                                <div
+                                    class="absolute w-[50px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
+                                    <p class="bg-sky-300 w-full text-center">
+                                        {{ \Carbon\Carbon::make($eventDate->startdate)->format('M') }}
+                                    </p>
+
+                                    <p class="pb-1">
+                                        {{ \Carbon\Carbon::make($eventDate->startdate)->format('d') }}
+                                    </p>
+                                </div>
+
+                                @break
+                            @endif
+                        @endforeach
+
                         <div class="flex justify-between items-center mb-2 mx-2">
                             <div class="flex flex-col gap-y-2">
                                 <p class="ml-2 flex items-center gap-x-1">
@@ -303,7 +329,7 @@
                                     }
                                 @endphp
                                 @if($mixed)
-                                    <p class="text-nowrap font-bold">Mixed</p>
+                                    <p class="text-nowrap font-bold">Mixed Currency</p>
                                 @else
                                     <p class="text-nowrap">
 

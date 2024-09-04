@@ -133,8 +133,17 @@
                                             {{ $event->category->categoryTranslations->first()?->name ?? '' }}
                                         </span>
 
-                                        @if($eventDate = $event->eventDates->first())
-                                            @if($eventDate?->isOnSale())
+                                        @foreach($event->eventDates as $eventDate)
+                                            @if($eventDate->recurrent === 1)
+                                                <div
+                                                    class="absolute w-[50px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
+                                                    <p class="bg-sky-300 w-full text-center">
+                                                        Multiple Event Dates
+                                                    </p>
+                                                </div>
+
+                                                @break
+                                            @elseif($eventDate->isOnSale())
                                                 <div
                                                     class="absolute w-[50px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
                                                     <p class="bg-sky-300 w-full text-center">
@@ -145,8 +154,10 @@
                                                         {{ \Carbon\Carbon::make($eventDate->startdate)->format('d') }}
                                                     </p>
                                                 </div>
+
+                                                @break
                                             @endif
-                                        @endif
+                                        @endforeach
 
                                         <img class="w-full h-40" loading="lazy"
                                              src="{{ Storage::url('events/' . $event->image_name) }}"
