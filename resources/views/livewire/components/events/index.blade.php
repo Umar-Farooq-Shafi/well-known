@@ -312,7 +312,7 @@
                                     @if($eventDate = $event->eventDates?->first())
                                         {{ $eventDate->startdate->timezone($timezone[0])->format('l') }},
                                         Start {{ $eventDate->startdate->timezone($timezone[0])->format('g:i a') }}
-                                        (Timezone: {{ $timezone[0] }})
+                                        (Timezone: {{ \Carbon\Carbon::now()->timezone($timezone[0])->format('T') }})
                                     @endif
                                 </p>
                             </div>

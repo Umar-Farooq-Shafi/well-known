@@ -119,7 +119,7 @@ class Home extends Component
                     );
                 }
             )
-            ->where('is_featured', 1)
+            ->where('is_featured', '=', true)
             ->where('completed', false)
             ->take($homepage_featured_events_nb)
             ->get();

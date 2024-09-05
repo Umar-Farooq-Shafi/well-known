@@ -4,13 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CountryResource\Pages;
 use App\Models\Country;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\App;
-use Nette\Utils\Html;
 
 class CountryResource extends Resource
 {
@@ -40,28 +39,28 @@ class CountryResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('name-en')
                                     ->label('Name')
-                                    ->required()
+                                    ->required(),
                             ]),
                         Forms\Components\Tabs\Tab::make('Fr')
                             ->schema([
                                 Forms\Components\TextInput::make('name-fr')
-                                    ->label('Nom')
+                                    ->label('Nom'),
                             ]),
                         Forms\Components\Tabs\Tab::make('Es')
                             ->schema([
                                 Forms\Components\TextInput::make('name-es')
-                                    ->label('Nombre')
+                                    ->label('Nombre'),
                             ]),
                         Forms\Components\Tabs\Tab::make('Ar')
                             ->schema([
                                 Forms\Components\TextInput::make('name-ar')
-                                    ->label('اسم')
+                                    ->label('اسم'),
                             ]),
                     ]),
 
                 Forms\Components\TextInput::make('code')
                     ->label('Country code')
-                    ->required()
+                    ->required(),
             ]);
     }
 
@@ -71,8 +70,22 @@ class CountryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('Name')
-                    ->formatStateUsing(fn($record) => $record->countryTranslations()->where('locale', App::getLocale())->first()?->name)
-                    ->searchable(isIndividual: true)
+                    ->formatStateUsing(
+                        fn($record) => $record->countryTranslations()->where('locale', App::getLocale())->first()?->name,
+                    )
+                    ->searchable(
+                        query: function ($query, $search) {
+                            $query->when(
+                                $search && $search !== '',
+                                function ($query) use ($search) {
+                                    $query->whereHas('countryTranslations', function ($query) use ($search) {
+                                        $query->where('name', 'like', '%' . $search . '%');
+                                    });
+                                },
+                            );
+                        },
+                        isIndividual: true,
+                    )
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('venues_count')
@@ -85,7 +98,7 @@ class CountryResource extends Resource
                     ->label('Status')
                     ->formatStateUsing(fn($state) => $state ? 'Hidden' : 'Visible')
                     ->color(fn($state) => $state ? 'danger' : 'primary')
-                    ->icon(fn ($state) => $state ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->icon(fn($state) => $state ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->badge(),
             ])
             ->filters([
@@ -105,7 +118,7 @@ class CountryResource extends Resource
                         ->action(fn($record) => $record->update(['hidden' => false])),
 
                     Tables\Actions\DeleteAction::make(),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
