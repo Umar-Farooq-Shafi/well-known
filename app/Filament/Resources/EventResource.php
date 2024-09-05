@@ -782,12 +782,12 @@ class EventResource extends Resource
                     Tables\Actions\Action::make('Mark as featured')
                         ->icon('heroicon-o-eye-slash')
                         ->hidden(
-                            fn($record) => $record->featured || auth()->user()->hasAnyRole(
+                            fn($record) => $record->is_featured || auth()->user()->hasAnyRole(
                                     ['ROLE_SCANNER', 'ROLE_POINTOFSALE'],
                                 ),
                         )
                         ->visible(function ($record) {
-                            if (!$record->featured) {
+                            if (!$record->is_featured) {
                                 return true;
                             }
 
@@ -802,12 +802,12 @@ class EventResource extends Resource
                     Tables\Actions\Action::make('Mark as not featured')
                         ->icon('heroicon-o-eye')
                         ->hidden(
-                            fn($record) => !$record->featured || auth()->user()->hasAnyRole(
+                            fn($record) => !$record->is_featured || auth()->user()->hasAnyRole(
                                     ['ROLE_SCANNER', 'ROLE_POINTOFSALE'],
                                 ),
                         )
                         ->visible(function ($record) {
-                            if ($record->featured) {
+                            if ($record->is_featured) {
                                 return true;
                             }
 
