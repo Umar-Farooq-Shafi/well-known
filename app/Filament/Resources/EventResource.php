@@ -786,14 +786,18 @@ class EventResource extends Resource
                                     ['ROLE_SCANNER', 'ROLE_POINTOFSALE'],
                                 ),
                         )
-                        ->visible(function () {
+                        ->visible(function ($record) {
+                            if (!$record->featured) {
+                                return true;
+                            }
+
                             $role = ucwords(
                                 str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))),
                             );
 
                             return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
                         })
-                        ->action(fn($record) => $record->update(['featured' => 1])),
+                        ->action(fn($record) => $record->update(['is_featured' => 1])),
 
                     Tables\Actions\Action::make('Mark as not featured')
                         ->icon('heroicon-o-eye')
@@ -802,14 +806,18 @@ class EventResource extends Resource
                                     ['ROLE_SCANNER', 'ROLE_POINTOFSALE'],
                                 ),
                         )
-                        ->visible(function () {
+                        ->visible(function ($record) {
+                            if ($record->featured) {
+                                return true;
+                            }
+
                             $role = ucwords(
                                 str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))),
                             );
 
                             return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
                         })
-                        ->action(fn($record) => $record->update(['featured' => false])),
+                        ->action(fn($record) => $record->update(['is_featured' => false])),
 
                     Tables\Actions\Action::make('completed')
                         ->label('Completed')

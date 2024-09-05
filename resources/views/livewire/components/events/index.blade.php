@@ -235,7 +235,7 @@
                         }
                     @endphp
 
-                    <div class="bg-white border border-gray-200 rounded shadow dark:bg-gray-800 dark:border-gray-700">
+                    <div class="relative bg-white border border-gray-200 rounded shadow dark:bg-gray-800 dark:border-gray-700">
                         <a class="relative"
                            href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
                             <img
@@ -273,7 +273,7 @@
                         @foreach($event->eventDates as $eventDate)
                             @if($eventDate->recurrent === 1)
                                 <div
-                                    class="absolute w-[50px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
+                                    class="absolute w-[70px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
                                     <p class="bg-sky-300 w-full text-center">
                                         Multiple Event Dates
                                     </p>

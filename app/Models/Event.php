@@ -148,6 +148,11 @@ class Event extends Model implements Feedable
         'completed',
     ];
 
+    protected $casts = [
+        'is_featured' => 'boolean',
+        'completed' => 'boolean',
+    ];
+
     protected static function boot(): void
     {
         parent::boot();
