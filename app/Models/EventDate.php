@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use Illuminate\Support\Str;
+
+use function Laravel\Prompts\select;
+
 /**
  *
  *
@@ -80,6 +84,21 @@ class EventDate extends Model
         'recurrent_startdate' => 'datetime',
         'recurrent_enddate' => 'datetime',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        self::creating(function ($model) {
+            $uniqueStr = Str::random(8);
+
+            while(EventDate::where('reference', $uniqueStr)->exists()) {
+                $uniqueStr = Str::random(8);
+            }
+
+            $model->reference = $uniqueStr;
+        });
+    }
 
     public function getTicketSoldAttribute(): float|int
     {

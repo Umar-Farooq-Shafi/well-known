@@ -15,11 +15,11 @@ trait ImageTrait
         if ($model->isDirty('image_name') || $isCreate) {
             $img = last(explode('/', $model->image_name));
 
-            $size = Storage::disk('public')->size("$dir/" . $img);
-            $mimetype = File::mimeType(Storage::disk('public')->path("$dir/" . $img));
+            $size = Storage::disk('public')->size("$dir/$img");
+            $mimetype = File::mimeType(Storage::disk('public')->path("$dir/$img"));
 
             $manager = new ImageManager(new Driver());
-            $image = $manager->read(Storage::disk('public')->path("$dir/" . $img));
+            $image = $manager->read(Storage::disk('public')->path("$dir/$img"));
 
             $model->image_name = $img;
             $model->image_size = $size;

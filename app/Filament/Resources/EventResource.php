@@ -294,7 +294,13 @@ class EventResource extends Resource
 
                             $timezones = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
 
-                            return $timezones;
+                            $options = [];
+
+                            foreach ($timezones as $timezone) {
+                                $options[$timezone] = str_replace('/', ' ', $timezone);
+                            }
+
+                            return $options;
                         }
 
                         return [];
@@ -533,7 +539,14 @@ class EventResource extends Resource
                                 Forms\Components\DateTimePicker::make('salesenddate')
                                     ->label('Sale ends On')
                                     ->native(false),
-                            ]),
+                            ])
+                            ->mutateRelationshipDataBeforeCreateUsing(function ($data) {
+                                $data['position'] = 0;
+                                $data['currency_symbol_position'] = $data['currency_symbol_position'] ?? 'left';
+                                $data['ticket_fee'] = $data['ticket_fee'] ?? 0;
+
+                                return $data;
+                            }),
                     ]),
 
             ]);
@@ -727,6 +740,8 @@ class EventResource extends Resource
                                     Forms\Components\FileUpload::make('image_name')
                                         ->label('Main event image')
                                         ->columnSpanFull()
+                                        ->image()
+                                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                                         ->disk('public')
                                         ->formatStateUsing(fn($state) => $state ? ["events/" . $state] : null)
                                         ->directory('events'),

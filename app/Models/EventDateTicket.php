@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Str;
 
 /**
  *
@@ -93,6 +94,21 @@ class EventDateTicket extends Model
         'salesstartdate' => 'datetime',
         'salesenddate' => 'datetime',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        self::creating(function ($model) {
+            $uniqueStr = Str::random(8);
+
+            while(EventDateTicket::where('reference', $uniqueStr)->exists()) {
+                $uniqueStr = Str::random(8);
+            }
+
+            $model->reference = $uniqueStr;
+        });
+    }
 
     public function getOrderElementsQuantitySum($status = 1, $user = "all", $role = "all"): int
     {
