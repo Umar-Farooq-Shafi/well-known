@@ -284,6 +284,22 @@ class EventResource extends Resource
                         return $options;
                     }),
 
+                Forms\Components\Select::make('eventtimezone')
+                    ->label('Time Zone')
+                    ->options(function (Forms\Get $get) {
+                        $country_id = $get('country_id');
+
+                        if ($country_id) {
+                            $country = Country::find($country_id);
+
+                            $timezones = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
+
+                            return $timezones;
+                        }
+
+                        return [];
+                    }),
+
                 Forms\Components\Repeater::make('eventDates')
                     ->label('Event dates')
                     ->required()
@@ -296,13 +312,13 @@ class EventResource extends Resource
                             ->live()
                             ->required(),
 
-                        Forms\Components\DatePicker::make('recurrent_startdate')
+                        Forms\Components\DateTimePicker::make('recurrent_startdate')
                             ->label('Calendar Starts On')
                             ->required()
                             ->native(false)
                             ->visible(fn(Forms\Get $get) => $get('recurrent')),
 
-                        Forms\Components\DatePicker::make('recurrent_enddate')
+                        Forms\Components\DateTimePicker::make('recurrent_enddate')
                             ->label('Calendar Ends On')
                             ->required()
                             ->native(false)
@@ -406,6 +422,7 @@ class EventResource extends Resource
 
                                 Forms\Components\Radio::make('free')
                                     ->label('Is this ticket free ?')
+                                    ->live()
                                     ->required()
                                     ->boolean(),
 
@@ -413,10 +430,12 @@ class EventResource extends Resource
                                     ->label('Currency')
                                     ->required()
                                     ->live()
+                                    ->hidden(fn (Forms\Get $get) => $get('free'))
                                     ->options(Currency::pluck('ccy', 'id')),
 
                                 Forms\Components\Radio::make('currency_symbol_position')
                                     ->required()
+                                    ->hidden(fn (Forms\Get $get) => $get('free'))
                                     ->options([
                                         'left' => 'Left',
                                         'right' => 'Right',
@@ -424,6 +443,7 @@ class EventResource extends Resource
 
                                 Forms\Components\Select::make('paymentGateways')
                                     ->multiple()
+                                    ->hidden(fn (Forms\Get $get) => $get('free'))
                                     ->relationship(
                                         'paymentGateways',
                                         'name',
@@ -449,6 +469,7 @@ class EventResource extends Resource
 
                                 Forms\Components\TextInput::make('price')
                                     ->numeric()
+                                    ->hidden(fn (Forms\Get $get) => $get('free'))
                                     ->prefix(function (Forms\Get $get) {
                                         $currencyCode = $get('currency_code_id');
 
@@ -462,6 +483,7 @@ class EventResource extends Resource
                                 Forms\Components\TextInput::make('ticket_fee')
                                     ->label('Ticket fee (Online)')
                                     ->required()
+                                    ->hidden(fn (Forms\Get $get) => $get('free'))
                                     ->numeric()
                                     ->helperText(
                                         'This fee will be added to the ticket sale price which are bought online, put 0 to disable additional fees for tickets which are bought online, does not apply for free tickets, will be applied to future orders',
@@ -478,6 +500,7 @@ class EventResource extends Resource
 
                                 Forms\Components\TextInput::make('promotionalprice')
                                     ->label('Promotional price')
+                                    ->hidden(fn (Forms\Get $get) => $get('free'))
                                     ->helperText(
                                         'Set a price lesser than than the original price to indicate a promotion (this price will be the SALE price)',
                                     )
