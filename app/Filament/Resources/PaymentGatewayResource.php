@@ -64,7 +64,7 @@ class PaymentGatewayResource extends Resource
                             'eseva' => 'ESeva',
                         ];
 
-                        if ($context && !array_key_exists($record->gateway_name, $options)) {
+                        if ($context !== 'create' && !array_key_exists($record->gateway_name, $options)) {
                             $options[$record->gateway_name] = $exists[$record->gateway_name];
                         }
 
@@ -147,6 +147,11 @@ class PaymentGatewayResource extends Resource
                 Forms\Components\TextInput::make('config.secret_key')
                     ->label('Stripe secret key')
                     ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'stripe_checkout')
+                    ->required(),
+
+                Forms\Components\TextInput::make('config.secret_key')
+                    ->label('ESEVA secret key')
+                    ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'eseva')
                     ->required(),
 
                 Forms\Components\Radio::make('config.production')

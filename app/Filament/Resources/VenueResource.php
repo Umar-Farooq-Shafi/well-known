@@ -179,7 +179,7 @@ class VenueResource extends Resource
                             ->limit(20)
                             ->when(
                                 $state && is_numeric($state),
-                                fn ($query) => $query->where('id', $state)
+                                fn ($query) => $query->where('translatable_id', $state)
                             )
                             ->pluck('name', 'translatable_id')
                     )
