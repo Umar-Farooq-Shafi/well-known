@@ -86,8 +86,15 @@ class AttendeeCheckInPage extends Page implements HasTable
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Bought on')
                     ->formatStateUsing(function ($state) use ($timezone) {
-                        return Carbon::make($state)->timezone($timezone[0])
-                            ->format('l jS F Y, h:i A');
+                        $time = Carbon::make($state);
+
+                        if ($this->record->eventtimezone) {
+                            $time->timezone($this->record->eventtimezone);
+                        } else {
+                            $time->timezone($timezone[0]);
+                        }
+
+                        return $time->format('l jS F Y, h:i A');
                     })
             ])
             ->headerActions([
@@ -161,7 +168,7 @@ class AttendeeCheckInPage extends Page implements HasTable
                     ->tooltip(function ($record) use ($timezone) {
                         if ($record->scanned) {
                             return "Checked In At " . Carbon::make($record->updated_at)
-                                    ->timezone($timezone[0])
+                                    ->timezone($this->record->eventtimezone ?? $timezone[0])
                                     ->format('l jS F Y, h:i A');
                         }
 

@@ -342,9 +342,9 @@
                         @if ($eventDate->isOnSale())
                             @php
                                 $eventDatesCalendar[] = [
-                                    'Date' => $eventDate->timezone($timezone[0])->startdate,
-                                    'Title' => $eventDate->timezone($timezone[0])->startdate,
-                                    'Link' => $eventDate->timezone($timezone[0])->reference,
+                                    'Date' => $eventDate->timezone($event->eventtimezone ?? $timezone[0])->startdate,
+                                    'Title' => $eventDate->timezone($event->eventtimezone ?? $timezone[0])->startdate,
+                                    'Link' => $eventDate->timezone($event->eventtimezone ?? $timezone[0])->reference,
                                 ];
                             @endphp
                         @endif
@@ -386,54 +386,54 @@
                                                 <div class="inline-block">
                                                     <div class="inline-block">
                                                         <span class="text-5xl">
-                                                            {{ $eventDate->startdate->timezone($timezone[0])->format('d') }}
+                                                            {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}
                                                         </span>
                                                     </div>
                                                     <div class="inline-block mr-3">
                                                         <div>
                                                             <span
-                                                                class="text-sm">{{ ucfirst($eventDate->startdate->timezone($timezone[0])->format('M')) }}</span>
+                                                                class="text-sm">{{ ucfirst($eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
                                                         </div>
                                                         <div>
                                                             <span class="text-sm">
-                                                                {{ $eventDate->startdate->timezone($timezone[0])->format('Y') }}
+                                                                {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}
                                                             </span>
                                                         </div>
                                                     </div>
                                                     <div class="mb-2">
                                                     <span class="text-gray-500 font-bold">
-                                                        {{ strtoupper($eventDate->startdate->timezone($timezone[0])->format('g:i a')) }}
-                                                        @if ($eventDate->enddate && Carbon::make($eventDate->enddate)->timezone($timezone[0])->equalTo($eventDate->startdate->timezone($timezone[0])))
-                                                            - {{ strtoupper($eventDate->enddate->timezone($timezone[0])->format('g:i a')) }}
+                                                        {{ strtoupper($eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
+                                                        @if ($eventDate->enddate && Carbon::make($eventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0])->equalTo($eventDate->startdate->timezone($timezone[0])))
+                                                            - {{ strtoupper($eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
                                                         @endif
                                                     </span>
                                                     </div>
                                                 </div>
                                                 @php
-                                                    $eventstartdate = $eventDate->startdate->timezone($timezone[0])->format('F d, Y H:i');
+                                                    $eventstartdate = $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i');
                                                 @endphp
                                             @endif
-                                            @if ($eventDate->enddate && $eventDate->enddate->timezone($timezone[0])->equalTo($eventDate->startdate->timezone($timezone[0])))
+                                            @if ($eventDate->enddate && $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->equalTo($eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])))
                                                 <div class="inline-block">
                                                     <div class="inline-block">
                                                         <span
-                                                            class="text-3xl">{{ $eventDate->enddate->timezone($timezone[0])->format('d') }}</span>
+                                                            class="text-3xl">{{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}</span>
                                                     </div>
                                                     <div class="inline-block">
                                                         <div><span
-                                                                class="text-xl">{{ ucfirst($eventDate->enddate->timezone($timezone[0])->format('M')) }}</span>
+                                                                class="text-xl">{{ ucfirst($eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
                                                         </div>
-                                                        <div><span>{{ $eventDate->enddate->timezone($timezone[0])->format('Y') }}</span></div>
+                                                        <div><span>{{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span></div>
                                                     </div>
                                                     <div class="mb-2">
                                                         <span
                                                             class="text-gray-500 font-bold">
-                                                            {{ strtoupper($eventDate->enddate->timezone($timezone[0])->format('g:i a')) }}
+                                                            {{ strtoupper($eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 @php
-                                                    $eventenddate = $eventDate->enddate->timezone($timezone[0])->format('F d, Y H:i');
+                                                    $eventenddate = $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i');
                                                 @endphp
                                             @endif
 
@@ -575,8 +575,8 @@
                                                     placeholder="Select Event Date"
                                                     without-timezone
                                                     without-time
-                                                    :min="$eventDate->recurrent_startdate->timezone($timezone[0])->format('Y-m-d')"
-                                                    :max="$eventDate->recurrent_enddate->timezone($timezone[0])->format('Y-m-d')"
+                                                    :min="$eventDate->recurrent_startdate->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
+                                                    :max="$eventDate->recurrent_enddate->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
                                                 />
                                             </div>
                                         @endif
@@ -595,8 +595,8 @@
                                             <div class="flex flex-col gap-y-1 font-medium text-base">
                                                 <p>{{ $eventTranslation->name }}</p>
 
-                                                <p>{{ $eventDate->startdate->timezone($timezone[0])->format('F d, Y H:i') }}
-                                                    - {{ $eventDate->enddate->timezone($timezone[0])->format('F d, Y H:i') }}</p>
+                                                <p>{{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i') }}
+                                                    - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i') }}</p>
                                             </div>
 
                                             <div class="px-8 py-4">
@@ -660,7 +660,7 @@
                                                                         </div>
 
                                                                         <p class="align-content-end">
-                                                                            @if($eventTicket->salesstartdate?->timezone($timezone[0])?->greaterThanOrEqualTo(now()) && $eventTicket->salesenddate?->timezone($timezone[0])?->lessThanOrEqualTo(now()))
+                                                                            @if($eventTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now()) && $eventTicket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now()))
                                                                                 {{ $eventTicket->promotionalprice }}
                                                                             @endif
                                                                         </p>

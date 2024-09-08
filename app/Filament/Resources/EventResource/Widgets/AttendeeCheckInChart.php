@@ -79,7 +79,7 @@ class AttendeeCheckInChart extends ApexChartWidget
 
         $countryAndTimeZone = [
             'country' => $country->name,
-            'timezone' => $timezone[0],
+            'timezone' => $this->record->eventtimezone ?? $timezone[0],
         ];
 
         return view('filament.resources.event-resource.pages.footer', $countryAndTimeZone);

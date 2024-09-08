@@ -13,7 +13,7 @@ use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $category_id
@@ -168,6 +168,11 @@ class Event extends Model implements Feedable
         self::updating(function ($model) {
             self::saveImage($model, 'events');
         });
+    }
+
+    public function getEventtimezoneAttribute()
+    {
+        return $this->attributes['eventtimezone'] === '' ? null : $this->attributes['eventtimezone'];
     }
 
     public function getNameAttribute()

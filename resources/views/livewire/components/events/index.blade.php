@@ -284,11 +284,11 @@
                                 <div
                                     class="absolute w-[50px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
                                     <p class="bg-sky-300 w-full text-center">
-                                        {{ \Carbon\Carbon::make($eventDate->startdate)->format('M') }}
+                                        {{ \Carbon\Carbon::make($eventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('M') }}
                                     </p>
 
                                     <p class="pb-1">
-                                        {{ \Carbon\Carbon::make($eventDate->startdate)->format('d') }}
+                                        {{ \Carbon\Carbon::make($eventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}
                                     </p>
                                 </div>
 
@@ -310,9 +310,9 @@
                                     <x-fas-clock class="w-4 h-4 text-red-500"/>
 
                                     @if($eventDate = $event->eventDates?->first())
-                                        {{ $eventDate->startdate->timezone($timezone[0])->format('l') }},
-                                        Start {{ $eventDate->startdate->timezone($timezone[0])->format('g:i a') }}
-                                        (Timezone: {{ \Carbon\Carbon::now()->timezone($timezone[0])->format('T') }})
+                                        {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }},
+                                        Start {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a') }}
+                                        (Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }})
                                     @endif
                                 </p>
                             </div>

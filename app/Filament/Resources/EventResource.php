@@ -286,6 +286,7 @@ class EventResource extends Resource
 
                 Forms\Components\Select::make('eventtimezone')
                     ->label('Time Zone')
+                    ->required()
                     ->options(function (Forms\Get $get) {
                         $country_id = $get('country_id');
 
