@@ -11,18 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('marketings', function (Blueprint $table) {
+        Schema::create('promotions', function (Blueprint $table) {
             $table->id();
 
-            $table->string('name');
-            $table->string('code');
-            $table->string('type');
+            $table->integer('quantity');
             $table->string('discount');
-            $table->string('duration');
-            $table->string('expire_date');
-            $table->string('limit');
-
-            $table->foreignId('organizer_id')->constrained('eventic_organizer');
 
             $table->timestamps();
         });
@@ -33,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('marketings');
+        Schema::dropIfExists('promotions');
     }
 };

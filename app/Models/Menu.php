@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property-read mixed $label
@@ -19,6 +19,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Menu newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Menu query()
  * @method static \Illuminate\Database\Eloquent\Builder|Menu whereId($value)
+ * @property-read mixed $header
+ * @property-read mixed $name
  * @mixin \Eloquent
  */
 class Menu extends Model

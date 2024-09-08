@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Coupon;
 use App\Models\EventDateTicket;
 use App\Models\EventTranslation;
 use App\Models\Organizer;
@@ -27,6 +28,19 @@ class Event extends Component
     public function mount(string $slug)
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
+    }
+
+    public function promoApply()
+    {
+        $event = $this->eventTranslation->event;
+
+        $coupon = Coupon::query()->where('organizer_id', $event->organizer_id)
+            ->whereDate('expire_date', '>', now())
+            ->first();
+
+        if ($coupon) {
+
+        }
     }
 
     public function updatedQuantity($value, $key)

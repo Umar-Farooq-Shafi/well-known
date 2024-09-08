@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $parent_id
@@ -38,6 +38,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|HelpCenterCategory whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HelpCenterCategory withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|HelpCenterCategory withoutTrashed()
+ * @property-read mixed $name
+ * @property-read mixed $slug
  * @mixin \Eloquent
  */
 class HelpCenterCategory extends Model

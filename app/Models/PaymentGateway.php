@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -38,6 +38,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentGateway whereOrganizerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentGateway whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentGateway whereUpdatedAt($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EventDateTicket> $eventDateTickets
+ * @property-read int|null $event_date_tickets_count
  * @mixin \Eloquent
  */
 class PaymentGateway extends Model

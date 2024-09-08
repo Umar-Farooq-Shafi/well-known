@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 use function Laravel\Prompts\select;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $event_id

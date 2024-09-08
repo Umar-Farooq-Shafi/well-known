@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $category_id
@@ -36,6 +36,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|HelpCenterArticle whereViews($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HelpCenterArticle withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|HelpCenterArticle withoutTrashed()
+ * @property-read mixed $slug
+ * @property-read mixed $title
  * @mixin \Eloquent
  */
 class HelpCenterArticle extends Model

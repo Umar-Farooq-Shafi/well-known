@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Page query()
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereUpdatedAt($value)
+ * @property-read mixed $slug
+ * @property-read mixed $title
  * @mixin \Eloquent
  */
 class Page extends Model

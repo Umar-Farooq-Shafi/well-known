@@ -600,8 +600,30 @@
                                             </div>
 
                                             <div class="px-8 py-4">
-                                                <x-input label="Promo Code" wire:model="promoCode"
-                                                         placeholder="Promo Code"/>
+                                                <x-input
+                                                    label="Promo Code"
+                                                    wire:model="promoCode"
+                                                    placeholder="Promo Code"
+                                                >
+                                                    <x-slot name="append">
+                                                        <x-heroicon-o-arrow-path
+                                                            class="animate-spin h-5 mt-8 w-5 text-blue-500"
+                                                            wire:loading
+                                                            wire:target="promoApply"
+                                                        />
+
+                                                        <x-button
+                                                            class="h-full"
+                                                            label="Apply"
+                                                            rounded="rounded-r-md"
+                                                            primary
+                                                            wire:loading.remove
+                                                            wire:target="promoApply"
+                                                            wire:click="promoApply"
+                                                            flat
+                                                        />
+                                                    </x-slot>
+                                                </x-input>
                                             </div>
 
                                             <div class="flex flex-col gap-y-2 divide-y-2 my-4 mx-2">

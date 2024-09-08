@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Laravel\Cashier\Billable;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -129,6 +129,10 @@ use Laravel\Cashier\Billable;
  * @property-read \App\Models\Scanner|null $scanner
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TicketReservation> $ticketReservations
  * @property-read int|null $ticket_reservations_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Cashier\Subscription> $subscriptions
+ * @property-read int|null $subscriptions_count
+ * @method static \Illuminate\Database\Eloquent\Builder|User hasExpiredGenericTrial()
+ * @method static \Illuminate\Database\Eloquent\Builder|User onGenericTrial()
  * @mixin \Eloquent
  */
 class User extends Authenticatable implements FilamentUser, HasName, HasAvatar

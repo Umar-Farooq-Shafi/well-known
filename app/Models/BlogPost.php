@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $category_id
@@ -47,6 +47,8 @@ use Illuminate\Support\Facades\Storage;
  * @method static \Illuminate\Database\Eloquent\Builder|BlogPost whereViews($value)
  * @method static \Illuminate\Database\Eloquent\Builder|BlogPost withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|BlogPost withoutTrashed()
+ * @property-read mixed $name
+ * @property-read mixed $slug
  * @mixin \Eloquent
  */
 class BlogPost extends Model

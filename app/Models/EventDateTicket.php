@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $eventdate_id
@@ -61,6 +61,8 @@ use Illuminate\Support\Str;
  * @property-read int|null $ticket_reservations_count
  * @property-read Collection<int, \App\Models\OrderTicket> $eventDateTickets
  * @property-read int|null $event_date_tickets_count
+ * @property-read Collection<int, \App\Models\PaymentGateway> $paymentGateways
+ * @property-read int|null $payment_gateways_count
  * @mixin \Eloquent
  */
 class EventDateTicket extends Model

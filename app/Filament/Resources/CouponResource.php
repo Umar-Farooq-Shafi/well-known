@@ -2,26 +2,25 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MarketingResource\Pages;
-use App\Filament\Resources\MarketingResource\RelationManagers;
-use App\Models\Marketing;
+use App\Filament\Resources\CouponResource\Pages;
+use App\Models\Coupon;
+use App\Models\Event;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class MarketingResource extends Resource
+class CouponResource extends Resource
 {
-    protected static ?string $model = Marketing::class;
+    protected static ?string $model = Coupon::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-megaphone';
+    protected static ?string $navigationIcon = 'heroicon-o-code-bracket';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'Marketing';
 
-    protected static ?int $navigationSort = 14;
+    protected static ?int $navigationSort = 1;
 
     public static function canAccess(): bool
     {
@@ -45,7 +44,7 @@ class MarketingResource extends Resource
                     ])
                     ->required(),
 
-                Forms\Components\Select::make('discount')
+                Forms\Components\TextInput::make('discount')
                     ->label('Percentage Off')
                     ->placeholder('Percentage off (In %) OR Amount off')
                     ->required(),
@@ -58,13 +57,25 @@ class MarketingResource extends Resource
                 Forms\Components\TextInput::make('limit')
                     ->label('Redemption Limit')
                     ->placeholder('List the total number of times this coupon can be  redemption')
-                    ->hint('[Note: This limit applies across customers so it\' won\'t prevent a single customer from redeeming multiple times]]'),
+                    ->helperText('[Note: This limit applies across customers so it\' won\'t prevent a single customer from redeeming multiple times]]'),
 
-
-                Forms\Components\Select::make('organizer_id')
-                    ->label('Organizer')
+                Forms\Components\Select::make('events')
                     ->hidden(auth()->user()->hasRole('ROLE_ORGANIZER'))
-                    ->relationship('organizer', 'name')
+                    ->multiple()
+                    ->relationship('events')
+                    ->options(function () {
+                        $events = Event::query()->where('completed', false)->get();
+
+                        $options = [];
+
+                        foreach ($events as $event) {
+                            if ($event->name)
+                                $options[$event->id] = $event->name;
+                        }
+
+                        return $options;
+                    })
+                    ->required()
             ]);
     }
 
@@ -79,6 +90,8 @@ class MarketingResource extends Resource
                 Tables\Columns\TextColumn::make('code')
                     ->searchable()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('type'),
 
                 Tables\Columns\TextColumn::make('discount')
                     ->searchable()
@@ -102,16 +115,16 @@ class MarketingResource extends Resource
         return parent::getEloquentQuery()
             ->when(
                 auth()->user()->hasRole('ROLE_ORGANIZER'),
-                fn (Builder $query): Builder => $query->where('organizer_id', auth()->user()->organizer_id)
+                fn (Builder $query): Builder => $query->where('events.organizer_id', auth()->user()->organizer_id)
             );
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMarketings::route('/'),
-            'create' => Pages\CreateMarketing::route('/create'),
-            'edit' => Pages\EditMarketing::route('/{record}/edit'),
+            'index' => Pages\ListCoupons::route('/'),
+            'create' => Pages\CreateCoupon::route('/create'),
+            'edit' => Pages\EditCoupon::route('/{record}/edit'),
         ];
     }
 }

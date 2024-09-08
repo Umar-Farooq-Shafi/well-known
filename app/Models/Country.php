@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $code
@@ -35,6 +35,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read int|null $venues_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Organizer> $organizers
  * @property-read int|null $organizers_count
+ * @property-read \App\Models\Event|null $event
+ * @property-read mixed $name
  * @mixin \Eloquent
  */
 class Country extends Model

@@ -13,7 +13,7 @@ use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $category_id
@@ -108,6 +108,10 @@ use Spatie\Feed\FeedItem;
  * @method static \Illuminate\Database\Eloquent\Builder|Event whereCompleted($value)
  * @property-read mixed $name
  * @property-read mixed $slug
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Coupon> $coupons
+ * @property-read int|null $coupons_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Promotion> $promotions
+ * @property-read int|null $promotions_count
  * @mixin \Eloquent
  */
 class Event extends Model implements Feedable
@@ -426,4 +430,21 @@ class Event extends Model implements Feedable
             ->authorName(auth()->user()->username)
             ->updated($this->updated_at);
     }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function coupons(): BelongsToMany
+    {
+        return $this->belongsToMany(Coupon::class);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function promotions(): BelongsToMany
+    {
+        return $this->belongsToMany(Promotion::class);
+    }
+
 }
