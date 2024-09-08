@@ -31,13 +31,21 @@ class PromotionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('quantity')
-                    ->integer()
-                    ->required(),
+                Forms\Components\Repeater::make('promotionQuantities')
+                    ->relationship()
+                    ->columns(2)
+                    ->columnSpanFull()
+                    ->minItems(1)
+                    ->required()
+                    ->schema([
+                        Forms\Components\TextInput::make('quantity')
+                            ->integer()
+                            ->required(),
 
-                Forms\Components\TextInput::make('discount')
-                    ->integer()
-                    ->required(),
+                        Forms\Components\TextInput::make('discount')
+                            ->integer()
+                            ->required(),
+                    ]),
 
                 Forms\Components\Select::make('events')
                     ->hidden(auth()->user()->hasRole('ROLE_ORGANIZER'))
@@ -49,13 +57,32 @@ class PromotionResource extends Resource
                         $options = [];
 
                         foreach ($events as $event) {
-                            if ($event->name)
+                            if ($event->name) {
                                 $options[$event->id] = $event->name;
+                            }
                         }
 
                         return $options;
                     })
-                    ->required()
+                    ->getSearchResultsUsing(function (string $query) {
+                        $events = Event::query()->where('completed', false)
+                            ->whereHas(
+                                'eventTranslations',
+                                fn (Builder $builder) => $builder->where('name', 'LIKE', '%' . $query . '%')
+                            )
+                            ->get();
+
+                        $options = [];
+
+                        foreach ($events as $event) {
+                            if ($event->name) {
+                                $options[$event->id] = $event->name;
+                            }
+                        }
+
+                        return $options;
+                    })
+                    ->required(),
             ]);
     }
 
@@ -63,16 +90,13 @@ class PromotionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('quantity')
+                Tables\Columns\TextColumn::make('promotionQuantities.quantity')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('discount')
+                Tables\Columns\TextColumn::make('promotionQuantities.discount')
                     ->searchable()
                     ->sortable(),
-            ])
-            ->filters([
-                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -89,7 +113,7 @@ class PromotionResource extends Resource
         return parent::getEloquentQuery()
             ->when(
                 auth()->user()->hasRole('ROLE_ORGANIZER'),
-                fn (Builder $query): Builder => $query->where('events.organizer_id', auth()->user()->organizer_id)
+                fn(Builder $query): Builder => $query->where('events.organizer_id', auth()->user()->organizer_id),
             );
     }
 

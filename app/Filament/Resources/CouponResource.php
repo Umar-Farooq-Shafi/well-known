@@ -49,13 +49,14 @@ class CouponResource extends Resource
                     ->placeholder('Percentage off (In %) OR Amount off')
                     ->required(),
 
-                Forms\Components\TextInput::make('duration'),
+                Forms\Components\TextInput::make('duration')->required(),
 
                 Forms\Components\DateTimePicker::make('expire_date')
                     ->required(),
 
                 Forms\Components\TextInput::make('limit')
                     ->label('Redemption Limit')
+                    ->required()
                     ->placeholder('List the total number of times this coupon can be  redemption')
                     ->helperText('[Note: This limit applies across customers so it\' won\'t prevent a single customer from redeeming multiple times]]'),
 
@@ -71,6 +72,24 @@ class CouponResource extends Resource
                         foreach ($events as $event) {
                             if ($event->name)
                                 $options[$event->id] = $event->name;
+                        }
+
+                        return $options;
+                    })
+                    ->getSearchResultsUsing(function (string $query) {
+                        $events = Event::query()->where('completed', false)
+                            ->whereHas(
+                                'eventTranslations',
+                                fn (Builder $builder) => $builder->where('name', 'LIKE', '%' . $query . '%')
+                            )
+                            ->get();
+
+                        $options = [];
+
+                        foreach ($events as $event) {
+                            if ($event->name) {
+                                $options[$event->id] = $event->name;
+                            }
                         }
 
                         return $options;

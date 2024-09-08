@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int $quantity
@@ -27,16 +28,15 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Promotion whereId($value)
  * @method static Builder|Promotion whereQuantity($value)
  * @method static Builder|Promotion whereUpdatedAt($value)
+ * @property-read Collection<int, \App\Models\PromotionQuantity> $promotionQuantities
+ * @property-read int|null $promotion_quantities_count
  * @mixin \Eloquent
  */
 class Promotion extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'quantity',
-        'discount'
-    ];
+    protected $fillable = [];
 
     /**
      * @return BelongsToMany
@@ -45,4 +45,13 @@ class Promotion extends Model
     {
         return $this->belongsToMany(Event::class);
     }
+
+    /**
+     * @return HasMany
+     */
+    public function promotionQuantities(): HasMany
+    {
+        return $this->hasMany(PromotionQuantity::class);
+    }
+
 }
