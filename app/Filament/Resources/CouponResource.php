@@ -50,7 +50,10 @@ class CouponResource extends Resource
                     ->placeholder('Percentage off (In %) OR Amount off')
                     ->required(),
 
-                Forms\Components\TextInput::make('duration')->required(),
+                Forms\Components\TextInput::make('duration')
+                    ->label('Duration In Days')
+                    ->integer()
+                    ->required(),
 
                 Forms\Components\TextInput::make('limit')
                     ->label('Redemption Limit')
