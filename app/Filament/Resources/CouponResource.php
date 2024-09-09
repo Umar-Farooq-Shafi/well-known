@@ -42,6 +42,7 @@ class CouponResource extends Resource
                         'percentage' => 'Percentage Discount',
                         'fixed_amount' => 'Fixed Amount Discount',
                     ])
+                    ->live()
                     ->required(),
 
                 Forms\Components\TextInput::make('discount')
