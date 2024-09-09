@@ -116,6 +116,7 @@ class MyOrganizerProfilePage extends Page
                     ->required()
                     ->disk('public')
                     ->directory('organizers')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                     ->formatStateUsing(fn($state) => $state ? ['organizers/' . $state] : null)
                     ->visibility('public')
                     ->storeFileNamesIn('logo_original_name'),
@@ -124,6 +125,7 @@ class MyOrganizerProfilePage extends Page
                     ->label('Cover Photo')
                     ->helperText('Optionally add a cover photo to showcase your organizer activities')
                     ->disk('public')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                     ->directory('organizers/covers')
                     ->formatStateUsing(fn($state) => $state ? ['organizers/covers/' . $state] : null)
                     ->visibility('public')

@@ -77,6 +77,7 @@ class CategoryResource extends Resource
                     ->required()
                     ->disk('public')
                     ->directory('categories')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                     ->formatStateUsing(fn ($state) => $state ? ['categories/' . $state] : null)
                     ->visibility('public')
                     ->storeFileNamesIn('image_original_name'),

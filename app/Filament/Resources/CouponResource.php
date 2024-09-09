@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
 use App\Models\Event;
+use DateTimeZone;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -31,74 +32,98 @@ class CouponResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required(),
+                Forms\Components\Section::make(function () {
+                    if (auth()->user()->hasAnyRole(['ROLE_SUPER_ADMIN', 'ROLE_ADMINISTRATOR'])) {
+                        return "Start Date and Time are in UTC Time";
+                    }
 
-                Forms\Components\TextInput::make('code')
-                    ->required(),
+                    return "";
+                })
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required(),
 
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'percentage' => 'Percentage Discount',
-                        'fixed_amount' => 'Fixed Amount Discount',
+                        Forms\Components\TextInput::make('code')
+                            ->required(),
+
+                        Forms\Components\Select::make('type')
+                            ->options([
+                                'percentage' => 'Percentage Discount',
+                                'fixed_amount' => 'Fixed Amount Discount',
+                            ])
+                            ->live()
+                            ->required(),
+
+                        Forms\Components\TextInput::make('discount')
+                            ->label(fn (Forms\Get $get) => $get('type') === 'fixed_amount' ? 'Fixed Amount For Discount' : 'Percentage Off')
+                            ->placeholder('Percentage off (In %) OR Amount off')
+                            ->required(),
+
+                        Forms\Components\TextInput::make('limit')
+                            ->label('Redemption Limit')
+                            ->required()
+                            ->placeholder('List the total number of times this coupon can be  redemption')
+                            ->helperText('[Note: This limit applies across customers so it\' won\'t prevent a single customer from redeeming multiple times]]'),
+
+                        Forms\Components\DateTimePicker::make('start_date')
+                            ->label('Start Date')
+                            ->required(),
+
+                        Forms\Components\DateTimePicker::make('expire_date')
+                            ->label('End Date')
+                            ->required(),
+
+                        Forms\Components\Select::make('events')
+                            ->hidden(auth()->user()->hasRole('ROLE_ORGANIZER'))
+                            ->multiple()
+                            ->relationship('events')
+                            ->options(function () {
+                                $events = Event::query()->where('completed', false)->get();
+
+                                $options = [];
+
+                                foreach ($events as $event) {
+                                    if ($event->name)
+                                        $options[$event->id] = $event->name;
+                                }
+
+                                return $options;
+                            })
+                            ->getSearchResultsUsing(function (string $query) {
+                                $events = Event::query()->where('completed', false)
+                                    ->whereHas(
+                                        'eventTranslations',
+                                        fn (Builder $builder) => $builder->where('name', 'LIKE', '%' . $query . '%')
+                                    )
+                                    ->get();
+
+                                $options = [];
+
+                                foreach ($events as $event) {
+                                    if ($event->name) {
+                                        $options[$event->id] = $event->name;
+                                    }
+                                }
+
+                                return $options;
+                            })
+                            ->required(),
+
+                        Forms\Components\Select::make('timezone')
+                            ->searchable()
+                            ->visible(auth()->user()->hasRole('ROLE_ORGANIZER'))
+                            ->options(function () {
+                                $timezones = DateTimeZone::listIdentifiers();
+                                $options = [];
+
+                                foreach ($timezones as $timezone) {
+                                    $options[$timezone] = str_replace('/', ' ', $timezone);
+                                }
+
+                                return $options;
+                            })
                     ])
-                    ->live()
-                    ->required(),
-
-                Forms\Components\TextInput::make('discount')
-                    ->label(fn (Forms\Get $get) => $get('type') === 'fixed_amount' ? 'Fixed Amount For Discount' : 'Percentage Off')
-                    ->placeholder('Percentage off (In %) OR Amount off')
-                    ->required(),
-
-                Forms\Components\TextInput::make('limit')
-                    ->label('Redemption Limit')
-                    ->required()
-                    ->placeholder('List the total number of times this coupon can be  redemption')
-                    ->helperText('[Note: This limit applies across customers so it\' won\'t prevent a single customer from redeeming multiple times]]'),
-
-                Forms\Components\DateTimePicker::make('start_date')
-                    ->label('Start Date')
-                    ->required(),
-
-                Forms\Components\DateTimePicker::make('expire_date')
-                    ->label('End Date')
-                    ->required(),
-
-                Forms\Components\Select::make('events')
-                    ->hidden(auth()->user()->hasRole('ROLE_ORGANIZER'))
-                    ->multiple()
-                    ->relationship('events')
-                    ->options(function () {
-                        $events = Event::query()->where('completed', false)->get();
-
-                        $options = [];
-
-                        foreach ($events as $event) {
-                            if ($event->name)
-                                $options[$event->id] = $event->name;
-                        }
-
-                        return $options;
-                    })
-                    ->getSearchResultsUsing(function (string $query) {
-                        $events = Event::query()->where('completed', false)
-                            ->whereHas(
-                                'eventTranslations',
-                                fn (Builder $builder) => $builder->where('name', 'LIKE', '%' . $query . '%')
-                            )
-                            ->get();
-
-                        $options = [];
-
-                        foreach ($events as $event) {
-                            if ($event->name) {
-                                $options[$event->id] = $event->name;
-                            }
-                        }
-
-                        return $options;
-                    })
-                    ->required()
             ]);
     }
 
@@ -124,11 +149,11 @@ class CouponResource extends Resource
                     ->label('Status')
                     ->state(function ($record) {
                         if ($record->start_date->greaterThan(now()) && $record->expire_date->lessThan(now())) {
-                            return 'Active';
+                            return 'Running';
                         }
 
-                        if ($record->start_date->lessThan(now())) {
-                            return 'Inactive';
+                        if (now()->lessThan($record->start_date)) {
+                            return 'Further';
                         }
 
                         return 'Completed';
@@ -152,10 +177,7 @@ class CouponResource extends Resource
         return parent::getEloquentQuery()
             ->when(
                 auth()->user()->hasRole('ROLE_ORGANIZER'),
-                fn (Builder $query): Builder => $query->whereHas(
-                    'events',
-                    fn (Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
-                )
+                fn(Builder $query): Builder => $query->where('organizer_id', auth()->user()->organizer_id),
             );
     }
 

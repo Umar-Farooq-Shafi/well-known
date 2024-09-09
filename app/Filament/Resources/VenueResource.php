@@ -207,6 +207,7 @@ class VenueResource extends Resource
                             ->formatStateUsing(fn ($state) => $state ? ["venues/" . $state] : null)
                             ->directory('venues')
                             ->required()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                             ->storeFileNamesIn('image_original_name')
                     ])
             ]);

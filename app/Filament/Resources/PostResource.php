@@ -112,6 +112,7 @@ class PostResource extends Resource
                     ->formatStateUsing(fn ($state) => $state ? ['blog/' . $state] : null)
                     ->storeFileNamesIn('image_original_name')
                     ->visibility('public')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                     ->required(),
 
                 Forms\Components\TextInput::make('readtime')

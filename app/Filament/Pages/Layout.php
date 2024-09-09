@@ -265,6 +265,7 @@ class Layout extends Page implements HasForms
                 ->required()
                 ->formatStateUsing(fn ($state) => $state ? ['layout/' . $state] : null)
                 ->visibility('public')
+                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                 ->storeFileNamesIn('logo_original_name')
                 ->helperText('Please choose a 200x50 image size to ensure compatibility with the website design'),
 
@@ -272,6 +273,7 @@ class Layout extends Page implements HasForms
                 ->disk('public')
                 ->formatStateUsing(fn ($state) => $state ? ['layout/' . $state] : null)
                 ->directory('layout')
+                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                 ->storeFileNamesIn('favicon_original_name')
                 ->label('Favicon'),
 

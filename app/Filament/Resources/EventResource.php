@@ -116,7 +116,7 @@ class EventResource extends Resource
                                         Forms\Components\TextInput::make('name-es')
                                             ->label('Nombre'),
 
-                                        Forms\Components\TextInput::make('tags-es')
+                                        Forms\Components\TextInput::make('content-es')
                                             ->label('Palabras clave'),
                                     ]),
                                 Forms\Components\Tabs\Tab::make('Ar')
@@ -194,6 +194,13 @@ class EventResource extends Resource
                 Forms\Components\CheckboxList::make('audiences')
                     ->helperText('Select the audience types that are targeted in your event')
                     ->columnSpanFull()
+                    ->relationship('audiences')
+                    ->saveRelationshipsUsing(function ($record, $state) {
+                        $record->audiences()->detach();
+
+                        $record->audiences()->attach($state);
+                        $record->save();
+                    })
                     ->options(function () {
                         $audiences = Audience::all();
                         $options = [];
@@ -249,6 +256,7 @@ class EventResource extends Resource
                     ->disk('public')
                     ->formatStateUsing(fn($state) => $state ? ["events/" . $state] : null)
                     ->directory('events')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                     ->preserveFilenames('image_original_name'),
 
                 Forms\Components\Repeater::make('eventImages')
@@ -264,6 +272,7 @@ class EventResource extends Resource
                             ->disk('public')
                             ->formatStateUsing(fn($state) => $state ? ["events/" . $state] : null)
                             ->directory('events')
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                             ->preserveFilenames('image_original_name'),
                     ]),
 
@@ -322,13 +331,11 @@ class EventResource extends Resource
                         Forms\Components\DateTimePicker::make('recurrent_startdate')
                             ->label('Calendar Starts On')
                             ->required()
-                            ->native(false)
                             ->visible(fn(Forms\Get $get) => $get('recurrent')),
 
                         Forms\Components\DateTimePicker::make('recurrent_enddate')
                             ->label('Calendar Ends On')
                             ->required()
-                            ->native(false)
                             ->visible(fn(Forms\Get $get) => $get('recurrent')),
 
                         Forms\Components\Radio::make('active')
@@ -339,15 +346,13 @@ class EventResource extends Resource
                                 'Enabling sales for an event date does not affect the tickets individual sale status',
                             ),
 
-                        Forms\Components\DatePicker::make('startdate')
+                        Forms\Components\DateTimePicker::make('startdate')
                             ->label('Starts On')
-                            ->native(false)
                             ->hidden(fn(Forms\Get $get) => $get('recurrent'))
                             ->required(),
 
-                        Forms\Components\DatePicker::make('enddate')
+                        Forms\Components\DateTimePicker::make('enddate')
                             ->label('Ends On')
-                            ->native(false)
                             ->hidden(fn(Forms\Get $get) => $get('recurrent'))
                             ->required(),
 
@@ -534,12 +539,10 @@ class EventResource extends Resource
                                     ->integer(),
 
                                 Forms\Components\DateTimePicker::make('salesstartdate')
-                                    ->label('Sale starts On')
-                                    ->native(false),
+                                    ->label('Sale starts On'),
 
                                 Forms\Components\DateTimePicker::make('salesenddate')
-                                    ->label('Sale ends On')
-                                    ->native(false),
+                                    ->label('Sale ends On'),
                             ])
                             ->mutateRelationshipDataBeforeCreateUsing(function ($data) {
                                 $data['position'] = 0;
@@ -754,6 +757,7 @@ class EventResource extends Resource
                                                 ->label('Gallery image')
                                                 ->required()
                                                 ->disk('public')
+                                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                                                 ->formatStateUsing(fn($state) => $state ? ["events/" . $state] : null)
                                                 ->directory('events'),
                                         ])
@@ -926,7 +930,7 @@ class EventResource extends Resource
                     'eventDates.pointOfSales',
                     fn(Builder $query) => $query->where('pointofsale_id', auth()->user()->pointOfSale->id),
                 ),
-            );
+            )->orderBy('created_at', 'desc');
     }
 
     public static function getPages(): array

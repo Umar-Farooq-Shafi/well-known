@@ -104,6 +104,7 @@ class PaymentGatewayResource extends Resource
                     ->columnSpanFull()
                     ->formatStateUsing(fn($state) => $state ? ['payment/gateways/' . $state] : null)
                     ->visibility('public')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                     ->required(),
 
                 Forms\Components\Radio::make('enabled')

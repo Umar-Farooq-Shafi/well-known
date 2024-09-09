@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $quantity
@@ -46,6 +47,8 @@ class Promotion extends Model
         'name',
         'start_date',
         'end_date',
+        'timezone',
+        'organizer_id',
     ];
 
     protected $casts = [
@@ -67,6 +70,14 @@ class Promotion extends Model
     public function promotionQuantities(): HasMany
     {
         return $this->hasMany(PromotionQuantity::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function organizer(): BelongsTo
+    {
+        return $this->belongsTo(Organizer::class);
     }
 
 }

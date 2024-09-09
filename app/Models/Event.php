@@ -13,7 +13,7 @@ use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $category_id
@@ -241,7 +241,7 @@ class Event extends Model implements Feedable
 
     public function stringifyStatus(): string
     {
-        if (!$this->organizer->user->enabled) {
+        if (!$this->organizer?->user?->enabled) {
             return "Organizer is disabled";
         }
 
@@ -258,7 +258,7 @@ class Event extends Model implements Feedable
 
     public function stringifyStatusClass(): string
     {
-        if (!$this->organizer->user->enabled) {
+        if (!$this->organizer?->user?->enabled) {
             return "danger";
         }
 

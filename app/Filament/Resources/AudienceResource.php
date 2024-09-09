@@ -65,6 +65,7 @@ class AudienceResource extends Resource
                     ->formatStateUsing(fn ($state) => $state ? ['audiences/' . $state] : null)
                     ->visibility('public')
                     ->required()
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                     ->storeFileNamesIn('image_original_name')
             ]);
     }

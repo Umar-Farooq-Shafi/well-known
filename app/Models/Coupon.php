@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -53,6 +54,7 @@ class Coupon extends Model
         'start_date',
         'expire_date',
         'limit',
+        'timezone',
         'organizer_id',
     ];
 
@@ -67,6 +69,14 @@ class Coupon extends Model
     public function events(): BelongsToMany
     {
         return $this->belongsToMany(Event::class, 'event_coupon');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function organizer(): BelongsTo
+    {
+        return $this->belongsTo(Organizer::class);
     }
 
 }
