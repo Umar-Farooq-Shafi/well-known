@@ -31,6 +31,17 @@ class PromotionResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('name')
+                ->required(),
+
+                Forms\Components\DateTimePicker::make('start_date')
+                    ->native(false)
+                    ->required(),
+
+                Forms\Components\DateTimePicker::make('end_date')
+                    ->native(false)
+                    ->required(),
+
                 Forms\Components\Repeater::make('promotionQuantities')
                     ->relationship()
                     ->columns(2)
@@ -90,6 +101,20 @@ class PromotionResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('start_date')
+                    ->dateTime()
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('end_date')
+                    ->dateTime()
+                    ->searchable()
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('promotionQuantities.quantity')
                     ->searchable()
                     ->sortable(),
@@ -97,13 +122,32 @@ class PromotionResource extends Resource
                 Tables\Columns\TextColumn::make('promotionQuantities.discount')
                     ->searchable()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('id')
+                    ->label('Status')
+                    ->state(function ($record) {
+                        if ($record->start_date->greaterThan(now()) && $record->end_date->lessThan(now())) {
+                            return 'Active';
+                        }
+
+                        if ($record->start_date->lessThan(now())) {
+                            return 'Inactive';
+                        }
+
+                        return 'Completed';
+                    })
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function ($livewire) {
+                            foreach ($livewire->getSelectedTableRecords() as $record) {
+                                $record->promotionQuantities()->delete();
+                            }
+                        }),
                 ]),
             ]);
     }

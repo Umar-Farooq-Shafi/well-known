@@ -45,13 +45,18 @@ class CouponResource extends Resource
                     ->required(),
 
                 Forms\Components\TextInput::make('discount')
-                    ->label('Percentage Off')
+                    ->label(fn (Forms\Get $get) => $get('type') === 'fixed_amount' ? 'Fixed Amount For Discount' : 'Percentage Off')
                     ->placeholder('Percentage off (In %) OR Amount off')
                     ->required(),
 
                 Forms\Components\TextInput::make('duration')->required(),
 
+                Forms\Components\DateTimePicker::make('start_date')
+                    ->label('Start Date')
+                    ->required(),
+
                 Forms\Components\DateTimePicker::make('expire_date')
+                    ->label('End Date')
                     ->required(),
 
                 Forms\Components\TextInput::make('limit')
@@ -115,6 +120,20 @@ class CouponResource extends Resource
                 Tables\Columns\TextColumn::make('discount')
                     ->searchable()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('id')
+                    ->label('Status')
+                    ->state(function ($record) {
+                        if ($record->start_date->greaterThan(now()) && $record->expire_date->lessThan(now())) {
+                            return 'Active';
+                        }
+
+                        if ($record->start_date->lessThan(now())) {
+                            return 'Inactive';
+                        }
+
+                        return 'Completed';
+                    })
             ])
             ->filters([
                 //
@@ -134,7 +153,10 @@ class CouponResource extends Resource
         return parent::getEloquentQuery()
             ->when(
                 auth()->user()->hasRole('ROLE_ORGANIZER'),
-                fn (Builder $query): Builder => $query->where('events.organizer_id', auth()->user()->organizer_id)
+                fn (Builder $query): Builder => $query->whereHas(
+                    'events',
+                    fn (Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                )
             );
     }
 

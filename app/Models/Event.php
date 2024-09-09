@@ -13,7 +13,7 @@ use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $category_id

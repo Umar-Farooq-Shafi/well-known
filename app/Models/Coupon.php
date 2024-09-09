@@ -49,9 +49,15 @@ class Coupon extends Model
         'type',
         'discount',
         'duration',
+        'start_date',
         'expire_date',
         'limit',
         'organizer_id',
+    ];
+
+    protected $casts = [
+        'start_date' => 'datetime',
+        'expire_date' => 'datetime',
     ];
 
     /**
