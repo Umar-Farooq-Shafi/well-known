@@ -52,6 +52,12 @@ class CouponResource extends Resource
 
                 Forms\Components\TextInput::make('duration')->required(),
 
+                Forms\Components\TextInput::make('limit')
+                    ->label('Redemption Limit')
+                    ->required()
+                    ->placeholder('List the total number of times this coupon can be  redemption')
+                    ->helperText('[Note: This limit applies across customers so it\' won\'t prevent a single customer from redeeming multiple times]]'),
+
                 Forms\Components\DateTimePicker::make('start_date')
                     ->label('Start Date')
                     ->required(),
@@ -59,12 +65,6 @@ class CouponResource extends Resource
                 Forms\Components\DateTimePicker::make('expire_date')
                     ->label('End Date')
                     ->required(),
-
-                Forms\Components\TextInput::make('limit')
-                    ->label('Redemption Limit')
-                    ->required()
-                    ->placeholder('List the total number of times this coupon can be  redemption')
-                    ->helperText('[Note: This limit applies across customers so it\' won\'t prevent a single customer from redeeming multiple times]]'),
 
                 Forms\Components\Select::make('events')
                     ->hidden(auth()->user()->hasRole('ROLE_ORGANIZER'))
