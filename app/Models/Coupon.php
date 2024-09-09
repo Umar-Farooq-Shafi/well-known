@@ -37,6 +37,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Coupon whereName($value)
  * @method static Builder|Coupon whereType($value)
  * @method static Builder|Coupon whereUpdatedAt($value)
+ * @property Carbon|null $start_date
+ * @method static Builder|Coupon whereStartDate($value)
  * @mixin \Eloquent
  */
 class Coupon extends Model
@@ -48,7 +50,6 @@ class Coupon extends Model
         'code',
         'type',
         'discount',
-        'duration',
         'start_date',
         'expire_date',
         'limit',

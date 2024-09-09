@@ -30,6 +30,12 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Promotion whereUpdatedAt($value)
  * @property-read Collection<int, \App\Models\PromotionQuantity> $promotionQuantities
  * @property-read int|null $promotion_quantities_count
+ * @property string $name
+ * @property Carbon $start_date
+ * @property Carbon $end_date
+ * @method static Builder|Promotion whereEndDate($value)
+ * @method static Builder|Promotion whereName($value)
+ * @method static Builder|Promotion whereStartDate($value)
  * @mixin \Eloquent
  */
 class Promotion extends Model
