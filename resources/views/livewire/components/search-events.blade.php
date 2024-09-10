@@ -1,4 +1,11 @@
 <div>
+    <style>
+        [name="form.wrapper.container"] {
+            --tw-ring-opacity: 0;
+            --tw-shadow: 0 0 0 0 rgb(0 0 0 / 0), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+    </style>
+
     <form wire:submit.prevent="submit" class="flex items-center justify-center w-full mt-2 mb-5">
         <div class="relative flex items-center divide-x-2 rounded bg-white p-1">
             <x-select
@@ -16,14 +23,16 @@
                 id="date-picker-input"
                 placeholder="All Dates"
                 wire:model.debounce.500ms="dates"
-                class="appearance-none w-[180px] border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block pl-3 pr-8 py-2.5"
+                style="border-style: none none none solid !important; border-color: #d1d5db"
+                class="appearance-none w-[180px] text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block pl-3 pr-8 py-2.5"
             />
 
             <div class="relative w-[400px]">
                 <input
                     type="text"
                     wire:model.debounce.500ms="query"
-                    class="w-[380px] bg-white border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block pl-10 pr-3 py-2.5"
+                    style="border-style: none none none solid !important; border-color: #d1d5db"
+                    class="w-[380px] bg-white text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block pl-10 pr-3 py-2.5"
                     placeholder="Search by Event"
                 />
 

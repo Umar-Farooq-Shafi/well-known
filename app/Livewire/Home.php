@@ -121,6 +121,7 @@ class Home extends Component
             )
             ->where('is_featured', '=', true)
             ->where('completed', false)
+            ->orderBy('created_at', 'desc')
             ->take($homepage_featured_events_nb)
             ->get();
 

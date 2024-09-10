@@ -9,7 +9,7 @@
                 @foreach($categories as $cat)
                     <div class="flex items-center flex-col">
                         <a
-                            href="?category={{ $cat->categoryTranslations->first()?->name  }}"
+                            href="{{ route('events', ['category' => str_replace('/', ' ', $cat->categoryTranslations->first()?->name)]) }}"
                             class="{{ $category === $cat->categoryTranslations->first()?->name ? 'bg-blue-300' : 'bg-white' }} border rounded-full border-gray-300 p-6 cursor-pointer hover:bg-gray-300 hover:border-blue-300">
                             <x-dynamic-component component="{{ $cat->icon }}" class="w-6 h-6"/>
                         </a>
