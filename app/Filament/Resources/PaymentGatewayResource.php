@@ -64,8 +64,8 @@ class PaymentGatewayResource extends Resource
                             'eseva' => 'ESeva',
                         ];
 
-                        if ($context !== 'create' && !array_key_exists($record->gateway_name, $options)) {
-                            $options[$record->gateway_name] = $exists[$record->gateway_name];
+                        if ($context !== 'create' && !array_key_exists($record->factory_name, $options)) {
+                            $options[$record->factory_name] = $exists[$record->gateway_name];
                         }
 
                         if (auth()->user()->hasRole('ROLE_ORGANIZER')) {

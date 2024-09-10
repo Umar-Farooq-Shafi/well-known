@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $eventticket_id
@@ -42,6 +42,8 @@ class TicketReservation extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'eventic_ticket_reservation';
+
+    public const UPDATED_AT = null;
 
     protected $fillable = [
         'eventticket_id',

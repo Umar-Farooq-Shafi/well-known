@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -87,6 +88,22 @@ class PaymentGateway extends Model
             'Payment_Gateway_id',
             'Ticket_id',
         );
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'paymentgateway_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function deletedOrders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'paymentgateway_id')->withTrashed();
     }
 
 }

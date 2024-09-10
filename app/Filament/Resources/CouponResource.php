@@ -75,11 +75,15 @@ class CouponResource extends Resource
                             ->required(),
 
                         Forms\Components\Select::make('events')
-                            ->hidden(auth()->user()->hasRole('ROLE_ORGANIZER'))
                             ->multiple()
                             ->relationship('events')
                             ->options(function () {
-                                $events = Event::query()->where('completed', false)->get();
+                                $events = Event::query()
+                                    ->when(
+                                        auth()->user()->hasRole('ROLE_ORGANIZER'),
+                                        fn (Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                                    )
+                                    ->where('completed', false)->get();
 
                                 $options = [];
 
@@ -113,6 +117,7 @@ class CouponResource extends Resource
                         Forms\Components\Select::make('timezone')
                             ->searchable()
                             ->visible(auth()->user()->hasRole('ROLE_ORGANIZER'))
+                            ->required()
                             ->options(function () {
                                 $timezones = DateTimeZone::listIdentifiers();
                                 $options = [];
@@ -153,7 +158,7 @@ class CouponResource extends Resource
                         }
 
                         if (now()->lessThan($record->start_date)) {
-                            return 'Further';
+                            return 'Future';
                         }
 
                         return 'Completed';

@@ -174,6 +174,12 @@ class EventResource extends Resource
                     ->label('Subtitle')
                     ->multiple()
                     ->relationship('subtitles')
+                    ->saveRelationshipsUsing(function ($record, $state) {
+                        $record->subtitles()->detach();
+
+                        $record->subtitles()->attach($state);
+                        $record->save();
+                    })
                     ->options(function () {
                         $languages = Language::all();
                         $options = [];
