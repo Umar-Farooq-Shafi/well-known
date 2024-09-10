@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,10 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 use Illuminate\Support\Str;
 
-use function Laravel\Prompts\select;
-
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $event_id
@@ -29,31 +29,31 @@ use function Laravel\Prompts\select;
  * @property string|null $recurrent_enddate
  * @property-read \App\Models\Event|null $event
  * @property-read \App\Models\Venue|null $venue
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate query()
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereEnddate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereEventId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereOnline($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereRecurrent($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereRecurrentEnddate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereRecurrentStartdate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereReference($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereStartdate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|EventDate whereVenueId($value)
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EventDateTicket> $eventDateTickets
+ * @method static Builder|EventDate newModelQuery()
+ * @method static Builder|EventDate newQuery()
+ * @method static Builder|EventDate query()
+ * @method static Builder|EventDate whereActive($value)
+ * @method static Builder|EventDate whereEnddate($value)
+ * @method static Builder|EventDate whereEventId($value)
+ * @method static Builder|EventDate whereId($value)
+ * @method static Builder|EventDate whereOnline($value)
+ * @method static Builder|EventDate whereRecurrent($value)
+ * @method static Builder|EventDate whereRecurrentEnddate($value)
+ * @method static Builder|EventDate whereRecurrentStartdate($value)
+ * @method static Builder|EventDate whereReference($value)
+ * @method static Builder|EventDate whereStartdate($value)
+ * @method static Builder|EventDate whereVenueId($value)
+ * @property-read Collection<int, EventDateTicket> $eventDateTickets
  * @property-read int|null $event_date_tickets_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PointsOfSale> $pointOfSales
+ * @property-read Collection<int, PointsOfSale> $pointOfSales
  * @property-read int|null $point_of_sales_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Scanner> $scanners
+ * @property-read Collection<int, Scanner> $scanners
  * @property-read int|null $scanners_count
  * @property-read mixed $organizer_payout_amount
  * @property-read mixed $ticket_price_percentage_cut_sum
  * @property-read int|float $ticket_sold
  * @property-read mixed $total_ticket_fees
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PayoutRequest> $payoutRequests
+ * @property-read Collection<int, PayoutRequest> $payoutRequests
  * @property-read int|null $payout_requests_count
  * @mixin \Eloquent
  */

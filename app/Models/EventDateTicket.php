@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $eventdate_id
@@ -339,12 +339,6 @@ class EventDateTicket extends Model
                     )->greaterThan(now())))
             && $this->active
             && !$this->isSoldOut()
-            && (
-            (!$this->salesstartdate || Carbon::make($this->salesstartdate)->lessThan(now()))
-            )
-            && (
-            (!$this->salesenddate || Carbon::make($this->salesenddate)->greaterThan(now()))
-            )
             && (!$this->eventDate->payoutRequested());
     }
 

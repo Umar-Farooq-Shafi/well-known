@@ -545,10 +545,10 @@ class EventResource extends Resource
                                     ->integer(),
 
                                 Forms\Components\DateTimePicker::make('salesstartdate')
-                                    ->label('Sale starts On'),
+                                    ->label('Promotion Starts On'),
 
                                 Forms\Components\DateTimePicker::make('salesenddate')
-                                    ->label('Sale ends On'),
+                                    ->label('Promotion Ends On'),
                             ])
                             ->mutateRelationshipDataBeforeCreateUsing(function ($data) {
                                 $data['position'] = 0;
