@@ -10,6 +10,8 @@ use Illuminate\Validation\ValidationException;
 
 class Login extends LoginPage
 {
+    protected static string $view = 'filament.pages.auth.login';
+
     /**
      * @return array|Form[]|string[]
      */

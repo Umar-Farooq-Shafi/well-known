@@ -19,6 +19,8 @@ use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class Register extends AuthRegister
 {
+    protected static string $view = 'filament.pages.auth.register';
+
     /**
      * @throws Exception
      */
@@ -91,11 +93,16 @@ class Register extends AuthRegister
             ->maxLength(255);
     }
 
-    protected function getRoleFormComponent(): Forms\Components\Select
+    protected function getRoleFormComponent(): Forms\Components\ToggleButtons
     {
-        return Forms\Components\Select::make('roles')
-            ->required()
+        return Forms\Components\ToggleButtons::make('roles')
+            ->label('')
+            ->icons([
+                'ROLE_ATTENDEE' => 'heroicon-o-check',
+            ])
             ->live()
+            ->grouped()
+            ->columnSpanFull()
             ->options([
                 'ROLE_ATTENDEE' => 'Attendee',
                 'ROLE_ORGANIZER' => 'Organizer',
