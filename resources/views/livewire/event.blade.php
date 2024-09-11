@@ -582,8 +582,12 @@
                                         @endif
 
                                         <div class="flex items-center justify-center w-full py-2">
-                                            <x-button wire:click="buyTicket" spinner="buyTicket" primary
-                                                      label="Buy Tickets"/>
+                                            <x-button
+                                                wire:click="buyTicket"
+                                                spinner="buyTicket"
+                                                primary
+                                                label="Buy Tickets"
+                                            />
                                         </div>
 
                                     </dd>
@@ -595,8 +599,13 @@
                                             <div class="flex flex-col gap-y-1 font-medium text-base">
                                                 <p>{{ $eventTranslation->name }}</p>
 
-                                                <p>{{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i') }}
-                                                    - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i') }}</p>
+                                                <p>[{{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
+                                                    - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
+                                                     ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
+                                                    - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }})
+                                                    ]</p>
+
+                                                <p>Selected Date: {{ $eventDatePick ? Carbon::make($eventDatePick)->format('F d Y - H:i A') : '' }}</p>
                                             </div>
 
                                             <div class="px-8 py-4">

@@ -1,6 +1,6 @@
 <div>
     <style>
-        [name="form.wrapper.container"] {
+        [form-wrapper="this-is-us"] label {
             --tw-ring-opacity: 0;
             --tw-shadow: 0 0 0 0 rgb(0 0 0 / 0), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         }
@@ -16,6 +16,7 @@
                 option-value="id"
                 wire:loading.attr="disabled"
                 class="w-[180px]"
+                id="this-is-us"
                 :async-data="route('api.events.country')"
             />
 

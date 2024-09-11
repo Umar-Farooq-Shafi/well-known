@@ -101,6 +101,9 @@ class Register extends AuthRegister
                 'ROLE_ATTENDEE' => 'heroicon-o-check',
             ])
             ->live()
+            ->extraAttributes([
+                'class' => 'w-full'
+            ])
             ->grouped()
             ->columnSpanFull()
             ->options([
@@ -134,8 +137,7 @@ class Register extends AuthRegister
     protected function getPhoneComponent(): PhoneInput
     {
         return PhoneInput::make('phone')
-            ->required()
-            ->visible(fn(Forms\Get $get) => $get('roles') === 'ROLE_ATTENDEE');
+            ->required();
     }
 
     protected function getRecaptchaFormComponent(): GRecaptcha
