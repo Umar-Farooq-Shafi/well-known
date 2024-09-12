@@ -24,7 +24,9 @@ class CreateVenue extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['organizer_id'] = auth()->user()->organizer_id;
+        if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
+            $data['organizer_id'] = auth()->user()->organizer_id;
+        }
 
         return $data;
     }

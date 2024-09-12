@@ -74,32 +74,32 @@
                 <div class="flex items-center">
                     <ul class="flex flex-row font-medium mt-0 space-x-8 rtl:space-x-reverse text-sm">
                         <li>
-                            <a href="/"
+                            <a href="?country={{ $country }}"
                                class="{{ $category === '' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-blue-700 text-base  dark:text-white hover:underline"
                                aria-current="page">
                                 All
                             </a>
                         </li>
                         <li>
-                            <a href="?category=online"
+                            <a href="?category=online&country={{ $country }}"
                                class="{{ $category === 'online' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                 Online
                             </a>
                         </li>
                         <li>
-                            <a href="?category=today"
+                            <a href="?category=today&country={{ $country }}"
                                class="{{ $category === 'today' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                 Today
                             </a>
                         </li>
                         <li>
-                            <a href="?category=this-weekend"
+                            <a href="?category=this-weekend&country={{ $country }}"
                                class="{{ $category === 'this-weekend' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                 This Weekend
                             </a>
                         </li>
                         <li>
-                            <a href="?category=free"
+                            <a href="?category=free&country={{ $country }}"
                                class="{{ $category === 'free' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                 Free
                             </a>
@@ -122,9 +122,19 @@
                         class="flex flex-nowrap"
                     >
                         @foreach($featuredEvents as $event)
+                            @php
+                                $country = $event->country;
+
+                                if ($country) {
+                                    $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
+                                } else {
+                                    $timezone[] = 'UTC';
+                                }
+                            @endphp
+
                             <div class="inline-block px-3">
                                 <div
-                                    class="relative w-80 h-72 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
+                                    class="relative w-[25rem] h-80 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
                                 >
                                     <a
                                         href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
@@ -164,25 +174,59 @@
                                              alt="{{ $event->eventTranslations->first()->name }}"
                                         />
 
-                                        <div class="flex flex-col h-2/5 justify-between p-2">
-                                            <p class="font-medium text-base">{{ $event->eventTranslations->first()->name }}</p>
+                                        <div class="flex justify-between items-center mb-2 mx-2">
+                                            <div class="flex flex-col gap-y-2">
+                                                <p class="ml-2 flex items-center gap-x-1">
+                                                    <x-fas-location-dot class="w-5 h-5 text-red-500"/>
 
-                                            <div class="flex justify-between items-center">
-                                                <p class="ml-2">
                                                     @if($venue = $event->eventDates?->first()?->venue)
-                                                        {{ $venue->stringifyAddress }}
+                                                        {{ $venue->name }}
                                                     @endif
                                                 </p>
 
-                                                <p class="text-nowrap">
-                                                    @if($eventDate = $event->eventDates?->first())
-                                                        {{ $eventDate->getCurrencyCode() }}
+                                                <p class="ml-2 flex items-center gap-x-1">
+                                                    <x-fas-clock class="w-4 h-4 text-red-500"/>
 
-                                                        {{ $eventDate->getTotalTicketFees() }}
+                                                    @if($eventDate = $event->eventDates?->first())
+                                                        {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }},
+                                                        Start {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a') }}
+                                                        (Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }})
                                                     @endif
                                                 </p>
                                             </div>
+
+                                            @if($countEventDates = count($event->eventDates))
+                                                @php
+                                                    $ccy = $event->eventDates->first()->getCurrencyCode();
+                                                    $mixed = false;
+
+                                                    foreach ($event->eventDates as $ed) {
+                                                        if ($ccy !== $ed->getCurrencyCode()) {
+                                                            $mixed = true;
+                                                        }
+                                                    }
+                                                @endphp
+                                                @if($mixed)
+                                                    <p class="text-nowrap font-bold">Mixed Currency</p>
+                                                @else
+                                                    <p class="text-nowrap">
+
+                                                        @if($ed = $event->eventDates->first()->getCurrencyCode())
+                                                            <span
+                                                                class="font-bold">From</span> {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
+                                                        @endif
+
+                                                        @if($countEventDates > 1)
+                                                            @foreach($event->eventDates as $eventDate)
+                                                                <span
+                                                                    class="font-bold">Lowest</span> {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
+                                                            @endforeach
+                                                        @endif
+                                                    </p>
+                                                @endif
+                                            @endif
                                         </div>
+
                                     </a>
                                 </div>
                             </div>

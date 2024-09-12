@@ -14,6 +14,7 @@ use Livewire\Component;
 
 class Home extends Component
 {
+    #[Url]
     public $country = 'All';
 
     #[Url]

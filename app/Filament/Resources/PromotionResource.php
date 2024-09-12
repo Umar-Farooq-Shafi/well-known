@@ -111,6 +111,7 @@ class PromotionResource extends Resource
                         Forms\Components\Select::make('timezone')
                             ->searchable()
                             ->visible(auth()->user()->hasRole('ROLE_ORGANIZER'))
+                            ->required()
                             ->options(function () {
                                 $timezones = DateTimeZone::listIdentifiers();
                                 $options = [];

@@ -189,6 +189,7 @@ class MenuResource extends Resource
                                     ->options(static::getLinks()),
 
                                 Forms\Components\TextInput::make('custom_link')
+                                    ->helperText('For absolute redirect please use a domain with https:// “e.g: https://example.com”')
                                     ->label('Custom link')
                             ])
                     ]),
