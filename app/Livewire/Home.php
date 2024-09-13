@@ -39,7 +39,7 @@ class Home extends Component
             ->take($homepage_categories_number)
             ->get();
 
-        $featuredEvents = Event::with([
+        $events = Event::with([
             'eventTranslations' => function ($query) {
                 $query->where('locale', App::getLocale());
             },
@@ -120,6 +120,23 @@ class Home extends Component
                     );
                 }
             )
+            ->where('completed', false)
+            ->orderBy('created_at', 'desc')
+            ->take(20)
+            ->get();
+
+        $featuredEvents = Event::with([
+            'eventTranslations' => function ($query) {
+                $query->where('locale', App::getLocale());
+            },
+            'category' => function ($query) {
+                $query->with([
+                    'categoryTranslations' => function ($query) {
+                        $query->where('locale', App::getLocale());
+                    },
+                ]);
+            },
+        ])
             ->where('is_featured', '=', true)
             ->where('completed', false)
             ->orderBy('created_at', 'desc')
@@ -146,6 +163,7 @@ class Home extends Component
         return view('livewire.home', [
             'categories' => $categories,
             'featuredEvents' => $featuredEvents,
+            'events' => $events,
             'countries' => $countries,
         ]);
     }
