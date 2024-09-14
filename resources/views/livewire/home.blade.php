@@ -109,7 +109,7 @@
             </div>
         </nav>
 
-        <div class="swiper eventSlider my-4">
+        <div class="swiper eventSlider my-4" wire:ignore>
             <div class="swiper-wrapper">
                 @foreach($events as $event)
                     @php
