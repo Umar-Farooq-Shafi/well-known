@@ -245,7 +245,8 @@
             </div>
 
             @if(count($featuredEvents))
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 py-10 overflow-x-auto hide-scroll-bar">
+                <div
+                    class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 gap-y-8 py-10 overflow-x-auto hide-scroll-bar">
                     @foreach($featuredEvents as $event)
                         @php
                             $country = $event->country;
@@ -257,7 +258,7 @@
                             }
                         @endphp
 
-                        <div class="inline-block px-3">
+                        <div class="inline-block">
                             <div
                                 class="relative h-80 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
                             >
@@ -295,9 +296,11 @@
                                         @endif
                                     @endforeach
 
-                                    <img class="w-full h-40" loading="lazy"
-                                         src="{{ Storage::url('events/' . $event->image_name) }}"
-                                         alt="{{ $event->eventTranslations->first()->name }}"
+                                    <img
+                                        class="w-full h-40"
+                                        loading="lazy"
+                                        src="{{ Storage::url('events/' . $event->image_name) }}"
+                                        alt="{{ $event->eventTranslations->first()->name }}"
                                     />
 
                                     <p class="p-2 font-normal text-lg text-gray-700 dark:text-gray-400">
@@ -364,6 +367,17 @@
                         </div>
                     @endforeach
                 </div>
+
+                @if($featuredEvents->hasMorePages())
+                    <div class="flex w-full items-center justify-center">
+                        <x-button
+                            primary
+                            label="Load more"
+                            spinner
+                            wire:click.prevent="loadMore"
+                        />
+                    </div>
+                @endif
             @endif
         </div>
     </main>

@@ -20,9 +20,16 @@ class Home extends Component
     #[Url]
     public $category = '';
 
+    public $perPage = 12;
+
     public function updateCountry($country)
     {
         $this->country = $country;
+    }
+
+    public function loadMore()
+    {
+        $this->perPage += 12;
     }
 
     #[Title("Nepal's 1st event ticketing platform. We provide complete solution regarding your event tickets from selling to door verification. | 'Aafno Ticket Nepal'")]
@@ -141,7 +148,7 @@ class Home extends Component
             ->where('completed', false)
             ->orderBy('created_at', 'desc')
             ->take($homepage_featured_events_nb)
-            ->get();
+            ->paginate($this->perPage);
 
         $countries = CountryTranslation::query()
             ->whereHas(
