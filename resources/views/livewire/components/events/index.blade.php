@@ -235,121 +235,131 @@
                         }
                     @endphp
 
-                    <div class="relative bg-white border border-gray-200 rounded shadow dark:bg-gray-800 dark:border-gray-700">
-                        <a class="relative"
-                           href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
-                            <img
-                                class="w-full h-64 rounded"
-                                src="{{ Storage::url('events/' . $event->image_name) }}"
-                                loading="lazy"
-                                alt="{{ $event->eventTranslations->first()?->name }}"
-                            />
+                    @if($event->eventTranslations->first())
+                        <div
+                            class="relative bg-white border border-gray-200 rounded shadow dark:bg-gray-800 dark:border-gray-700">
+                            <a class="relative"
+                               href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
+                                <img
+                                    class="w-full h-64 rounded"
+                                    src="{{ Storage::url('events/' . $event->image_name) }}"
+                                    loading="lazy"
+                                    alt="{{ $event->eventTranslations->first()?->name }}"
+                                />
 
-                            @if(auth()->check())
-                                <span
-                                    wire:click.prevent="eventFavourite({{ $event->id }})"
-                                    class="absolute right-2 -bottom-2 z-10 bg-gray-50 shadow rounded-full p-1">
+                                @if(auth()->check())
+                                    <span
+                                        wire:click.prevent="eventFavourite({{ $event->id }})"
+                                        class="absolute right-2 -bottom-2 z-10 bg-gray-50 shadow rounded-full p-1">
                                     @if($event->favourites()->where('User_id', auth()->id())->exists())
-                                        <x-heroicon-s-heart class="w-4 h-4"/>
-                                    @else
-                                        <x-heroicon-o-heart class="w-4 h-4"/>
-                                    @endif
+                                            <x-heroicon-s-heart class="w-4 h-4"/>
+                                        @else
+                                            <x-heroicon-o-heart class="w-4 h-4"/>
+                                        @endif
                                 </span>
-                            @endif
-                        </a>
-
-                        <div class="p-5">
-                            <a href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
-                                <h5 class="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                                    {{ $event->category->categoryTranslations->first()?->name }}
-                                </h5>
-
-                                <p class="mb-3 font-normal text-xl text-gray-700 dark:text-gray-400">
-                                    {{ $event->eventTranslations->first()?->name }}
-                                </p>
+                                @endif
                             </a>
-                        </div>
 
-                        @foreach($event->eventDates as $eventDate)
-                            @if($eventDate->recurrent === 1)
-                                <div
-                                    class="absolute w-[70px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
-                                    <p class="bg-sky-300 w-full text-center">
-                                        Multiple Event Dates
+                            <div class="p-5">
+                                <a href="{{ route('event', ['slug' => $event->eventTranslations->first()->slug]) }}">
+                                    <h5 class="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                                        {{ $event->category->categoryTranslations->first()?->name }}
+                                    </h5>
+
+                                    <p class="mb-3 font-normal text-xl text-gray-700 dark:text-gray-400">
+                                        {{ $event->eventTranslations->first()?->name }}
                                     </p>
-                                </div>
-
-                                @break
-                            @elseif($eventDate->isOnSale())
-                                <div
-                                    class="absolute w-[50px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
-                                    <p class="bg-sky-300 w-full text-center">
-                                        {{ \Carbon\Carbon::make($eventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('M') }}
-                                    </p>
-
-                                    <p class="pb-1">
-                                        {{ \Carbon\Carbon::make($eventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}
-                                    </p>
-                                </div>
-
-                                @break
-                            @endif
-                        @endforeach
-
-                        <div class="flex justify-between items-center mb-2 mx-2">
-                            <div class="flex flex-col gap-y-2">
-                                <p class="ml-2 flex items-center gap-x-1">
-                                    <x-fas-location-dot class="w-5 h-5 text-red-500"/>
-
-                                    @if($venue = $event->eventDates?->first()?->venue)
-                                        {{ $venue->name }}
-                                    @endif
-                                </p>
-
-                                <p class="ml-2 flex items-center gap-x-1">
-                                    <x-fas-clock class="w-4 h-4 text-red-500"/>
-
-                                    @if($eventDate = $event->eventDates?->first())
-                                        {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }},
-                                        Start {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a') }}
-                                        (Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }})
-                                    @endif
-                                </p>
+                                </a>
                             </div>
 
-                            @if($countEventDates = count($event->eventDates))
-                                @php
-                                    $ccy = $event->eventDates->first()->getCurrencyCode();
-                                    $mixed = false;
+                            @foreach($event->eventDates as $eventDate)
+                                @if($eventDate->recurrent === 1)
+                                    <div
+                                        class="absolute w-[70px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
+                                        <p class="bg-sky-300 w-full text-center">
+                                            Multiple Event Dates
+                                        </p>
+                                    </div>
 
-                                    foreach ($event->eventDates as $ed) {
-                                        if ($ccy !== $ed->getCurrencyCode()) {
-                                            $mixed = true;
-                                        }
-                                    }
-                                @endphp
-                                @if($mixed)
-                                    <p class="text-nowrap font-bold">Mixed Currency</p>
-                                @else
-                                    <p class="text-nowrap">
+                                    @break
+                                @elseif($eventDate->isOnSale())
+                                    <div
+                                        class="absolute w-[50px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
+                                        <p class="bg-sky-300 w-full text-center">
+                                            {{ \Carbon\Carbon::make($eventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('M') }}
+                                        </p>
 
-                                        @if($ed = $event->eventDates->first()->getCurrencyCode())
-                                            <span
-                                                class="font-bold">From</span> {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
-                                        @endif
+                                        <p class="pb-1">
+                                            {{ \Carbon\Carbon::make($eventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}
+                                        </p>
+                                    </div>
 
-                                        @if($countEventDates > 1)
-                                            @foreach($event->eventDates as $eventDate)
-                                                <span
-                                                    class="font-bold">Lowest</span> {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
-                                            @endforeach
+                                    @break
+                                @endif
+                            @endforeach
+
+                            <div class="flex justify-between items-center mb-2 mx-2">
+                                <div class="flex flex-col gap-y-2">
+                                    <p class="ml-2 flex items-center gap-x-1">
+                                        <x-fas-location-dot class="w-5 h-5 text-red-500"/>
+
+                                        @if($venue = $event->eventDates?->first()?->venue)
+                                            {{ $venue->name }}: {{ $venue->state }} {{ $venue->city }}
                                         @endif
                                     </p>
-                                @endif
-                            @endif
-                        </div>
-                    </div>
 
+                                    <p class="ml-2 flex items-center gap-x-1">
+                                        <x-fas-clock class="w-4 h-4 text-red-500"/>
+
+                                        @if($eventDate = $event->eventDates?->first())
+                                            {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }}
+                                            ,
+                                            Start {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a') }}
+                                            (Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }}
+                                            )
+                                        @endif
+                                    </p>
+                                </div>
+
+                                @if($countEventDates = count($event->eventDates))
+                                    @php
+                                        $ccy = $event->eventDates->first()->getCurrencyCode();
+                                        $mixed = false;
+                                        $lowest = $event->eventDates->first()?->getTotalTicketFees();
+
+                                        foreach ($event->eventDates as $ed) {
+                                            if ($ccy !== $ed->getCurrencyCode()) {
+                                                $mixed = true;
+                                            }
+
+                                            if ($ed->getTotalTicketFees() < $lowest) {
+                                                $lowest = $ed->getTotalTicketFees();
+                                            }
+                                        }
+                                    @endphp
+                                    @if($mixed)
+                                        <p class="text-nowrap font-bold">Mixed Currency</p>
+                                    @else
+                                        <p class="text-nowrap">
+                                            @if($ed = $event->eventDates->first()->getCurrencyCode())
+                                                @if($countEventDates > 1)
+                                                    <span class="font-bold">From</span>
+                                                @endif
+                                                {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
+                                            @endif
+
+                                            @if($countEventDates > 1)
+                                                @foreach($event->eventDates as $eventDate)
+                                                    <span
+                                                        class="font-bold">Lowest</span> {{ $eventDate->getCurrencyCode() }} {{ $lowest }}
+                                                @endforeach
+                                            @endif
+                                        </p>
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                 @endforeach
             </div>
 

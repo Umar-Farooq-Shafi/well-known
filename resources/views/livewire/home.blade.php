@@ -178,7 +178,7 @@
                                                 <x-fas-location-dot class="w-5 h-5 text-red-500"/>
 
                                                 @if($venue = $event->eventDates?->first()?->venue)
-                                                    {{ $venue->name }}
+                                                    {{ $venue->name }}: {{ $venue->state }} {{ $venue->city }}
                                                 @endif
                                             </p>
 
