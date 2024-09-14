@@ -177,7 +177,9 @@
                                             <p class="ml-2 flex items-center gap-x-1">
                                                 <x-fas-location-dot class="w-5 h-5 text-red-500"/>
 
-                                                @if($venue = $event->eventDates?->first()?->venue)
+                                                @if($event->eventDates?->first()?->online)
+                                                    {{ __('This is an online event') }}
+                                                @elseif($venue = $event->eventDates?->first()?->venue)
                                                     {{ $venue->name }}: {{ $venue->state }} {{ $venue->city }}
                                                 @endif
                                             </p>
@@ -199,10 +201,15 @@
                                             @php
                                                 $ccy = $event->eventDates->first()->getCurrencyCode();
                                                 $mixed = false;
+                                                $lowest = $event->eventDates->first()?->getTotalTicketFees();
 
                                                 foreach ($event->eventDates as $ed) {
                                                     if ($ccy !== $ed->getCurrencyCode()) {
                                                         $mixed = true;
+                                                    }
+
+                                                    if ($ed->getTotalTicketFees() < $lowest) {
+                                                        $lowest = $ed->getTotalTicketFees();
                                                     }
                                                 }
                                             @endphp
@@ -212,8 +219,10 @@
                                                 <p class="text-nowrap">
 
                                                     @if($ed = $event->eventDates->first()->getCurrencyCode())
-                                                        <span
-                                                            class="font-bold">From</span> {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
+                                                        @if($countEventDates > 1)
+                                                            <span class="font-bold">From</span>
+                                                        @endif
+                                                        {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
                                                     @endif
 
                                                     @if($countEventDates > 1)
@@ -312,8 +321,10 @@
                                             <p class="ml-2 flex items-center gap-x-1">
                                                 <x-fas-location-dot class="w-5 h-5 text-red-500"/>
 
-                                                @if($venue = $event->eventDates?->first()?->venue)
-                                                    {{ $venue->name }}
+                                                @if($event->eventDates?->first()?->online)
+                                                    {{ __('This is an online event') }}
+                                                @elseif($venue = $event->eventDates?->first()?->venue)
+                                                    {{ $venue->name }}: {{ $venue->state }} {{ $venue->city }}
                                                 @endif
                                             </p>
 
@@ -334,10 +345,15 @@
                                             @php
                                                 $ccy = $event->eventDates->first()->getCurrencyCode();
                                                 $mixed = false;
+                                                $lowest = $event->eventDates->first()?->getTotalTicketFees();
 
                                                 foreach ($event->eventDates as $ed) {
                                                     if ($ccy !== $ed->getCurrencyCode()) {
                                                         $mixed = true;
+                                                    }
+
+                                                    if ($ed->getTotalTicketFees() < $lowest) {
+                                                        $lowest = $ed->getTotalTicketFees();
                                                     }
                                                 }
                                             @endphp
@@ -347,8 +363,10 @@
                                                 <p class="text-nowrap">
 
                                                     @if($ed = $event->eventDates->first()->getCurrencyCode())
-                                                        <span
-                                                            class="font-bold">From</span> {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
+                                                        @if($countEventDates > 1)
+                                                            <span class="font-bold">From</span>
+                                                        @endif
+                                                        {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
                                                     @endif
 
                                                     @if($countEventDates > 1)

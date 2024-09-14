@@ -303,7 +303,9 @@
                                     <p class="ml-2 flex items-center gap-x-1">
                                         <x-fas-location-dot class="w-5 h-5 text-red-500"/>
 
-                                        @if($venue = $event->eventDates?->first()?->venue)
+                                        @if($event->eventDates?->first()?->online)
+                                            {{ __('This is an online event') }}
+                                        @elseif($venue = $event->eventDates?->first()?->venue)
                                             {{ $venue->name }}: {{ $venue->state }} {{ $venue->city }}
                                         @endif
                                     </p>
@@ -315,8 +317,7 @@
                                             {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }}
                                             ,
                                             Start {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a') }}
-                                            (Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }}
-                                            )
+                                            (Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }})
                                         @endif
                                     </p>
                                 </div>

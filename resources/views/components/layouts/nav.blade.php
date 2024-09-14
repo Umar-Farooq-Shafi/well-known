@@ -25,7 +25,7 @@
     <div
         class="{{ auth()->check() ? 'max-w-screen-xl' : 'max-w-screen-2xl' }} flex flex-wrap items-center justify-between mx-auto p-4">
         <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="{{ $logo }}" class="h-8" alt="App Logo">
+            <img src="{{ $logo }}" class="h-12 w-12" alt="App Logo">
         </a>
 
         @if(auth()->check())
@@ -76,10 +76,16 @@
         @else
             <div class="flex items-center md:order-2 md:space-x-0 rtl:space-x-reverse">
                 <a href="{{ route('filament.admin.auth.login') }}"
-                   class="p-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Login</a>
-                <a href="{{ route('filament.admin.auth.register') }}"
-                   class="p-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign
-                    Up</a>
+                   class="p-2 flex gap-x-2 items-center text-lg font-bold text-white hover:bg-gray-100">
+                    <x-fas-arrow-right-to-bracket class="w-6 h-6" />
+
+                    Login
+                </a>
+                <a href="{{ route('filament.admin.auth.register') }}" class="p-2 flex gap-x-2 items-center text-lg font-bold text-white hover:bg-gray-100">
+                    <x-fas-user-plus class="w-6 h-6" />
+
+                    Sign Up
+                </a>
             </div>
         @endif
 
@@ -89,6 +95,14 @@
 
         <div class="items-center justify-between hidden w-full lg:flex md:w-auto md:order-1" id="navbar-sticky">
             <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:dark:bg-gray-900 dark:border-gray-700">
+                @php
+                    $path = Request::path();
+
+                    if ($path !== '/') {
+                        $path = '/' . $path;
+                    }
+                @endphp
+
                 @foreach($firstMenu->menu->menuElements as $menuElement)
                     @php
                         $trans = $menuElement->menuElementTranslations()
@@ -99,7 +113,7 @@
                     @if($menuElement->link !== 'categories_dropdown')
                         <li>
                             <a href="{{ $menuElement->link ?? $menuElement->custom_link }}"
-                               class="flex items-center gap-x-1 my-2 py-4 px-2 text-base {{ Request::url() === ($menuElement->link ?? $menuElement->custom_link) ? 'text-white' : 'text-gray-900' }} rounded md:bg-transparent md:p-0 md:dark:text-blue-500"
+                               class="flex items-center gap-x-1 my-2 py-4 px-2 text-base {{ $path === ($menuElement->link ?? $menuElement->custom_link) ? 'text-blue-500' : 'text-white' }} rounded md:bg-transparent md:p-0 md:dark:text-blue-500 hover:text-blue-700"
                                aria-current="page">
                                 <x-dynamic-component :component="$menuElement->icon" class="h-5 w-5"/>
                                 {{ $trans->label }}
@@ -128,7 +142,7 @@
                                     <div>
                                         <button x-ref="button" x-on:click="toggle()" :aria-expanded="open"
                                                 :aria-controls="$id('dropdown-button')" type="button"
-                                                class="inline-flex py-2 text-gray-900 rounded hover:bg-transparent hover:text-blue-700 focus:outline-none"
+                                                class="inline-flex py-2 text-white rounded hover:bg-transparent hover:text-blue-700 focus:outline-none"
                                                 id="menu-button" aria-expanded="true" aria-haspopup="true">
                                             <x-fas-stream class="h-4 w-4 mt-1 mr-1"/>
                                             Explore
