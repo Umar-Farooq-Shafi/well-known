@@ -427,6 +427,13 @@
                 mousewheel: true,
                 keyboard: true,
             });
+
+            document.addEventListener('livewire:init', () => {
+                Livewire.on('refreshComponent', () => {
+                    window.location.reload();
+                });
+            });
         </script>
     @endpush
+
 </div>

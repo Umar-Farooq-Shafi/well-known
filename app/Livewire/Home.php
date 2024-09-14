@@ -20,11 +20,16 @@ class Home extends Component
     #[Url]
     public $category = '';
 
+    #[Url]
+    public $page = 1;
+
     public $perPage = 12;
 
     public function updateCountry($country)
     {
         $this->country = $country;
+
+        $this->dispatch('refreshComponent');
     }
 
     public function loadMore()
@@ -148,7 +153,7 @@ class Home extends Component
             ->where('completed', false)
             ->orderBy('created_at', 'desc')
             ->take($homepage_featured_events_nb)
-            ->paginate($this->perPage);
+            ->paginate($this->perPage, page:  $this->page);
 
         $countries = CountryTranslation::query()
             ->whereHas(
