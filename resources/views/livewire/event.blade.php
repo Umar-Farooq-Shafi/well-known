@@ -660,7 +660,7 @@
                                                                     <div class="flex gap-x-8">
                                                                         <div>
                                                                             <p class="border-t-0" style="width: 75%;">
-                                                                                {{ $ticket->name }} {{ $eventTicket->currency->ccy }}
+                                                                                {{ $ticket->name }} {{ $eventTicket->free ? 'Free' : $eventTicket->currency->ccy }}
                                                                             </p>
 
                                                                             <div class="font-semibold">
