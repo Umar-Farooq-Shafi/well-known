@@ -76,12 +76,12 @@
         @else
             <div class="flex items-center md:order-2 md:space-x-0 rtl:space-x-reverse">
                 <a href="{{ route('filament.admin.auth.login') }}"
-                   class="p-2 flex gap-x-2 items-center text-lg font-bold text-white hover:bg-gray-100">
+                   class="p-2 flex gap-x-2 items-center text-lg font-bold text-white hover:bg-gray-100 hover:text-blue-500">
                     <x-fas-arrow-right-to-bracket class="w-6 h-6" />
 
                     Login
                 </a>
-                <a href="{{ route('filament.admin.auth.register') }}" class="p-2 flex gap-x-2 items-center text-lg font-bold text-white hover:bg-gray-100">
+                <a href="{{ route('filament.admin.auth.register') }}" class="p-2 flex gap-x-2 items-center hover:text-blue-500 text-lg font-bold text-white hover:bg-gray-100">
                     <x-fas-user-plus class="w-6 h-6" />
 
                     Sign Up
