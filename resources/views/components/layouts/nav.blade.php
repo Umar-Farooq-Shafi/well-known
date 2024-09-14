@@ -25,7 +25,7 @@
     <div
         class="{{ auth()->check() ? 'max-w-screen-xl' : 'max-w-screen-2xl' }} flex flex-wrap items-center justify-between mx-auto p-4">
         <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="{{ $logo }}" class="h-12 w-12" alt="App Logo">
+            <img src="{{ $logo }}" class="h-12" alt="App Logo">
         </a>
 
         @if(auth()->check())
