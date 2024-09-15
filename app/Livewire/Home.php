@@ -29,7 +29,7 @@ class Home extends Component
     {
         $this->country = $country;
 
-        $this->dispatch('refreshComponent');
+        $this->redirect('?country=' . $country . '&category=' . $this->category);
     }
 
     public function loadMore()

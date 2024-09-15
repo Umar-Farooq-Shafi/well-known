@@ -1,4 +1,4 @@
-@php use Illuminate\Support\Facades\Storage; @endphp
+@php use Illuminate\Support\Facades\DB;use Illuminate\Support\Facades\Storage; @endphp
 
 @push('styles')
     <style>
@@ -7,7 +7,6 @@
             width: 24px;
             height: 24px;
             -webkit-appearance: none;
-            /* @apply w-6 h-6 appearance-none pointer-events-auto; */
         }
     </style>
 @endpush
@@ -306,7 +305,7 @@
                                         @if($event->eventDates?->first()?->online)
                                             {{ __('This is an online event') }}
                                         @elseif($venue = $event->eventDates?->first()?->venue)
-                                            {{ $venue->name }}: {{ $venue->state }} {{ $venue->city }}
+                                            {{ $venue->name }}: {{ $venue->city }}, {{ $venue->country->name }}
                                         @endif
                                     </p>
 
@@ -317,7 +316,8 @@
                                             {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }}
                                             ,
                                             Start {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a') }}
-                                            (Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }})
+                                            (Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }}
+                                            )
                                         @endif
                                     </p>
                                 </div>
@@ -327,6 +327,11 @@
                                         $ccy = $event->eventDates->first()->getCurrencyCode();
                                         $mixed = false;
                                         $lowest = $event->eventDates->first()?->getTotalTicketFees();
+                                        $isFree = DB::table('eventic_event_date_ticket')
+                                            ->whereIn('eventdate_id', $event->eventDates->pluck('id')->toArray())
+                                            ->where('free', true)
+                                            ->exists();
+                                        $isPartialFree = false;
 
                                         foreach ($event->eventDates as $ed) {
                                             if ($ccy !== $ed->getCurrencyCode()) {
@@ -336,10 +341,18 @@
                                             if ($ed->getTotalTicketFees() < $lowest) {
                                                 $lowest = $ed->getTotalTicketFees();
                                             }
+
+                                            if ($ed->free) {
+                                                $isPartialFree = true;
+                                            }
                                         }
                                     @endphp
                                     @if($mixed)
                                         <p class="text-nowrap font-bold">Mixed Currency</p>
+                                    @elseif($isFree)
+                                        <p class="text-nowrap font-bold">Free</p>
+                                    @elseif($isPartialFree)
+                                        <p class="text-nowrap font-bold">Free Options Available</p>
                                     @else
                                         <p class="text-nowrap">
                                             @if($ed = $event->eventDates->first()->getCurrencyCode())
