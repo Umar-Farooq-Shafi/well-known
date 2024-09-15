@@ -81,6 +81,7 @@ class EventDate extends Model
     protected $casts = [
         'startdate' => 'datetime',
         'enddate' => 'datetime',
+        'recurrent' => 'boolean',
         'recurrent_startdate' => 'datetime',
         'recurrent_enddate' => 'datetime',
     ];

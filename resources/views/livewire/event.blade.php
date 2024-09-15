@@ -79,18 +79,20 @@
                                                     $eventstartdate = $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i');
                                                 @endphp
                                             @endif
-                                            @if ($eventDate->enddate && $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->equalTo($eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])))
+
+                                            @if ($eventDate->enddate && !$eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->equalTo($eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])))
                                                 <div class="inline-block">
                                                     <div class="inline-block">
                                                         <span
-                                                            class="text-3xl">{{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}</span>
+                                                            class="text-5xl">{{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}</span>
                                                     </div>
                                                     <div class="inline-block">
                                                         <div><span
-                                                                class="text-xl">{{ ucfirst($eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
+                                                                class="text-sm">{{ ucfirst($eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
                                                         </div>
                                                         <div>
-                                                            <span>{{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
+                                                            <span
+                                                                class="text-sm">{{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="mb-2">
@@ -110,6 +112,7 @@
                                                         class="cursor-pointer bg-yellow-400 whitespace-nowrap rounded-md px-4 py-2 text-center text-sm font-medium tracking-wide text-white transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 active:opacity-100 active:outline-offset-0 dark:bg-sky-600 dark:text-white dark:focus-visible:outline-sky-600">
                                                     {{ __('Add to calendar') }}
                                                 </button>
+
                                                 <div x-cloak x-show="modalIsOpen" x-transition.opacity.duration.200ms
                                                      x-trap.inert.noscroll="modalIsOpen"
                                                      @keydown.esc.window="modalIsOpen = false"
@@ -144,36 +147,7 @@
                                                             </button>
                                                         </div>
 
-                                                        <div
-                                                            class="flex flex-col gap-y-2 px-4 justify-center items-center py-8">
-                                                            <div
-                                                                class="flex items-center gap-2 text-zinc-800 hover:bg-zinc-50 px-4 py-2 whitespace-nowrap">
-                                                                <x-fab-google class="h-4 w-4"/>
-
-                                                                Google Calendar
-                                                            </div>
-
-                                                            <div
-                                                                class="flex items-center gap-2 text-zinc-800 hover:bg-zinc-50 px-4 py-2 whitespace-nowrap">
-                                                                <x-fab-yahoo class="h-4 w-4"/>
-
-                                                                Yahoo Calendar
-                                                            </div>
-
-                                                            <div
-                                                                class="flex items-center gap-2 text-zinc-800 hover:bg-zinc-50 px-4 py-2 whitespace-nowrap">
-                                                                <x-fab-apple class="h-4 w-4"/>
-
-                                                                iCal Calendar
-                                                            </div>
-
-                                                            <div
-                                                                class="flex items-center gap-2 text-zinc-800 hover:bg-zinc-50 px-4 py-2 whitespace-nowrap">
-                                                                <x-fab-yahoo class="h-4 w-4"/>
-
-                                                                Outlook Calendar
-                                                            </div>
-                                                        </div>
+                                                        <livewire:add-to-calendar :event="$event"/>
 
                                                         <div
                                                             class="flex flex-col-reverse justify-between gap-2 border-t border-zinc-300 bg-zinc-100/60 p-4 dark:border-zinc-700 dark:bg-zinc-900/20 sm:flex-row sm:items-center md:justify-end">
@@ -541,10 +515,11 @@
                                                 <tbody>
                                                 @foreach ($eventDate->eventDateTickets as $ticket)
                                                     @if ($ticket->active)
-                                                        <tr class="bg-gray-200 my-0.5 px-1">
-                                                            <td class="border-t-0" style="width: 75%;">
+                                                        <tr class="bg-gray-200 flex w-full justify-between my-2 px-0.5">
+                                                            <td class="border-t-0">
                                                                 {{ $ticket->name }}
                                                             </td>
+
                                                             <td>
                                                                 @if($ticket->free)
                                                                     {{ 'Free' }}
@@ -552,20 +527,22 @@
                                                                     {{ $ticket->currency->ccy }}
                                                                 @endif
                                                             </td>
-                                                            <td class="border-t-0 text-right">
+
+                                                            <td class="border-t-0 text-left">
                                                                 @if (!$ticket->isOnSale())
                                                                     <span
                                                                         class="badge {{ $ticket->stringifyStatusClass() }}">{{ __($ticket->stringifyStatus()) }}</span>
                                                                 @else
+                                                                    {{ $ticket->free ? __('Free') :  $ticket->price }}
 
-                                                                    {{ $ticket->free ? __('Free') :  $ticket->currency->symbol }}
                                                                     @if ($ticket->promotionalprice && !$ticket->free)
                                                                         <del
                                                                             class="text-gray-500">
                                                                             @if($ticket->currency_symbol_position === 'left')
                                                                                 {{ $ticket->currency->symbol }}
                                                                             @endif
-                                                                            {{ $ticket->price }}
+
+                                                                            {{ $ticket->promotionalprice }}
                                                                             @if($ticket->currency_symbol_position === 'right')
                                                                                 {{ $ticket->currency->symbol }}
                                                                             @endif
@@ -613,12 +590,12 @@
                                                 <p>{{ $eventTranslation->name }}</p>
 
                                                 <p>
-                                                    [{{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
+                                                    {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
                                                     - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
                                                     ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
                                                     - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
                                                     )
-                                                    ]</p>
+                                                </p>
 
                                                 <p>Selected
                                                     Date: {{ $eventDatePick ? Carbon::make($eventDatePick)->format('F d Y - H:i A') : '' }}</p>
@@ -657,47 +634,59 @@
                                                         @foreach ($ed->eventDateTickets as $eventTicket)
                                                             @if ($eventTicket->active)
                                                                 <div class="p-1 flex justify-between">
-                                                                    <div class="flex gap-x-8">
-                                                                        <div>
-                                                                            <p class="border-t-0" style="width: 75%;">
-                                                                                {{ $ticket->name }} {{ $eventTicket->free ? 'Free' : $eventTicket->currency->ccy }}
-                                                                            </p>
+                                                                    <div class="flex flex-col gap-y-4 w-full">
+                                                                        <p class="border-t-0 flex gap-x-2"
+                                                                           style="width: 75%;">
+                                                                            {{ $ticket->name }}
 
-                                                                            <div class="font-semibold">
-                                                                                @if (!$eventTicket->isOnSale())
-                                                                                    <span
-                                                                                        class="badge {{ $eventTicket->stringifyStatusClass() }}">{{ __($eventTicket->stringifyStatus()) }}</span>
-                                                                                @elseif($eventTicket->free)
-                                                                                    {{ __('Free') }}
-                                                                                @else
-                                                                                    <p class="text-gray-500">
-                                                                                        @if($eventTicket->currency_symbol_position === 'left')
-                                                                                            {{ $eventTicket->currency->symbol }}
-                                                                                            :
-                                                                                        @endif
-                                                                                        {{ $eventTicket->price }}
-                                                                                        @if($eventTicket->currency_symbol_position === 'right')
-                                                                                            {{ $eventTicket->currency->symbol }}
-                                                                                        @endif
-                                                                                    </p>
-                                                                                @endif
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <p class="align-content-end">
-                                                                            @if($eventTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now()) && $eventTicket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now()))
-                                                                                {{ $eventTicket->promotionalprice }}
+                                                                            @if($ticket->description)
+                                                                                <x-fas-info
+                                                                                    x-tooltip.raw="{{ $ticket->description }}"
+                                                                                    class="h-5 w-5 bg-blue-500 p-1 rounded-full text-white"
+                                                                                />
                                                                             @endif
                                                                         </p>
+
+                                                                        <div class="font-semibold">
+                                                                            @if (!$eventTicket->isOnSale())
+                                                                                <span
+                                                                                    class="badge {{ $eventTicket->stringifyStatusClass() }}">{{ __($eventTicket->stringifyStatus()) }}</span>
+                                                                            @elseif($eventTicket->free)
+                                                                                {{ __('Free') }}
+                                                                            @else
+                                                                                <p class="text-gray-500">
+                                                                                    @if($eventTicket->currency_symbol_position === 'left')
+                                                                                        {{ $eventTicket->currency->symbol }}
+                                                                                        :
+                                                                                    @endif
+                                                                                    {{ $eventTicket->price }}
+                                                                                    @if($eventTicket->currency_symbol_position === 'right')
+                                                                                        {{ $eventTicket->currency->symbol }}
+                                                                                    @endif
+                                                                                </p>
+                                                                            @endif
+                                                                        </div>
+
+                                                                        @if($eventTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now()) && $eventTicket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now()))
+                                                                            <p class="align-content-end">
+                                                                                {{ $eventTicket->promotionalprice }}
+                                                                            </p>
+                                                                        @endif
                                                                     </div>
 
                                                                     <div class="w-20">
+                                                                        @php
+                                                                            $options = $eventTicket->ticketsperattendee
+                                                                                        ? range(0, $eventTicket->ticketsperattendee)
+                                                                                        : ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+                                                                        @endphp
+
                                                                         <x-native-select
                                                                             label="Quantity"
                                                                             placeholder=""
                                                                             wire:model.live="quantity.{{ $eventTicket->id }}"
                                                                             :disabled="$ccy !== null && $ccy !== $eventTicket->currency->ccy"
-                                                                            :options="['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']"
+                                                                            :options="$options"
                                                                         />
                                                                     </div>
                                                                 </div>

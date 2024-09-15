@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Coupon;
+use App\Models\EventDate;
 use App\Models\EventDateTicket;
 use App\Models\EventTranslation;
 use App\Models\Organizer;
@@ -28,6 +29,15 @@ class Event extends Component
     public function mount(string $slug)
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
+
+        $isRecurrent = EventDate::whereEventId($this->eventTranslation->translatable_id)
+            ->where('recurrent', true)
+            ->exists();
+
+        if (!$isRecurrent) {
+            $this->eventDatePick = EventDate::whereEventId($this->eventTranslation->translatable_id)
+                ->first()->startdate;
+        }
     }
 
     public function promoApply()

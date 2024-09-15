@@ -183,6 +183,14 @@ class Event extends Model implements Feedable
             ->first()?->name;
     }
 
+    public function getDescriptionAttribute()
+    {
+        return $this
+            ->eventTranslations()
+            ->where('locale', app()->getLocale())
+            ->first()?->description;
+    }
+
     public function getSlugAttribute()
     {
         return $this

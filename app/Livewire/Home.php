@@ -153,7 +153,7 @@ class Home extends Component
             ->where('completed', false)
             ->orderBy('created_at', 'desc')
             ->take($homepage_featured_events_nb)
-            ->paginate($this->perPage, page:  $this->page);
+            ->paginate($this->perPage);
 
         $countries = CountryTranslation::query()
             ->whereHas(

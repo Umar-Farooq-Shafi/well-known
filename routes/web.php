@@ -20,6 +20,12 @@ use App\Livewire\ToursAndAdventure;
 use App\Livewire\Venue;
 use App\Livewire\Venues;
 use App\Livewire\WorkshopTraining;
+use Eluceo\iCal\Domain\Entity\Event as IEvent;
+use Eluceo\iCal\Domain\Entity\Calendar;
+use Eluceo\iCal\Domain\ValueObject\Location;
+use Eluceo\iCal\Domain\ValueObject\Date;
+use Eluceo\iCal\Domain\ValueObject\SingleDay;
+use Eluceo\iCal\Presentation\Factory\CalendarFactory;
 use Illuminate\Support\Facades\Route;
 
 Route::feeds();
@@ -82,3 +88,35 @@ Route::get('/venue/{slug}', Venue::class)->name('venue');
 Route::middleware('auth')->group(function () {
     Route::get('/event/my-reviews/{slug}/add', AddReview::class)->name('add-review');
 });
+
+Route::get('/calendar.ics', function () {
+    $event = new IEvent();
+
+    $location = new Location(request('location'));
+
+    dd(request('start'));
+    dd(DateTimeImmutable::createFromFormat('Y-m-d', request('start')));
+
+    $event->setSummary(request('title'))
+        ->setDescription(request('description'))
+        ->setLocation($location)
+        ->setOccurrence(
+            new SingleDay(
+                new Date(
+                    DateTimeImmutable::createFromFormat('Y-m-d', request('start'))
+                )
+            )
+        );
+
+    $calendar = new Calendar([$event]);
+
+    $componentFactory = new CalendarFactory();
+    $calendarComponent = $componentFactory->createCalendar($calendar);
+
+    header('Content-Type: text/calendar; charset=utf-8');
+    header('Content-Disposition: attachment; filename="cal.ics"');
+
+    echo $calendarComponent;
+    exit;
+})->name('calendar.ics');
+

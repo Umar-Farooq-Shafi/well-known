@@ -287,6 +287,7 @@ class EventDateTicket extends Model
         $includeFees = false,
     ): float|int {
         $sum = 0;
+
         foreach ($this->orderElements as $orderElement) {
             if ($orderElement->order?->status === 1 &&
                 ($role == "all" || $orderElement->order?->user?->hasRole($role))
