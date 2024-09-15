@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\EventDate;
 use App\Models\EventTranslation;
+use App\Models\Setting;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
@@ -17,6 +18,8 @@ class Checkout extends Component
     public $eventDate;
 
     public $ccy;
+
+    public $eventDatePick;
 
     public $paymentGateways;
 
@@ -35,13 +38,19 @@ class Checkout extends Component
 
     public $paymentGateway;
 
-    public function mount(string $slug, string $eventDate, string $ccy): void
+    public $sessionTime;
+
+    public function mount(string $slug, string $eventDate, string $ccy, string $eventDatePick): void
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
 
         $this->eventDate = EventDate::findOrFail($eventDate);
 
         $this->ccy = $ccy;
+
+        $this->eventDatePick = $eventDatePick;
+
+        $this->sessionTime = Setting::query()->where('key', 'checkout_timeleft')->first()?->value;
 
         foreach ($this->eventDate->eventDateTickets as $eventDateTicket) {
             foreach ($eventDateTicket->paymentGateways as $paymentGateway) {
@@ -66,6 +75,11 @@ class Checkout extends Component
             $this->confirmEmail = auth()->user()->email;
             $this->phone = auth()->user()->phone;
         }
+    }
+
+    public function returnToCart()
+    {
+        $this->redirect(route('event', ['slug' => $this->eventTranslation->slug]));
     }
 
     public function placeOrder()

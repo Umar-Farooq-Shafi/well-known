@@ -37,7 +37,7 @@ Route::get('/', Home::class)->name('home');
 
 Route::get('/event/{slug}', Event::class)->name('event');
 
-Route::get('/event/{slug}/checkout/{eventDate}/{ccy}', Checkout::class)->name('event-checkout');
+Route::get('/event/{slug}/checkout/{eventDate}/{ccy}/{eventDatePick}', Checkout::class)->name('event-checkout');
 
 Route::get('/events/{category?}', Events::class)->name('events');
 
@@ -94,16 +94,13 @@ Route::get('/calendar.ics', function () {
 
     $location = new Location(request('location'));
 
-    dd(request('start'));
-    dd(DateTimeImmutable::createFromFormat('Y-m-d', request('start')));
-
     $event->setSummary(request('title'))
         ->setDescription(request('description'))
         ->setLocation($location)
         ->setOccurrence(
             new SingleDay(
                 new Date(
-                    DateTimeImmutable::createFromFormat('Y-m-d', request('start'))
+                    DateTimeImmutable::createFromFormat('Y-m-d', request('start') ?? now())
                 )
             )
         );

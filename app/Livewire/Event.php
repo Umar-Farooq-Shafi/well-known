@@ -90,7 +90,8 @@ class Event extends Component
                 'slug' => $this->eventTranslation->slug,
                 'eventDate' => $eventDate,
                 'quantity' => json_encode($this->quantity),
-                'ccy' => $this->ccy
+                'ccy' => $this->ccy,
+                'eventDatePick' => $this->eventDatePick,
             ]);
         }
     }
