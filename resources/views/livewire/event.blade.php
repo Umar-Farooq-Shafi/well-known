@@ -637,11 +637,11 @@
                                                                     <div class="flex flex-col gap-y-4 w-full">
                                                                         <p class="border-t-0 flex gap-x-2"
                                                                            style="width: 75%;">
-                                                                            {{ $ticket->name }}
+                                                                            {{ $eventTicket->name }}
 
-                                                                            @if($ticket->description)
+                                                                            @if($eventTicket->description)
                                                                                 <x-fas-info
-                                                                                    x-tooltip.raw="{{ $ticket->description }}"
+                                                                                    x-tooltip.raw="{{ $eventTicket->description }}"
                                                                                     class="h-5 w-5 bg-blue-500 p-1 rounded-full text-white"
                                                                                 />
                                                                             @endif
