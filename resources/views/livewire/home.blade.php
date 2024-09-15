@@ -204,6 +204,11 @@
                                                     $ccy = $event->eventDates->first()->getCurrencyCode();
                                                     $mixed = false;
                                                     $lowest = $event->eventDates->first()?->getTotalTicketFees();
+                                                    $isFree = DB::table('eventic_event_date_ticket')
+                                                        ->whereIn('eventdate_id', $event->eventDates->pluck('id')->toArray())
+                                                        ->where('free', true)
+                                                        ->exists();
+                                                    $isPartialFree = false;
 
                                                     foreach ($event->eventDates as $ed) {
                                                         if ($ccy !== $ed->getCurrencyCode()) {
@@ -213,10 +218,18 @@
                                                         if ($ed->getTotalTicketFees() < $lowest) {
                                                             $lowest = $ed->getTotalTicketFees();
                                                         }
+
+                                                        if ($ed->free) {
+                                                            $isPartialFree = true;
+                                                        }
                                                     }
                                                 @endphp
                                                 @if($mixed)
                                                     <p class="text-nowrap font-bold">Mixed Currency</p>
+                                                @elseif($isFree)
+                                                    <p class="text-nowrap font-bold">Free</p>
+                                                @elseif($isPartialFree)
+                                                    <p class="text-nowrap font-bold">Free Options Available</p>
                                                 @else
                                                     <p class="text-nowrap">
 
@@ -353,6 +366,11 @@
                                                 $ccy = $event->eventDates->first()->getCurrencyCode();
                                                 $mixed = false;
                                                 $lowest = $event->eventDates->first()?->getTotalTicketFees();
+                                                $isFree = DB::table('eventic_event_date_ticket')
+                                                    ->whereIn('eventdate_id', $event->eventDates->pluck('id')->toArray())
+                                                    ->where('free', true)
+                                                    ->exists();
+                                                $isPartialFree = false;
 
                                                 foreach ($event->eventDates as $ed) {
                                                     if ($ccy !== $ed->getCurrencyCode()) {
@@ -362,10 +380,18 @@
                                                     if ($ed->getTotalTicketFees() < $lowest) {
                                                         $lowest = $ed->getTotalTicketFees();
                                                     }
+
+                                                    if ($ed->free) {
+                                                        $isPartialFree = true;
+                                                    }
                                                 }
                                             @endphp
                                             @if($mixed)
                                                 <p class="text-nowrap font-bold">Mixed Currency</p>
+                                            @elseif($isFree)
+                                                <p class="text-nowrap font-bold">Free</p>
+                                            @elseif($isPartialFree)
+                                                <p class="text-nowrap font-bold">Free Options Available</p>
                                             @else
                                                 <p class="text-nowrap">
 
@@ -378,7 +404,8 @@
 
                                                     @if($countEventDates > 1)
                                                         @foreach($event->eventDates as $eventDate)
-                                                            <span class="font-bold">Lowest</span> {{ $eventDate->getCurrencyCode() }}{{ $lowest }}
+                                                            <span
+                                                                class="font-bold">Lowest</span> {{ $eventDate->getCurrencyCode() }}{{ $lowest }}
                                                         @endforeach
                                                     @endif
                                                 </p>
