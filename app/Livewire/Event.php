@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\CartElement;
 use App\Models\EventDate;
 use App\Models\EventDateTicket;
 use App\Models\EventTranslation;
@@ -111,13 +112,19 @@ class Event extends Component
                 'description' => 'Please select a ticket!',
             ]);
         } else {
-            $this->redirectRoute('event-checkout', [
-                'slug' => $this->eventTranslation->slug,
-                'eventDate' => $eventDate,
-                'quantity' => json_encode($this->quantity),
-                'ccy' => $this->ccy,
-                'eventDatePick' => $this->eventDatePick,
-            ]);
+            foreach ($this->quantity as $ticketId => $quantity) {
+                $ticket = EventDateTicket::find($ticketId);
+
+                CartElement::create([
+                    'user_id' => auth()->id(),
+                    'eventticket_id' => $ticketId,
+                    'quantity' => $quantity,
+                    'ticket_fee' => $ticket->ticket_fee,
+                    'chosen_event_date' => $this->eventDatePick,
+                ]);
+            }
+
+            $this->redirectRoute('event-checkout');
         }
     }
 

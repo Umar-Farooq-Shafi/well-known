@@ -400,4 +400,12 @@ class EventDateTicket extends Model
         );
     }
 
+    /**
+     * @return HasMany
+     */
+    public function cartElements(): HasMany
+    {
+        return $this->hasMany(CartElement::class, 'eventticket_id');
+    }
+
 }

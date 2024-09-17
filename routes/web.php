@@ -37,7 +37,7 @@ Route::get('/', Home::class)->name('home');
 
 Route::get('/event/{slug}', Event::class)->name('event');
 
-Route::get('/event/{slug}/checkout/{eventDate}/{ccy}/{eventDatePick}', Checkout::class)->name('event-checkout');
+Route::get('/event/{slug}/checkout', Checkout::class)->name('event-checkout');
 
 Route::get('/events/{category?}', Events::class)->name('events');
 

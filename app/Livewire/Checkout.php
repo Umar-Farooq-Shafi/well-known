@@ -2,10 +2,9 @@
 
 namespace App\Livewire;
 
-use App\Models\EventDate;
 use App\Models\EventTranslation;
 use App\Models\Setting;
-use Livewire\Attributes\Url;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
 
@@ -15,16 +14,11 @@ class Checkout extends Component
 
     public $eventTranslation;
 
-    public $eventDate;
-
-    public $ccy;
-
     public $eventDatePick;
 
     public $paymentGateways;
 
-    #[Url]
-    public $quantity;
+    public $tickets = [];
 
     public $firstName;
 
@@ -40,15 +34,23 @@ class Checkout extends Component
 
     public $sessionTime;
 
-    public function mount(string $slug, string $eventDate, string $ccy, string $eventDatePick): void
+    public function mount(string $slug): void
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
 
-        $this->eventDate = EventDate::findOrFail($eventDate);
+        foreach ($this->eventTranslation->event->eventDates as $eventDate) {
+            foreach ($eventDate->eventDateTickets as $ticket) {
+                foreach ($ticket->cartElements as $cartElement) {
+                    $this->eventDatePick = $cartElement->chosen_event_date;
 
-        $this->ccy = $ccy;
+                    $this->tickets[] = $ticket;
+                }
+            }
+        }
 
-        $this->eventDatePick = $eventDatePick;
+        if (count($this->tickets) === 0) {
+            abort(404);
+        }
 
         $this->sessionTime = Setting::query()->where('key', 'checkout_timeleft')->first()?->value;
 
@@ -150,9 +152,15 @@ class Checkout extends Component
         dd($this->paymentGateway);
     }
 
-    public function purchase($paymentMethod) {
-
+    #[On('clear-cart')]
+    public function clearCart(): void
+    {
+        foreach ($this->tickets as $ticket) {
+            $ticket->cartElements()->delete();
+        }
     }
+
+    public function purchase($paymentMethod) {}
 
     protected function updateDotEnv($key, $newValue, $delim = ''): void
     {

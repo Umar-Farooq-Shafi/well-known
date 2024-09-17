@@ -42,8 +42,7 @@
                             )
                         </p>
 
-                        <p>Selected
-                            Date: {{ $eventDatePick ? Carbon::make($eventDatePick)->format('F d Y - H:i A') : '' }}</p>
+                        <p>Selected Date: {{ $eventDatePick->format('F d Y - H:i A') }}</p>
                     </div>
 
                     <x-card title="Billing Information" class="mt-2">
@@ -250,6 +249,8 @@
                         init() {
                             setTimeout(() => {
                                 this.isExpired = true;
+
+                                Livewire.dispatch('clear-cart');
                             }, parseInt(@js($sessionTime)) * 1000);
                         }
                     };

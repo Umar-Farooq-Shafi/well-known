@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -45,11 +45,23 @@ class CartElement extends Model
         'chosen_event_date'
     ];
 
+    protected $casts = [
+        'chosen_event_date' => 'datetime'
+    ];
+
     /**
      * @return BelongsTo
      */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function eventDateTicket(): BelongsTo
+    {
+        return $this->belongsTo(EventDateTicket::class, 'eventticket_id');
     }
 }
