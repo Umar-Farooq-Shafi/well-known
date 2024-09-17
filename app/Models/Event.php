@@ -449,7 +449,7 @@ class Event extends Model implements Feedable
      */
     public function coupons(): BelongsToMany
     {
-        return $this->belongsToMany(Coupon::class);
+        return $this->belongsToMany(Coupon::class, 'event_coupon');
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\Coupon;
 use App\Models\EventDate;
 use App\Models\EventDateTicket;
 use App\Models\EventTranslation;
@@ -38,19 +37,45 @@ class Event extends Component
             $this->eventDatePick = EventDate::whereEventId($this->eventTranslation->translatable_id)
                 ->first()->startdate;
         }
+
+        $promotion = null;
+
+        foreach ($this->eventTranslation->event->promotions as $eventPromotion) {
+            $now = now()->timezone($eventPromotion->timezone);
+
+            if ($eventPromotion->start_date->greaterThanOrEqualTo($now) && $eventPromotion->end_date->lessThanOrEqualTo($now)) {
+                $promotion = $eventPromotion;
+            }
+        }
     }
 
     public function promoApply()
     {
+        if ($this->promoCode === null || $this->promoCode === '') {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => 'Promo code cannot be blank.',
+            ]);
+            return;
+        }
+
         $event = $this->eventTranslation->event;
 
-        $coupon = Coupon::query()->where('organizer_id', $event->organizer_id)
+        $coupon = $event->coupons()
             ->whereDate('expire_date', '>', now())
             ->first();
 
-        if ($coupon) {
-
+        if ($coupon && $coupon->code !== $this->promoCode) {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => 'Promo code is invalid.',
+            ]);
+            return;
         }
+
+
     }
 
     public function updatedQuantity($value, $key)

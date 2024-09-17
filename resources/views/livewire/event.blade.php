@@ -13,14 +13,7 @@
     $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country);
 @endphp
 
-<div class="mt-40">
-    <div
-        class="flex flex-col gap-y-1 md:flex-row justify-between bg-gray-300 px-4 py-2 md:rounded md:mx-16 lg:mx-32 my-4">
-        <div class="font-bold text-xl">{{ $eventTranslation->name }}</div>
-
-        <x-breadcrumbs/>
-    </div>
-
+<div class="mt-36">
     <div class="w-full">
         <img src="{{ Storage::url('events/' . $event->image_name) }}" alt="Canyon Swing"
              loading="lazy"
@@ -533,20 +526,35 @@
                                                                     <span
                                                                         class="badge {{ $ticket->stringifyStatusClass() }}">{{ __($ticket->stringifyStatus()) }}</span>
                                                                 @else
-                                                                    {{ $ticket->free ? __('Free') :  $ticket->price }}
+                                                                    @if($ticket->free)
+                                                                        <span>Free</span>
+                                                                    @elseif($ticket->promotionalprice)
+                                                                        @php
+                                                                            $isStartDate = $ticket->salesstartdate?->greaterThanOrEqualTo(now());
+                                                                            $isEndDate = $ticket->salesenddate?->lessThanOrEqualTo(now());
+                                                                        @endphp
 
-                                                                    @if ($ticket->promotionalprice && !$ticket->free)
-                                                                        <del
-                                                                            class="text-gray-500">
-                                                                            @if($ticket->currency_symbol_position === 'left')
-                                                                                {{ $ticket->currency->symbol }}
-                                                                            @endif
+                                                                        @if($isStartDate && $isEndDate)
+                                                                            <del class="text-gray-500">
+                                                                                {{ $ticket->price }}
+                                                                            </del>
 
-                                                                            {{ $ticket->promotionalprice }}
-                                                                            @if($ticket->currency_symbol_position === 'right')
-                                                                                {{ $ticket->currency->symbol }}
-                                                                            @endif
-                                                                        </del>
+                                                                            <span>
+                                                                                @if($ticket->currency_symbol_position === 'left')
+                                                                                    {{ $ticket->currency->symbol }}
+                                                                                @endif
+                                                                                {{ $ticket->price - $ticket->promotionalprice }}
+                                                                                @if($ticket->currency_symbol_position === 'right')
+                                                                                    {{ $ticket->currency->symbol }}
+                                                                                @endif
+                                                                            </span>
+                                                                        @else
+                                                                            <span>
+                                                                                {{ $ticket->price }}
+                                                                            </span>
+                                                                        @endif
+                                                                    @else
+                                                                        <span>{{ $ticket->price }}</span>
                                                                     @endif
                                                                 @endif
                                                             </td>
@@ -587,8 +595,6 @@
                                     <div class="grid grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-4">
                                         <div class="md:col-span-2 lg:col-span-5">
                                             <div class="flex flex-col gap-y-1 font-medium text-base">
-                                                <p>{{ $eventTranslation->name }}</p>
-
                                                 <p>
                                                     {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
                                                     - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
@@ -597,8 +603,15 @@
                                                     )
                                                 </p>
 
-                                                <p>Selected
-                                                    Date: {{ $eventDatePick ? Carbon::make($eventDatePick)->format('F d Y - H:i A') : '' }}</p>
+                                                <p>
+                                                    Selected Date:
+                                                    @if($eventDatePick)
+                                                        {{  Carbon::make($eventDatePick)->format('F d Y') }}
+                                                        ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
+                                                        - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
+                                                        )
+                                                    @endif
+                                                </p>
                                             </div>
 
                                             <div class="px-8 py-4">
@@ -608,19 +621,12 @@
                                                     placeholder="Promo Code"
                                                 >
                                                     <x-slot name="append">
-                                                        <x-heroicon-o-arrow-path
-                                                            class="animate-spin h-5 mt-8 w-5 text-blue-500"
-                                                            wire:loading
-                                                            wire:target="promoApply"
-                                                        />
-
                                                         <x-button
                                                             class="h-full"
                                                             label="Apply"
                                                             rounded="rounded-r-md"
                                                             primary
-                                                            wire:loading.remove
-                                                            wire:target="promoApply"
+                                                            spinner="promoApply"
                                                             wire:click="promoApply"
                                                             flat
                                                         />
@@ -633,7 +639,9 @@
                                                     @if ($ed->isOnSale())
                                                         @foreach ($ed->eventDateTickets as $eventTicket)
                                                             @if ($eventTicket->active)
-                                                                <div class="p-1 flex justify-between">
+                                                                <div
+                                                                    class="p-1 flex justify-between {{ $ccy !== null && $ccy !== $eventTicket->currency->ccy ? 'bg-gray-50' : '' }}"
+                                                                >
                                                                     <div class="flex flex-col gap-y-4 w-full">
                                                                         <p class="border-t-0 flex gap-x-2"
                                                                            style="width: 75%;">
@@ -656,7 +664,7 @@
                                                                             @else
                                                                                 <p class="text-gray-500">
                                                                                     @if($eventTicket->currency_symbol_position === 'left')
-                                                                                        {{ $eventTicket->currency->symbol }}
+                                                                                        {{ $eventTicket->currency->ccy }}
                                                                                         :
                                                                                     @endif
                                                                                     {{ $eventTicket->price }}
@@ -728,7 +736,7 @@
                                                                         {{ $eventDateTicket->currency->ccy }}
                                                                     @endif
                                                                     {{ $eventDateTicket->price * $value }}
-                                                                    @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                    @if($eventDateTicket->currency_symbol_position === 'right')
                                                                         {{ $eventDateTicket->currency->ccy }}
                                                                     @endif
                                                                 </p>
@@ -746,8 +754,9 @@
                                                                 @if($eventDateTicket->currency_symbol_position === 'left')
                                                                     {{ $ccy }}
                                                                 @endif
+                                                                {{ $subtotal }}
                                                                 @if($eventDateTicket->currency_symbol_position === 'right')
-                                                                    {{ $subtotal }}
+                                                                    {{ $ccy }}
                                                                 @endif
                                                             </p>
                                                         </div>

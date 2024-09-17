@@ -173,32 +173,7 @@
                                             {{ $event->eventTranslations->first()?->name }}
                                         </p>
 
-                                        <div class="flex justify-between  items-center mb-2 mx-2">
-                                            <div class="flex flex-col gap-y-2">
-                                                <p class="ml-2 flex items-center gap-x-1">
-                                                    <x-fas-location-dot class="w-5 h-5 text-red-500"/>
-
-                                                    @if($event->eventDates?->first()?->online)
-                                                        {{ __('This is an online event') }}
-                                                    @elseif($venue = $event->eventDates?->first()?->venue)
-                                                        {{ $venue->name }}: {{ $venue->city }}
-                                                        , {{ $venue->country->name }}
-                                                    @endif
-                                                </p>
-
-                                                <p class="ml-2 flex items-center gap-x-1">
-                                                    <x-fas-clock class="w-4 h-4 text-red-500"/>
-
-                                                    @if($eventDate = $event->eventDates?->first())
-                                                        {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }}
-                                                        ,
-                                                        Start {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a') }}
-                                                        (Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }}
-                                                        )
-                                                    @endif
-                                                </p>
-                                            </div>
-
+                                        <div class="px-4">
                                             @if($countEventDates = count($event->eventDates))
                                                 @php
                                                     $ccy = $event->eventDates->first()->getCurrencyCode();
@@ -224,33 +199,69 @@
                                                         }
                                                     }
                                                 @endphp
-                                                @if($mixed)
-                                                    <p class="text-nowrap font-bold">Mixed Currency</p>
-                                                @elseif($isFree)
-                                                    <p class="text-nowrap font-bold">Free</p>
-                                                @elseif($isPartialFree)
-                                                    <p class="text-nowrap font-bold">Free Options Available</p>
-                                                @else
-                                                    <p class="text-nowrap">
 
-                                                        @if($ed = $event->eventDates->first()->getCurrencyCode())
-                                                            @if($countEventDates > 1)
-                                                                <span class="font-bold">From</span>
+                                                <div class="mb-1 text-sm">
+                                                    @if($mixed)
+                                                        <p class="text-nowrap font-bold">Mixed Currency</p>
+                                                    @elseif($isFree)
+                                                        <p class="text-nowrap font-bold">Free</p>
+                                                    @elseif($isPartialFree)
+                                                        <p class="text-nowrap font-bold">Free Options Available</p>
+                                                    @else
+                                                        <p class="text-nowrap">
+
+                                                            @if($ed = $event->eventDates->first()->getCurrencyCode())
+                                                                @if($countEventDates > 1)
+                                                                    <span class="font-bold">From</span>
+                                                                @endif
+                                                                {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
                                                             @endif
-                                                            {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
-                                                        @endif
 
-                                                        @if($countEventDates > 1)
-                                                            @foreach($event->eventDates as $eventDate)
-                                                                <span
-                                                                    class="font-bold">Lowest</span> {{ $eventDate->getCurrencyCode() }}{{ $lowest }}
-                                                            @endforeach
-                                                        @endif
-                                                    </p>
-                                                @endif
+                                                            @if($countEventDates > 1)
+                                                                @foreach($event->eventDates as $eventDate)
+                                                                    <span
+                                                                        class="font-bold">Lowest</span> {{ $eventDate->getCurrencyCode() }}{{ $lowest }}
+                                                                @endforeach
+                                                            @endif
+                                                        </p>
+                                                    @endif
+                                                </div>
                                             @endif
-                                        </div>
 
+                                            <div class="flex flex-col gap-y-2">
+                                                <div class="flex items-center gap-x-1">
+                                                    <x-fas-location-dot class="w-5 h-5 text-red-500"/>
+
+                                                    @if($event->eventDates?->first()?->online)
+                                                        <p>{{ __('This is an online event') }}</p>
+                                                    @elseif($venue = $event->eventDates?->first()?->venue)
+                                                        <div class="flex flex-col gap-y-0.5">
+                                                            <p class="truncate">{{ $venue->name }}</p>
+                                                            <p class="truncate">{{ $venue->city }}
+                                                                , {{ $venue->country->name }}</p>
+                                                        </div>
+                                                    @endif
+                                                </div>
+
+                                                <div class="flex items-center gap-x-2">
+                                                    <x-fas-clock class="w-4 h-4 text-red-500"/>
+
+                                                    @if($eventDate = $event->eventDates?->first())
+                                                        <div class="flex flex-col gap-y-0.5">
+                                                            <p class="truncate">
+                                                                {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }}
+                                                                ,
+                                                                Start {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a') }}
+                                                            </p>
+
+                                                            <p class="truncate">
+                                                                Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }}
+                                                            </p>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
                                     </a>
                                 </div>
                             </div>
@@ -336,31 +347,7 @@
                                         {{ $event->eventTranslations->first()?->name }}
                                     </p>
 
-                                    <div class="flex justify-between  items-center mb-2 mx-2">
-                                        <div class="flex flex-col gap-y-2">
-                                            <p class="ml-2 flex items-center gap-x-1">
-                                                <x-fas-location-dot class="w-5 h-5 text-red-500"/>
-
-                                                @if($event->eventDates?->first()?->online)
-                                                    {{ __('This is an online event') }}
-                                                @elseif($venue = $event->eventDates?->first()?->venue)
-                                                    {{ $venue->name }}: {{ $venue->city }}, {{ $venue->country->name }}
-                                                @endif
-                                            </p>
-
-                                            <p class="ml-2 flex items-center gap-x-1">
-                                                <x-fas-clock class="w-4 h-4 text-red-500"/>
-
-                                                @if($eventDate = $event->eventDates?->first())
-                                                    {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }}
-                                                    ,
-                                                    Start {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a') }}
-                                                    (Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }}
-                                                    )
-                                                @endif
-                                            </p>
-                                        </div>
-
+                                    <div class="px-4">
                                         @if($countEventDates = count($event->eventDates))
                                             @php
                                                 $ccy = $event->eventDates->first()->getCurrencyCode();
@@ -386,31 +373,68 @@
                                                     }
                                                 }
                                             @endphp
-                                            @if($mixed)
-                                                <p class="text-nowrap font-bold">Mixed Currency</p>
-                                            @elseif($isFree)
-                                                <p class="text-nowrap font-bold">Free</p>
-                                            @elseif($isPartialFree)
-                                                <p class="text-nowrap font-bold">Free Options Available</p>
-                                            @else
-                                                <p class="text-nowrap">
 
-                                                    @if($ed = $event->eventDates->first()->getCurrencyCode())
-                                                        @if($countEventDates > 1)
-                                                            <span class="font-bold">From</span>
+                                            <div class="mb-1 text-sm">
+                                                @if($mixed)
+                                                    <p class="text-nowrap font-bold">Mixed Currency</p>
+                                                @elseif($isFree)
+                                                    <p class="text-nowrap font-bold">Free</p>
+                                                @elseif($isPartialFree)
+                                                    <p class="text-nowrap font-bold">Free Options Available</p>
+                                                @else
+                                                    <p class="text-nowrap">
+
+                                                        @if($ed = $event->eventDates->first()->getCurrencyCode())
+                                                            @if($countEventDates > 1)
+                                                                <span class="font-bold">From</span>
+                                                            @endif
+                                                            {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
                                                         @endif
-                                                        {{ $eventDate->getCurrencyCode() }}{{ $eventDate->getTotalTicketFees() }}
-                                                    @endif
 
-                                                    @if($countEventDates > 1)
-                                                        @foreach($event->eventDates as $eventDate)
-                                                            <span
-                                                                class="font-bold">Lowest</span> {{ $eventDate->getCurrencyCode() }}{{ $lowest }}
-                                                        @endforeach
-                                                    @endif
-                                                </p>
-                                            @endif
+                                                        @if($countEventDates > 1)
+                                                            @foreach($event->eventDates as $eventDate)
+                                                                <span
+                                                                    class="font-bold">Lowest</span> {{ $eventDate->getCurrencyCode() }}{{ $lowest }}
+                                                            @endforeach
+                                                        @endif
+                                                    </p>
+                                                @endif
+                                            </div>
                                         @endif
+
+                                        <div class="flex flex-col gap-y-2">
+                                            <div class="flex items-center gap-x-1">
+                                                <x-fas-location-dot class="w-5 h-5 text-red-500"/>
+
+                                                @if($event->eventDates?->first()?->online)
+                                                    <p>{{ __('This is an online event') }}</p>
+                                                @elseif($venue = $event->eventDates?->first()?->venue)
+                                                    <div class="flex flex-col gap-y-0.5">
+                                                        <p class="truncate">{{ $venue->name }}</p>
+                                                        <p class="truncate">{{ $venue->city }}
+                                                            , {{ $venue->country->name }}</p>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <div class="flex items-center gap-x-2">
+                                                <x-fas-clock class="w-4 h-4 text-red-500"/>
+
+                                                @if($eventDate = $event->eventDates?->first())
+                                                    <div class="flex flex-col gap-y-0.5">
+                                                        <p class="truncate">
+                                                            {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }}
+                                                            ,
+                                                            Start {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a') }}
+                                                        </p>
+
+                                                        <p class="truncate">
+                                                            Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }}
+                                                        </p>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
 
                                 </a>
