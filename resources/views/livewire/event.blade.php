@@ -530,8 +530,8 @@
                                                                         <span>Free</span>
                                                                     @elseif($ticket->promotionalprice)
                                                                         @php
-                                                                            $isStartDate = $ticket->salesstartdate?->greaterThanOrEqualTo(now());
-                                                                            $isEndDate = $ticket->salesenddate?->lessThanOrEqualTo(now());
+                                                                            $isStartDate = $ticket->salesstartdate?->lessThanOrEqualTo(now());
+                                                                            $isEndDate = $ticket->salesenddate?->greaterThanOrEqualTo(now());
                                                                         @endphp
 
                                                                         @if($isStartDate && $isEndDate)
