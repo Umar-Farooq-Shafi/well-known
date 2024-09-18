@@ -116,7 +116,9 @@
                         @php
                             $country = $event->country;
 
-                            if ($country) {
+                            if ($event->eventtimezone) {
+                                $timezone[] = $event->eventtimezone;
+                            } else if ($country) {
                                 $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
                             } else {
                                 $timezone[] = 'UTC';
@@ -255,7 +257,7 @@
                                                             </p>
 
                                                             <p class="truncate">
-                                                                Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }}
+                                                                Timezone: {{ $event->eventtimezone ?? $timezone[0] }}
                                                             </p>
                                                         </div>
                                                     @endif

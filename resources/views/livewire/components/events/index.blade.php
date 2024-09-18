@@ -227,7 +227,9 @@
                     @php
                         $country = $event->country;
 
-                        if ($country) {
+                        if ($event->eventtimezone) {
+                            $timezone[] = $event->eventtimezone;
+                        } else if ($country) {
                             $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
                         } else {
                             $timezone[] = 'UTC';
@@ -316,8 +318,7 @@
                                             {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }}
                                             ,
                                             Start {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a') }}
-                                            (Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }}
-                                            )
+                                            (Timezone: {{ $event->eventtimezone ?? $timezone[0] }})
                                         @endif
                                     </p>
                                 </div>

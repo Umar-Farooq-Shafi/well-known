@@ -12,6 +12,16 @@
                     $trans = $sliderContent->eventTranslations()
                         ->where('locale', app()->getLocale())
                         ->first();
+
+                    $country = $sliderContent->country;
+
+                    if ($sliderContent->eventtimezone) {
+                        $timezone[] = $sliderContent->eventtimezone;
+                    } else if ($country) {
+                        $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country->code);
+                    } else {
+                        $timezone[] = 'UTC';
+                    }
                 @endphp
 
                 <div class="swiper-slide relative">
@@ -28,21 +38,31 @@
                             <p class="text-lg mb-4 flex items-center text-center gap-x-2">
                                 <x-fas-map-marker-alt class="w-4 h-4"/>
 
-                                @if($saleEvent?->venue)
-                                    {{ $saleEvent?->venue?->name }} {{ $saleEvent?->venue?->stringifyAddress }}
-                                @else
-                                    <span>Online</span>
+                                @if($saleEvent->eventDates?->first()?->online)
+                                    {{ __('This is an online event') }}
+                                @elseif($venue = $saleEvent->eventDates?->first()?->venue)
+                                    <div class="flex flex-col gap-y-0.5">
+                                        <p class="truncate">{{ $venue->name }}</p>
+                                        <p class="truncate">{{ $venue->city }}
+                                            , {{ $venue->country->name }}</p>
+                                    </div>
                                 @endif
+
                             </p>
                             <p class="text-lg mb-8 flex items-center text-center gap-x-2">
                                 <x-fas-clock class="w-4 h-4"/>
 
                                 @if($saleEvent?->startdate)
-                                    <span>{{ $saleEvent->startdate }}</span>
+                                    <span>
+                                        {{ $saleEvent->startdate->timezone($timezone[0])->format('l') }}
+                                        ,
+                                        Start {{ $saleEvent->startdate->timezone($timezone[0])->format('g:i a') }}
+                                    </span>
                                 @endif
                             </p>
 
-                            <a href="{{ route('event', ['slug' => $trans->slug]) }}" class="bg-white text-gray-800 py-2 px-4 rounded-full flex items-center gap-x-2">
+                            <a href="{{ route('event', ['slug' => $trans->slug]) }}"
+                               class="bg-white text-gray-800 py-2 px-4 rounded-full flex items-center gap-x-2">
                                 <x-fas-ticket-alt class="w-4 h-4"/>
 
                                 BUY TICKETS
