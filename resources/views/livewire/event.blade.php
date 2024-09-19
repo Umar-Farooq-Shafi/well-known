@@ -754,6 +754,13 @@
                                                                     }
                                                                 }
 
+                                                                if (array_key_exists($quantity, $this->promotions)) {
+                                                                    $discountPercentage = $this->promotions[$quantity];
+                                                                    $discountAmount = ($price * $discountPercentage) / 100;
+                                                                    $price = $price - $discountAmount;
+                                                                }
+
+
                                                                 $subtotal += $price * $value;
                                                                 $fee += $eventDateTicket->ticket_fee * $value;
                                                             @endphp

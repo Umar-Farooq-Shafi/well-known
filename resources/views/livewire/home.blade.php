@@ -1,4 +1,4 @@
-@php use Illuminate\Support\Facades\Storage; @endphp
+@php use Illuminate\Support\Facades\DB;use Illuminate\Support\Facades\Storage; @endphp
 
 <div>
     <livewire:side-panel/>
@@ -128,7 +128,7 @@
                         @if($event->eventTranslations->first())
                             <div class="inline-block px-3 swiper-slide">
                                 <div
-                                    class="relative overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
+                                    class="relative h-96 overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
                                 >
                                     <a
                                         class="flex flex-col justify-between h-full"
@@ -283,7 +283,7 @@
 
         <div class="m-4">
             <div class="flex justify-center">
-                <h1 class="font-semibold text-2xl">Featured Events</h1>
+                <h1 class="font-semibold mt-2 text-2xl">Featured Events</h1>
             </div>
 
             @if(count($featuredEvents))
@@ -431,7 +431,7 @@
                                                         </p>
 
                                                         <p class="truncate">
-                                                            Timezone: {{ \Carbon\Carbon::now()->timezone($event->eventtimezone ?? $timezone[0])->format('T') }}
+                                                            Timezone: {{ $event->eventtimezone ?? $timezone[0] }}
                                                         </p>
                                                     </div>
                                                 @endif

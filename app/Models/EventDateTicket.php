@@ -289,8 +289,8 @@ class EventDateTicket extends Model
         $sum = 0;
 
         foreach ($this->orderElements as $orderElement) {
-            if ($orderElement->order?->status === 1 &&
-                ($role == "all" || $orderElement->order?->user?->hasRole($role))
+            // $orderElement->order?->status === 1
+            if (($role == "all" || $orderElement->order?->user?->hasRole($role))
                 && ($user == "all" || $orderElement->order?->user == $user)) {
                 $sum += $orderElement->getPrice($formattedForPayoutApproval);
             }
@@ -315,8 +315,8 @@ class EventDateTicket extends Model
         $sum = 0;
 
         foreach ($this->orderElements as $orderElement) {
-            if ($orderElement->order?->status === 1
-                && ($role == "all" || $orderElement->order?->user?->hasRole($role))
+            // $orderElement->order?->status === 1
+            if (($role == "all" || $orderElement->order?->user?->hasRole($role))
                 && ($user == "all" || $orderElement->order?->user == $user) && !$this->free) {
                 $sum += $orderElement->order->ticket_fee * $orderElement->quantity;
             }

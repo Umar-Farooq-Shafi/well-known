@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Jobs\EmptyCard;
 use App\Models\EventTranslation;
 use App\Models\Setting;
 use Livewire\Attributes\On;
@@ -54,18 +55,22 @@ class Checkout extends Component
 
         $this->sessionTime = Setting::query()->where('key', 'checkout_timeleft')->first()?->value;
 
-        foreach ($this->eventDate->eventDateTickets as $eventDateTicket) {
-            foreach ($eventDateTicket->paymentGateways as $paymentGateway) {
-                $found = false;
+        EmptyCard::dispatch($this->tickets)->delay(now()->addSeconds($this->sessionTime));
 
-                foreach ($this->paymentGateways ?? [] as $gt) {
-                    if ($gt->id == $paymentGateway->id) {
-                        $found = true;
+        foreach ($this->eventTranslation->event->eventDates as $eventDate) {
+            foreach ($eventDate->eventDateTickets as $eventDateTicket) {
+                foreach ($eventDateTicket->paymentGateways as $paymentGateway) {
+                    $found = false;
+
+                    foreach ($this->paymentGateways ?? [] as $gt) {
+                        if ($gt->id == $paymentGateway->id) {
+                            $found = true;
+                        }
                     }
-                }
 
-                if (!$found) {
-                    $this->paymentGateways[] = $paymentGateway;
+                    if (!$found) {
+                        $this->paymentGateways[] = $paymentGateway;
+                    }
                 }
             }
         }

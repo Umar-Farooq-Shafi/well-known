@@ -20,6 +20,8 @@ class Event extends Component
 
     public $quantity = [];
 
+    public $promotions = [];
+
     public $ccy;
 
     public $promoCode;
@@ -44,10 +46,12 @@ class Event extends Component
         foreach ($this->eventTranslation->event->promotions as $eventPromotion) {
             $now = now()->timezone($eventPromotion->timezone);
 
-            if ($eventPromotion->start_date->greaterThanOrEqualTo($now) && $eventPromotion->end_date->lessThanOrEqualTo($now)) {
+            if ($eventPromotion->start_date->lessThanOrEqualTo($now) && $eventPromotion->end_date->greaterThanOrEqualTo($now)) {
                 $promotion = $eventPromotion;
             }
         }
+
+        $this->promotions = $promotion->promotionQuantities->pluck('discount', 'quantity')->toArray();
     }
 
     public function promoApply()
@@ -124,7 +128,7 @@ class Event extends Component
                 ]);
             }
 
-            $this->redirectRoute('event-checkout');
+            $this->redirectRoute('event-checkout', ['slug' => $this->eventTranslation->slug]);
         }
     }
 
