@@ -316,9 +316,9 @@ class EventDateTicket extends Model
 
         foreach ($this->orderElements as $orderElement) {
             // $orderElement->order?->status === 1
-            if (($role == "all" || $orderElement->order?->user?->hasRole($role))
+            if ($orderElement->order?->ticket_fee && ($role == "all" || $orderElement->order?->user?->hasRole($role))
                 && ($user == "all" || $orderElement->order?->user == $user) && !$this->free) {
-                $sum += $orderElement->order->ticket_fee * $orderElement->quantity;
+                    $sum += $orderElement->order->ticket_fee * $orderElement->quantity;
             }
         }
 
