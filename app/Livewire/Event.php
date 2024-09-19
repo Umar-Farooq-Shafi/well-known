@@ -26,6 +26,10 @@ class Event extends Component
 
     public $promoCode;
 
+    public $couponType;
+
+    public $couponDiscount;
+
     public ?EventTranslation $eventTranslation = null;
 
     public function mount(string $slug)
@@ -51,7 +55,7 @@ class Event extends Component
             }
         }
 
-        $this->promotions = $promotion->promotionQuantities->pluck('discount', 'quantity')->toArray();
+        $this->promotions = $promotion?->promotionQuantities?->pluck('discount', 'quantity')?->toArray() ?? [];
     }
 
     public function promoApply()
@@ -71,7 +75,7 @@ class Event extends Component
             ->whereDate('expire_date', '>', now())
             ->first();
 
-        if ($coupon && $coupon->code !== $this->promoCode) {
+        if (!$coupon || $coupon->code !== $this->promoCode) {
             $this->notification()->send([
                 'icon' => 'error',
                 'title' => 'Error',
@@ -80,7 +84,8 @@ class Event extends Component
             return;
         }
 
-
+        $this->couponType = $coupon->type;
+        $this->couponDiscount = $coupon->discount;
     }
 
     public function updatedQuantity($value, $key)

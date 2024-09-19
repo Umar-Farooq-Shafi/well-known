@@ -639,7 +639,8 @@
                                                     @if ($ed->isOnSale())
                                                         @foreach ($ed->eventDateTickets as $eventTicket)
                                                             @if ($eventTicket->active)
-                                                                <x-card class="{{ $ccy !== null && $ccy !== $eventTicket->currency->ccy ? '!bg-gray-50' : '' }}">
+                                                                <x-card
+                                                                    class="{{ $ccy !== null && $ccy !== $eventTicket->currency->ccy ? '!bg-gray-50' : '' }}">
                                                                     <div
                                                                         class="p-1 flex justify-between"
                                                                     >
@@ -754,15 +755,27 @@
                                                                     }
                                                                 }
 
-                                                                if (array_key_exists($quantity, $this->promotions)) {
-                                                                    $discountPercentage = $this->promotions[$quantity];
+                                                                if (array_key_exists($value, $this->promotions)) {
+                                                                    $discountPercentage = $this->promotions[$value];
                                                                     $discountAmount = ($price * $discountPercentage) / 100;
-                                                                    $price = $price - $discountAmount;
+                                                                    $price -= $discountAmount;
                                                                 }
-
 
                                                                 $subtotal += $price * $value;
                                                                 $fee += $eventDateTicket->ticket_fee * $value;
+
+                                                                if ($this->couponType === 'percentage') {
+                                                                     $discount = ($subtotal * $this->couponDiscount) / 100;
+                                                                     $subtotal -= $discount;
+                                                                }
+
+                                                                if ($this->couponType === 'fixed_amount') {
+                                                                    $subtotal -= $this->couponDiscount;
+                                                                }
+
+                                                                if ($subtotal < 0) {
+                                                                    $subtotal = 0;
+                                                                }
                                                             @endphp
 
                                                             <div class="flex justify-between items-center m-2">
