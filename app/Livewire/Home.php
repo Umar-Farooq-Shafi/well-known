@@ -121,17 +121,6 @@ class Home extends Component
                     );
                 }
             )
-            ->when(
-                $this->category && $this->category !== '',
-                function (Builder $query) {
-                    $query->whereHas(
-                        'category.categoryTranslations',
-                        function (Builder $query) {
-                            $query->where('name', 'LIKE', '%' . $this->category . '%');
-                        }
-                    );
-                }
-            )
             ->where('completed', false)
             ->orderBy('created_at', 'desc')
             ->take(20)
