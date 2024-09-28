@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -104,6 +104,8 @@ use Illuminate\Support\Facades\Storage;
  * @property-read int|null $followings_count
  * @property-read mixed $image
  * @property-read \App\Models\Country|null $country
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Payment> $paymentGateways
+ * @property-read int|null $payment_gateways_count
  * @mixin \Eloquent
  */
 class Organizer extends Model
@@ -234,6 +236,14 @@ class Organizer extends Model
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function paymentGateways(): HasMany
+    {
+        return $this->hasMany(PaymentGateway::class);
     }
 
 }

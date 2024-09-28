@@ -87,6 +87,13 @@ class Event extends Component
 
         $this->couponType = $coupon->type;
         $this->couponDiscount = $coupon->discount;
+
+        $this->reset('promoCode');
+
+        $this->notification()->send([
+            'icon' => 'success',
+            'title' => 'Coupon applied',
+        ]);
     }
 
     public function updatedQuantity($value, $key)
@@ -134,6 +141,8 @@ class Event extends Component
                     'chosen_event_date' => $this->eventDatePick,
                 ]);
             }
+
+            $this->reset('eventDatePick', 'quantity');
 
             $this->redirectRoute('event-checkout', ['slug' => $this->eventTranslation->slug]);
         }

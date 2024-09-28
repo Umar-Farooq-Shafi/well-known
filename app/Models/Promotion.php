@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int $quantity
@@ -37,6 +37,11 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Promotion whereEndDate($value)
  * @method static Builder|Promotion whereName($value)
  * @method static Builder|Promotion whereStartDate($value)
+ * @property int|null $organizer_id
+ * @property string $timezone
+ * @property-read \App\Models\Organizer|null $organizer
+ * @method static Builder|Promotion whereOrganizerId($value)
+ * @method static Builder|Promotion whereTimezone($value)
  * @mixin \Eloquent
  */
 class Promotion extends Model

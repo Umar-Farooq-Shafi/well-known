@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $user_id
@@ -29,6 +29,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereTicketFee($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereUserId($value)
+ * @property string|null $code
+ * @property-read \App\Models\EventDateTicket|null $eventDateTicket
+ * @method static \Illuminate\Database\Eloquent\Builder|CartElement whereCode($value)
  * @mixin \Eloquent
  */
 class CartElement extends Model

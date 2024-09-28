@@ -3,17 +3,20 @@
 namespace App\Models;
 
 use App\Traits\ImageTrait;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $category_id
@@ -39,79 +42,80 @@ use Spatie\Feed\FeedItem;
  * @property string|null $image_mime_type
  * @property string|null $image_original_name
  * @property string|null $image_dimensions (DC2Type:simple_array)
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property Carbon $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
  * @property int $published
  * @property int $enablereviews
  * @property int $showattendees
  * @property int $is_featured
  * @property string $eventtimezone
- * @property-read \App\Models\Category|null $category
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EventDate> $eventDates
+ * @property-read Category|null $category
+ * @property-read Collection<int, EventDate> $eventDates
  * @property-read int|null $event_dates_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EventTranslation> $eventTranslations
+ * @property-read Collection<int, EventTranslation> $eventTranslations
  * @property-read int|null $event_translations_count
  * @property-read \App\Models\Organizer|null $organizer
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Review> $reviews
+ * @property-read Collection<int, Review> $reviews
  * @property-read int|null $reviews_count
- * @method static \Illuminate\Database\Eloquent\Builder|Event newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Event newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Event onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|Event query()
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereArtists($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereCategoryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereCountryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereEnablereviews($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereEventtimezone($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereExternallink($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereFacebook($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereGoogleplus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereImageDimensions($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereImageMimeType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereImageName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereImageOriginalName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereImageSize($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereInstagram($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereIsFeatured($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereIsonhomepagesliderId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereLinkedin($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereOrganizerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event wherePhonenumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event wherePublished($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereReference($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereShowattendees($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereTags($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereTwitter($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereViews($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereYear($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereYoutubeurl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Event withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|Event withoutTrashed()
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Audience> $audiences
+ * @method static Builder|Event newModelQuery()
+ * @method static Builder|Event newQuery()
+ * @method static Builder|Event onlyTrashed()
+ * @method static Builder|Event query()
+ * @method static Builder|Event whereArtists($value)
+ * @method static Builder|Event whereCategoryId($value)
+ * @method static Builder|Event whereCountryId($value)
+ * @method static Builder|Event whereCreatedAt($value)
+ * @method static Builder|Event whereDeletedAt($value)
+ * @method static Builder|Event whereEmail($value)
+ * @method static Builder|Event whereEnablereviews($value)
+ * @method static Builder|Event whereEventtimezone($value)
+ * @method static Builder|Event whereExternallink($value)
+ * @method static Builder|Event whereFacebook($value)
+ * @method static Builder|Event whereGoogleplus($value)
+ * @method static Builder|Event whereId($value)
+ * @method static Builder|Event whereImageDimensions($value)
+ * @method static Builder|Event whereImageMimeType($value)
+ * @method static Builder|Event whereImageName($value)
+ * @method static Builder|Event whereImageOriginalName($value)
+ * @method static Builder|Event whereImageSize($value)
+ * @method static Builder|Event whereInstagram($value)
+ * @method static Builder|Event whereIsFeatured($value)
+ * @method static Builder|Event whereIsonhomepagesliderId($value)
+ * @method static Builder|Event whereLinkedin($value)
+ * @method static Builder|Event whereOrganizerId($value)
+ * @method static Builder|Event wherePhonenumber($value)
+ * @method static Builder|Event wherePublished($value)
+ * @method static Builder|Event whereReference($value)
+ * @method static Builder|Event whereShowattendees($value)
+ * @method static Builder|Event whereTags($value)
+ * @method static Builder|Event whereTwitter($value)
+ * @method static Builder|Event whereUpdatedAt($value)
+ * @method static Builder|Event whereViews($value)
+ * @method static Builder|Event whereYear($value)
+ * @method static Builder|Event whereYoutubeurl($value)
+ * @method static Builder|Event withTrashed()
+ * @method static Builder|Event withoutTrashed()
+ * @property-read Collection<int, \App\Models\Audience> $audiences
  * @property-read int|null $audiences_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Language> $languages
+ * @property-read Collection<int, Language> $languages
  * @property-read int|null $languages_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EventImage> $eventImages
+ * @property-read Collection<int, EventImage> $eventImages
  * @property-read int|null $event_images_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Language> $subtitles
+ * @property-read Collection<int, Language> $subtitles
  * @property-read int|null $subtitles_count
  * @property int $completed
- * @property-read \App\Models\Country|null $country
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $favourites
+ * @property-read Country|null $country
+ * @property-read Collection<int, \App\Models\User> $favourites
  * @property-read int|null $favourites_count
- * @method static \Illuminate\Database\Eloquent\Builder|Event whereCompleted($value)
+ * @method static Builder|Event whereCompleted($value)
  * @property-read mixed $name
  * @property-read mixed $slug
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Coupon> $coupons
+ * @property-read Collection<int, Coupon> $coupons
  * @property-read int|null $coupons_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Promotion> $promotions
+ * @property-read Collection<int, Promotion> $promotions
  * @property-read int|null $promotions_count
+ * @property-read mixed $description
  * @mixin \Eloquent
  */
 class Event extends Model implements Feedable

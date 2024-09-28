@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $name
@@ -40,6 +40,11 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Coupon whereUpdatedAt($value)
  * @property Carbon|null $start_date
  * @method static Builder|Coupon whereStartDate($value)
+ * @property int|null $organizer_id
+ * @property string $timezone
+ * @property-read \App\Models\Organizer|null $organizer
+ * @method static Builder|Coupon whereOrganizerId($value)
+ * @method static Builder|Coupon whereTimezone($value)
  * @mixin \Eloquent
  */
 class Coupon extends Model

@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Jobs\EmptyCard;
 use App\Models\EventTranslation;
+use App\Models\PaymentGateway;
 use App\Models\Setting;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -35,31 +36,21 @@ class Checkout extends Component
 
     public $sessionTime;
 
+    public $stripe;
+
     public function mount(string $slug): void
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
 
         foreach ($this->eventTranslation->event->eventDates as $eventDate) {
             foreach ($eventDate->eventDateTickets as $ticket) {
+                $this->tickets[] = $ticket;
+
                 foreach ($ticket->cartElements as $cartElement) {
                     $this->eventDatePick = $cartElement->chosen_event_date;
-
-                    $this->tickets[] = $ticket;
                 }
-            }
-        }
 
-        if (count($this->tickets) === 0) {
-            abort(404);
-        }
-
-        $this->sessionTime = Setting::query()->where('key', 'checkout_timeleft')->first()?->value;
-
-        EmptyCard::dispatch($this->tickets)->delay(now()->addSeconds($this->sessionTime));
-
-        foreach ($this->eventTranslation->event->eventDates as $eventDate) {
-            foreach ($eventDate->eventDateTickets as $eventDateTicket) {
-                foreach ($eventDateTicket->paymentGateways as $paymentGateway) {
+                foreach ($ticket->paymentGateways as $paymentGateway) {
                     $found = false;
 
                     foreach ($this->paymentGateways ?? [] as $gt) {
@@ -73,6 +64,25 @@ class Checkout extends Component
                     }
                 }
             }
+        }
+
+        if (count($this->tickets) === 0) {
+            abort(404);
+        }
+
+        $this->sessionTime = Setting::query()->where('key', 'checkout_timeleft')->first()?->value;
+
+        EmptyCard::dispatch($this->tickets)->delay(now()->addSeconds((int) $this->sessionTime));
+
+        $this->stripe = $this->eventTranslation->event->organizer->paymentGateways()
+            ->where('factory_name', 'stripe_checkout')
+            ->first();
+
+        if (!$this->stripe) {
+            $this->stripe = PaymentGateway::query()
+                ->where('factory_name', 'stripe_checkout')
+                ->whereNull('organizer_id')
+                ->first();
         }
 
         if (auth()->check()) {

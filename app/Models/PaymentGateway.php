@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int|null $organizer_id
@@ -41,6 +41,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentGateway whereUpdatedAt($value)
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EventDateTicket> $eventDateTickets
  * @property-read int|null $event_date_tickets_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $deletedOrders
+ * @property-read int|null $deleted_orders_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
+ * @property-read int|null $orders_count
  * @mixin \Eloquent
  */
 class PaymentGateway extends Model

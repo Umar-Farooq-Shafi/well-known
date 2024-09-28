@@ -34,13 +34,17 @@
                     <div class="flex flex-col gap-y-1 font-medium text-base pb-2">
                         <p>{{ $eventTranslation->name }}</p>
 
-                        <p>
-                            {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
-                            - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
-                            ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
-                            - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
-                            )
-                        </p>
+                        @foreach($tickets as $ticket)
+                            @php $eventDate = $ticket->eventDate @endphp
+
+                            <p>
+                                {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
+                                - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
+                                ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
+                                - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
+                                )
+                            </p>
+                        @endforeach
 
                         <p>Selected Date: {{ $eventDatePick->format('F d Y - H:i A') }}</p>
                     </div>
@@ -147,70 +151,73 @@
                     <div class="mt-1">
                         <h1 class="font-semibold">Order Summary</h1>
 
-                        @if(count($quantity))
-                            @php $subtotal = 0; $fee = 0; @endphp
+                        @php
+                            $subtotal = 0; $fee = 0;
+                        @endphp
 
-                            @foreach($quantity as $id => $value)
+                        @foreach($tickets as $ticket)
+                            @foreach ($ticket->cartElements as $cartElement)
                                 @php
-                                    $eventDateTicket = \App\Models\EventDateTicket::find($id);
+                                    $ccy = $ticket->currency->ccy;
 
-                                    $subtotal += $eventDateTicket->price * $value;
-                                    $fee += $eventDateTicket->ticket_fee * $value;
+                                    $subtotal += $ticket->price * $cartElement->quantity;
+                                    $fee += $ticket->ticket_fee * $cartElement->quantity;
                                 @endphp
 
                                 <div class="flex justify-between items-center m-2">
-                                    <p>{{ $value }} x {{ $eventDateTicket->name }}</p>
+                                    <p>{{ $cartElement->quantity }} x {{ $ticket->name }}</p>
 
-                                    <p class="font-semibold">{{ $eventDateTicket->currency->ccy }} {{ $eventDateTicket->price * $value }}</p>
+                                    <p class="font-semibold">{{ $ccy }} {{ $ticket->price * $cartElement->quantity }}</p>
                                 </div>
+
                             @endforeach
+                        @endforeach
 
-                            <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
+                        <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
 
-                            <div class="flex justify-between items-center m-2">
-                                <p>Subtotal</p>
+                        <div class="flex justify-between items-center m-2">
+                            <p>Subtotal</p>
 
-                                <p class="font-semibold">
-                                    @if($eventDateTicket->currency_symbol_position === 'left')
-                                        {{ $ccy }}
-                                    @endif
-                                    {{ $subtotal }}
-                                    @if($eventDateTicket->currency_symbol_position === 'right')
-                                        {{ $ccy }}
-                                    @endif
-                                </p>
-                            </div>
-
-                            <div class="flex justify-between items-center m-2">
-                                <p>Fees</p>
-
-                                <p class="font-semibold">
-                                    @if($eventDateTicket->currency_symbol_position === 'left')
-                                        {{ $ccy }}
-                                    @endif
+                            <p class="font-semibold">
+                                @if($ticket->currency_symbol_position === 'left')
                                     {{ $ccy }}
-                                    @if($eventDateTicket->currency_symbol_position === 'right')
-                                        {{ $ccy }}
-                                    @endif
-                                </p>
-                            </div>
+                                @endif
+                                {{ $subtotal }}
+                                @if($ticket->currency_symbol_position === 'right')
+                                    {{ $ccy }}
+                                @endif
+                            </p>
+                        </div>
 
-                            <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
+                        <div class="flex justify-between items-center m-2">
+                            <p>Fees</p>
 
-                            <div class="flex justify-between items-center m-2">
-                                <p class="font-bold">Total</p>
+                            <p class="font-semibold">
+                                @if($ticket->currency_symbol_position === 'left')
+                                    {{ $ccy }}
+                                @endif
+                                {{ $fee }}
+                                @if($ticket->currency_symbol_position === 'right')
+                                    {{ $ccy }}
+                                @endif
+                            </p>
+                        </div>
 
-                                <p class="font-bold">
-                                    @if($eventDateTicket->currency_symbol_position === 'left')
-                                        {{ $ccy }}
-                                    @endif
-                                    {{ $fee + $subtotal }}
-                                    @if($eventDateTicket->currency_symbol_position === 'right')
-                                        {{ $ccy }}
-                                    @endif
-                                </p>
-                            </div>
-                        @endif
+                        <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
+
+                        <div class="flex justify-between items-center m-2">
+                            <p class="font-bold">Total</p>
+
+                            <p class="font-bold">
+                                @if($ticket->currency_symbol_position === 'left')
+                                    {{ $ccy }}
+                                @endif
+                                {{ $fee + $subtotal }}
+                                @if($ticket->currency_symbol_position === 'right')
+                                    {{ $ccy }}
+                                @endif
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -223,17 +230,19 @@
             </div>
         </div>
 
-        <x-modal-card :title="$eventTranslation->name" name="cardModal" blur="md" width="5xl">
-            <input id="card-holder-name" type="text">
+        @if($this->stripe)
+            <x-modal-card :title="$eventTranslation->name" name="cardModal" blur="md" width="5xl">
+                <input id="card-holder-name" type="text">
 
-            <div id="card-element">
+                <div id="card-element">
 
-            </div>
+                </div>
 
-            <button id="card-button">
-                Process Payment
-            </button>
-        </x-modal-card>
+                <button id="card-button">
+                    Process Payment
+                </button>
+            </x-modal-card>
+        @endif
 
     </div>
 
@@ -257,33 +266,51 @@
                 });
             });
 
-            const stripe = Stripe('stripe-public-key');
+            const stripConfig = @js($stripe);
 
-            const elements = stripe.elements();
-            const cardElement = elements.create('card');
+            if (stripConfig?.config?.secret_key) {
+                const stripe = Stripe(stripConfig.config.secret_key);
 
-            cardElement.mount('#card-element');
+                const elements = stripe.elements();
+                const cardElement = elements.create('card', {
+                    style: {
+                        base: {
+                            fontSize: '16px',
+                            color: '#32325d',
+                            '::placeholder': {
+                                color: '#aab7c4',
+                            },
+                        },
+                        invalid: {
+                            color: '#fa755a',
+                            iconColor: '#fa755a',
+                        },
+                    },
+                });
 
-            const cardHolderName = document.getElementById('card-holder-name');
-            const cardButton = document.getElementById('card-button');
+                cardElement.mount('#card-element');
 
-            cardButton.addEventListener('click', async (e) => {
-                const {paymentMethod, error} = await stripe.createPaymentMethod(
-                    'card', cardElement, {
-                        billing_details: {name: cardHolderName.value}
+                const cardHolderName = document.getElementById('card-holder-name');
+                const cardButton = document.getElementById('card-button');
+
+                cardButton.addEventListener('click', async (e) => {
+                    const {paymentMethod, error} = await stripe.createPaymentMethod(
+                        'card', cardElement, {
+                            billing_details: {name: cardHolderName.value}
+                        }
+                    );
+
+                    if (error) {
+                        window.$wireui.notify({
+                            'icon': 'error',
+                            'title': 'Error',
+                            'description': typeof error === 'string' ? error : 'Unexpected error',
+                        });
+                    } else {
+                        Livewire.dispatch('purchase', {paymentMethod});
                     }
-                );
-
-                if (error) {
-                    window.$wireui.notify({
-                        'icon': 'error',
-                        'title': 'Error',
-                        'description': typeof error === 'string' ? error : 'Unexpected error',
-                    });
-                } else {
-                    Livewire.dispatch('purchase', {paymentMethod});
-                }
-            });
+                });
+            }
         </script>
     @endpush
 </div>
