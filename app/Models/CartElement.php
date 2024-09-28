@@ -42,6 +42,7 @@ class CartElement extends Model
         'eventticket_id',
         'quantity',
         'ticket_fee',
+        'code',
         'chosen_event_date'
     ];
 

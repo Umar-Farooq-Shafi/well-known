@@ -72,10 +72,11 @@ class Event extends Component
         $event = $this->eventTranslation->event;
 
         $coupon = $event->coupons()
-            ->whereDate('expire_date', '>', now())
+            ->whereDate('expire_date', '>=', now())
+            ->where('code', 'test123')
             ->first();
 
-        if (!$coupon || $coupon->code !== $this->promoCode) {
+        if (!$coupon) {
             $this->notification()->send([
                 'icon' => 'error',
                 'title' => 'Error',
@@ -129,6 +130,7 @@ class Event extends Component
                     'eventticket_id' => $ticketId,
                     'quantity' => $quantity,
                     'ticket_fee' => $ticket->ticket_fee,
+                    'code' => $this->promoCode,
                     'chosen_event_date' => $this->eventDatePick,
                 ]);
             }
