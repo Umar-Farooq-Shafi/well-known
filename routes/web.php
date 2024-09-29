@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\PrintTicket;
 use App\Livewire\AddReview;
 use App\Livewire\AllCategories;
@@ -117,3 +118,5 @@ Route::get('/calendar.ics', function () {
     exit;
 })->name('calendar.ics');
 
+Route::get('success-transaction', [PayPalController::class, 'successTransaction'])->name('successTransaction');
+Route::get('cancel-transaction', [PayPalController::class, 'cancelTransaction'])->name('cancelTransaction');

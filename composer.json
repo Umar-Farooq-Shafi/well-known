@@ -30,6 +30,7 @@
         "spatie/laravel-feed": "^4.4",
         "spatie/laravel-pdf": "^1.5",
         "spatie/laravel-sitemap": "^7.2",
+        "srmklive/paypal": "^3.0",
         "stechstudio/filament-impersonate": "^3.9",
         "stijnvanouplines/blade-country-flags": "^1.0",
         "symfony/dotenv": "^7.1",

@@ -14,6 +14,7 @@ use Stripe\PaymentIntent;
 use Stripe\PaymentMethod;
 use Stripe\Stripe;
 use WireUi\Traits\WireUiActions;
+use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class Checkout extends Component
 {
@@ -104,7 +105,10 @@ class Checkout extends Component
         $this->redirect(route('event', ['slug' => $this->eventTranslation->slug]));
     }
 
-    public function placeOrder()
+    /**
+     * @throws \Throwable
+     */
+    public function placeOrder(): void
     {
         if (empty($this->firstName)) {
             $this->notification()->send([
@@ -175,6 +179,94 @@ class Checkout extends Component
             $this->dispatch('openModal');
 
             return;
+        }
+
+        if ($paymentGateway->factory_name === 'paypal_express_checkout') {
+            $paypal = $this->eventTranslation->event->organizer->paymentGateways()
+                ->where('factory_name', 'paypal_express_checkout')
+                ->first();
+
+            if (!$paypal) {
+                $paypal = PaymentGateway::query()
+                    ->where('factory_name', 'paypal_express_checkout')
+                    ->whereNull('organizer_id')
+                    ->first();
+            }
+
+            $subtotal = 0;
+            $fee = 0;
+            $ccy = null;
+
+            foreach($this->tickets as $ticket) {
+                foreach ($ticket->cartElements as $cartElement) {
+                    $ccy = $ticket->currency->ccy;
+
+                    $subtotal += $ticket->price * $cartElement->quantity;
+                    $fee += $ticket->ticket_fee * $cartElement->quantity;
+                }
+            }
+
+            $provider = new PayPalClient;
+            $provider->setApiCredentials(credentials: [
+                'mode' => app()->isProduction() ? 'live' : 'sandbox',
+
+                'sandbox' => [
+                    'client_id' => $paypal->config['secret_key'],
+                    'client_secret' => $paypal->config['signature'],
+                    'app_id' => 'APP-80W284485P519543T',
+                ],
+
+                'live' => [
+                    'client_id' => env('PAYPAL_LIVE_CLIENT_ID', ''),
+                    'client_secret' => $paypal->config['signature'],
+                    'app_id' => env('PAYPAL_LIVE_APP_ID', ''),
+                ],
+
+                'payment_action' => 'Sale',
+                'currency' => $ccy,
+                'notify_url' => 'https://your-site.com/paypal/notify',
+                'locale' => 'en_US',
+                'validate_ssl' => true,
+            ]);
+
+            $provider->getAccessToken();
+
+            $response = $provider->createOrder([
+                "intent" => "CAPTURE",
+                "application_context" => [
+                    "return_url" => route('successTransaction'),
+                    "cancel_url" => route('cancelTransaction'),
+                ],
+                "purchase_units" => [
+                    0 => [
+                        "amount" => [
+                            "currency_code" => $ccy,
+                            "value" => $subtotal + $fee
+                        ]
+                    ]
+                ]
+            ]);
+
+            if (isset($response['id']) && $response['id'] != null) {
+                // redirect to approve href
+                foreach ($response['links'] as $links) {
+                    if ($links['rel'] == 'approve') {
+                        $this->redirect($links['href']);
+                    }
+                }
+
+                $this->notification()->send([
+                    'icon' => 'error',
+                    'title' => 'Error',
+                    'description' => 'Something went wrong.',
+                ]);
+            } else {
+                $this->notification()->send([
+                    'icon' => 'error',
+                    'title' => 'Error',
+                    'description' => $response['message'] ?? 'Something went wrong.',
+                ]);
+            }
         }
 
         dd($paymentGateway);
