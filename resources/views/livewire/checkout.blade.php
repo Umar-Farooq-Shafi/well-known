@@ -2,6 +2,10 @@
     use Carbon\Carbon;
 
     $event = $eventTranslation->event;
+
+    $subtotal = 0;
+    $fee = 0;
+    $ccy = null;
 @endphp
 
 <div x-data="checkoutData">
@@ -29,7 +33,7 @@
         </div>
 
         <div class="flex items-center flex-col mt-8">
-            <div class="grid w-2/3 grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-4">
+            <div class="grid w-2/3 grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-3">
                 <div class="md:col-span-2 lg:col-span-5">
                     <div class="flex flex-col gap-y-1 font-medium text-base pb-2">
                         <p>{{ $eventTranslation->name }}</p>
@@ -46,7 +50,9 @@
                             </p>
                         @endforeach
 
-                        <p>Selected Date: {{ $eventDatePick->format('F d Y - H:i A') }}</p>
+                        @if($eventDatePick)
+                            <p>Selected Date: {{ $eventDatePick->format('F d Y - H:i A') }}</p>
+                        @endif
                     </div>
 
                     <x-card title="Billing Information" class="mt-2">
@@ -151,10 +157,6 @@
                     <div class="mt-1">
                         <h1 class="font-semibold">Order Summary</h1>
 
-                        @php
-                            $subtotal = 0; $fee = 0;
-                        @endphp
-
                         @foreach($tickets as $ticket)
                             @foreach ($ticket->cartElements as $cartElement)
                                 @php
@@ -225,22 +227,28 @@
             <div class="flex justify-end mt-4 flex-row-reverse gap-x-4">
                 <x-button flat label="Cancel" x-on:click="close"/>
 
-                <x-button primary label="Place Order" spinner="placeOrder"
-                          wire:click="placeOrder"/>
+                <x-button
+                    primary
+                    label="Place Order"
+                    spinner="placeOrder"
+                    wire:click="placeOrder"
+                />
             </div>
         </div>
 
         @if($this->stripe)
-            <x-modal-card :title="$eventTranslation->name" name="cardModal" blur="md" width="5xl">
-                <input id="card-holder-name" type="text">
+            <x-modal-card :title="$eventTranslation->name" name="stripeModal" blur="md">
+                <x-input
+                    label="Name"
+                    placeholder="Card Holder Name"
+                    id="card-holder-name"
+                />
 
-                <div id="card-element">
+                <div id="card-element" class="my-4">
 
                 </div>
 
-                <button id="card-button">
-                    Process Payment
-                </button>
+                <x-button spinner="purchase" label="Process Payment" id="card-button" />
             </x-modal-card>
         @endif
 
@@ -266,51 +274,64 @@
                 });
             });
 
-            const stripConfig = @js($stripe);
+            document.addEventListener('livewire:init', function () {
+                Livewire.on('openModal', () => {
+                    $openModal('stripeModal');
 
-            if (stripConfig?.config?.secret_key) {
-                const stripe = Stripe(stripConfig.config.secret_key);
+                    setTimeout(() => {
+                        const stripConfig = @js($stripe);
 
-                const elements = stripe.elements();
-                const cardElement = elements.create('card', {
-                    style: {
-                        base: {
-                            fontSize: '16px',
-                            color: '#32325d',
-                            '::placeholder': {
-                                color: '#aab7c4',
-                            },
-                        },
-                        invalid: {
-                            color: '#fa755a',
-                            iconColor: '#fa755a',
-                        },
-                    },
-                });
+                        if (stripConfig?.config?.publishable_key) {
+                            const stripe = Stripe(stripConfig.config.publishable_key);
 
-                cardElement.mount('#card-element');
+                            const elements = stripe.elements();
+                            const cardElement = elements.create('card', {
+                                style: {
+                                    base: {
+                                        fontSize: '16px',
+                                        color: '#32325d',
+                                        '::placeholder': {
+                                            color: '#aab7c4',
+                                        },
+                                    },
+                                    invalid: {
+                                        color: '#fa755a',
+                                        iconColor: '#fa755a',
+                                    },
+                                },
+                            });
 
-                const cardHolderName = document.getElementById('card-holder-name');
-                const cardButton = document.getElementById('card-button');
+                            cardElement.mount('#card-element');
 
-                cardButton.addEventListener('click', async (e) => {
-                    const {paymentMethod, error} = await stripe.createPaymentMethod(
-                        'card', cardElement, {
-                            billing_details: {name: cardHolderName.value}
+                            const cardHolderName = document.getElementById('card-holder-name');
+                            const cardButton = document.getElementById('card-button');
+
+                            cardButton.addEventListener('click', async (e) => {
+                                const {paymentMethod, error} = await stripe.createPaymentMethod(
+                                    'card', cardElement, {
+                                        billing_details: {name: cardHolderName.value}
+                                    }
+                                );
+
+                                if (error) {
+                                    window.$wireui.notify({
+                                        'icon': 'error',
+                                        'title': 'Error',
+                                        'description': error?.message || 'Unexpected error',
+                                    });
+                                } else {
+                                    Livewire.dispatch('purchase', {
+                                        paymentMethodId: paymentMethod.id, // Send the PaymentMethod ID
+                                        amount: @js($subtotal),
+                                        ccy: @js($ccy)
+                                    });
+                                }
+                            });
                         }
-                    );
-
-                    if (error) {
-                        window.$wireui.notify({
-                            'icon': 'error',
-                            'title': 'Error',
-                            'description': typeof error === 'string' ? error : 'Unexpected error',
-                        });
-                    } else {
-                        Livewire.dispatch('purchase', {paymentMethod});
-                    }
+                    }, 1000);
                 });
-            }
+            });
+
         </script>
     @endpush
 </div>

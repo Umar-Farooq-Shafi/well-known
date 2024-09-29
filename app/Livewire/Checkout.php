@@ -8,6 +8,11 @@ use App\Models\PaymentGateway;
 use App\Models\Setting;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Stripe\Customer;
+use Stripe\Exception\ApiErrorException;
+use Stripe\PaymentIntent;
+use Stripe\PaymentMethod;
+use Stripe\Stripe;
 use WireUi\Traits\WireUiActions;
 
 class Checkout extends Component
@@ -72,7 +77,7 @@ class Checkout extends Component
 
         $this->sessionTime = Setting::query()->where('key', 'checkout_timeleft')->first()?->value;
 
-        EmptyCard::dispatch($this->tickets)->delay(now()->addSeconds((int) $this->sessionTime));
+        EmptyCard::dispatch($this->tickets)->delay(now()->addSeconds((int)$this->sessionTime));
 
         $this->stripe = $this->eventTranslation->event->organizer->paymentGateways()
             ->where('factory_name', 'stripe_checkout')
@@ -164,7 +169,15 @@ class Checkout extends Component
             return;
         }
 
-        dd($this->paymentGateway);
+        $paymentGateway = PaymentGateway::find($this->paymentGateway);
+
+        if ($paymentGateway->factory_name === 'stripe_checkout') {
+            $this->dispatch('openModal');
+
+            return;
+        }
+
+        dd($paymentGateway);
     }
 
     #[On('clear-cart')]
@@ -175,7 +188,52 @@ class Checkout extends Component
         }
     }
 
-    public function purchase($paymentMethod) {}
+    /**
+     * @throws ApiErrorException
+     */
+    #[On('purchase')]
+    public function purchase($paymentMethodId, $amount, $ccy): void
+    {
+        Stripe::setApiKey($this->stripe->config['secret_key']);
+
+        $paymentMethod = PaymentMethod::retrieve($paymentMethodId);
+
+        // Create a new Stripe customer.
+        $customer = Customer::create([
+            'email' => $this->email,
+            'payment_method' => $paymentMethodId, // Use the payment method ID from the client
+            'invoice_settings' => [
+                'default_payment_method' => $paymentMethodId, // Set as default for future invoices
+            ],
+        ]);
+
+        $paymentMethod->attach([
+            'customer' => $customer->id,
+        ]);
+
+        $paymentIntent = PaymentIntent::create([
+            'amount' => $amount,
+            'currency' => $ccy,
+            'customer' => $customer->id,
+            'payment_method' => $paymentMethod->id,
+            'off_session' => true,  // for automatic payments without user interaction
+            'confirm' => true,      // immediately confirm the payment
+        ]);
+
+        if ($paymentIntent->status === 'succeeded') {
+            $this->notification()->send([
+                'icon' => 'success',
+                'title' => 'Payment successful!',
+            ]);
+        } else {
+            $this->notification()->send([
+                'icon' => 'error',
+                'title' => 'Error',
+                'description' => $paymentIntent->status,
+            ]);
+        }
+
+    }
 
     protected function updateDotEnv($key, $newValue, $delim = ''): void
     {
