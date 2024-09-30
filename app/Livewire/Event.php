@@ -8,6 +8,7 @@ use App\Models\EventDateTicket;
 use App\Models\EventTranslation;
 use App\Models\Organizer;
 use App\Traits\RatingTrait;
+use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
 
@@ -129,11 +130,23 @@ class Event extends Component
                 'description' => 'Please select a ticket!',
             ]);
         } else {
+            if (!auth()->check()) {
+                $userId = rand(1, 100000);
+
+                while (CartElement::whereUserId($userId)->exists()) {
+                    $userId = rand(1, 100000);
+                }
+
+                Session::put('user_id', $userId);
+            } else {
+                $userId = auth()->id();
+            }
+
             foreach ($this->quantity as $ticketId => $quantity) {
                 $ticket = EventDateTicket::find($ticketId);
 
                 CartElement::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $userId,
                     'eventticket_id' => $ticketId,
                     'quantity' => $quantity,
                     'ticket_fee' => $ticket->ticket_fee,

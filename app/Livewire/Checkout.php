@@ -3,9 +3,11 @@
 namespace App\Livewire;
 
 use App\Jobs\EmptyCard;
+use App\Models\CartElement;
 use App\Models\EventTranslation;
 use App\Models\PaymentGateway;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Stripe\Customer;
@@ -48,11 +50,28 @@ class Checkout extends Component
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
 
+        if (!auth()->check()) {
+            $userId = Session::get('user_id');
+        } else {
+            $userId = auth()->id();
+        }
+
+        if (!$userId) {
+            abort(404);
+        }
+
         foreach ($this->eventTranslation->event->eventDates as $eventDate) {
             foreach ($eventDate->eventDateTickets as $ticket) {
-                $this->tickets[] = $ticket;
 
-                foreach ($ticket->cartElements as $cartElement) {
+                $cartElements = $ticket->cartElements()
+                    ->where('user_id', $userId)
+                    ->get();
+
+                if (count($cartElements)) {
+                    $this->tickets[] = $ticket;
+                }
+
+                foreach ($cartElements as $cartElement) {
                     $this->eventDatePick = $cartElement->chosen_event_date;
                 }
 
@@ -197,7 +216,7 @@ class Checkout extends Component
             $fee = 0;
             $ccy = null;
 
-            foreach($this->tickets as $ticket) {
+            foreach ($this->tickets as $ticket) {
                 foreach ($ticket->cartElements as $cartElement) {
                     $ccy = $ticket->currency->ccy;
 
@@ -269,6 +288,60 @@ class Checkout extends Component
             }
         }
 
+        if ('eseva' === $paymentGateway->factory_name) {
+            $eseva = $this->eventTranslation->event->organizer->paymentGateways()
+                ->where('factory_name', 'eseva')
+                ->first();
+
+            if (!$eseva) {
+                $eseva = PaymentGateway::query()
+                    ->where('factory_name', 'eseva')
+                    ->whereNull('organizer_id')
+                    ->first();
+            }
+
+            $subtotal = 0;
+            $fee = 0;
+            $ccy = null;
+
+            foreach ($this->tickets as $ticket) {
+                foreach ($ticket->cartElements as $cartElement) {
+                    $ccy = $ticket->currency->ccy;
+
+                    $subtotal += $ticket->price * $cartElement->quantity;
+                    $fee += $ticket->ticket_fee * $cartElement->quantity;
+                }
+            }
+
+            if (app()->isProduction()) {
+                $key = $eseva?->config['secret_key'];
+            } else {
+                $key = '8gBm/:&EnhH.1/q';
+            }
+
+            $tuid = now()->timestamp;
+            $message = "total_amount=" . ($subtotal + $fee) . ",transaction_uuid=$tuid,product_code=" . $eseva?->config['merchant_code'];
+            $s = hash_hmac('sha256', $message, $key, true);
+            $signature = base64_encode($s);
+            $dataArray = [
+                "amount" => $subtotal + $fee,
+                "failure_url" => route('esewa.failure'),
+                "product_delivery_charge" => "0",
+                "product_service_charge" => "0",
+                "product_code" => $eseva?->config['merchant_code'],
+                "signature" => $signature,
+                "signed_field_names" => "total_amount,transaction_uuid,product_code",
+                "success_url" => route('esewa.success'),
+                "tax_amount" => "0",
+                "total_amount" => $subtotal + $fee,
+                "transaction_uuid" => $tuid,
+                "currency" => $ccy
+            ];
+
+            $this->dispatch("redirectToEsewaPage", $dataArray);
+            return;
+        }
+
         dd($paymentGateway);
     }
 
@@ -317,6 +390,9 @@ class Checkout extends Component
                 'icon' => 'success',
                 'title' => 'Payment successful!',
             ]);
+
+            $this->clearCart();
+            $this->returnToCart();
         } else {
             $this->notification()->send([
                 'icon' => 'error',

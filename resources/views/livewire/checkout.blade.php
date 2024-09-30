@@ -248,7 +248,7 @@
 
                 </div>
 
-                <x-button spinner="purchase" label="Process Payment" id="card-button" />
+                <x-button spinner="purchase" label="Process Payment" id="card-button"/>
             </x-modal-card>
         @endif
 
@@ -329,6 +329,26 @@
                             });
                         }
                     }, 1000);
+                });
+
+                Livewire.on('redirectToEsewaPage', function (data) {
+                    data = data[0];
+                    const path = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
+                    const form = document.createElement("form")
+                    form.setAttribute("method", "POST")
+                    form.setAttribute("action", path)
+
+                    const formData = new FormData();
+                    for (const key in data) {
+                        const hiddenField = document.createElement("input")
+                        hiddenField.setAttribute("type", "hidden")
+                        hiddenField.setAttribute("name", key)
+                        hiddenField.setAttribute("value", data[key])
+                        form.append(hiddenField)
+                    }
+
+                    document.body.appendChild(form)
+                    form.submit()
                 });
             });
 

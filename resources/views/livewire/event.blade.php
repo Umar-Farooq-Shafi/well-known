@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    <div class="flex justify-center rounded-lg shadow-lg bg-white mx-8 md:mx-16 lg:mx-44 my-8">
+    <div class="flex justify-center rounded-lg shadow-lg bg-white mx-8 md:mx-8 lg:mx-44 my-8">
         <div class="container w-[65%]">
             <div class="mt-8 p-6">
                 <div class="flex gap-x-4">
