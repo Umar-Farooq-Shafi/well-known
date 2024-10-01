@@ -3,7 +3,7 @@
 <div>
     <livewire:side-panel/>
 
-    <main class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+    <main class="max-w-screen-xl justify-between mx-auto p-4">
         @if(count($categories))
             <section class="flex items-center overflow-auto gap-x-24 py-6 justify-center w-full">
                 @foreach($categories as $cat)
@@ -252,8 +252,7 @@
 
                                                             @if($lowestPromotionalPrice !== null && $lowestPromotionalPrice < $lowest)
                                                                 {{-- Display promotional price if available --}}
-                                                                <del class="text-gray-500">{{ $lowest }}</del>
-                                                                {{ $ccy }} {{ $lowestPromotionalPrice }}
+                                                                <del class="text-gray-500">{{ $lowest }}</del> {{ $ccy }} {{ $lowestPromotionalPrice }}
                                                             @else
                                                                 {{-- Display lowest price if no promotional price --}}
                                                                 {{ $ccy }} {{ $lowest }}
@@ -465,8 +464,7 @@
 
                                                         @if($lowestPromotionalPrice !== null && $lowestPromotionalPrice < $lowest)
                                                             {{-- Display promotional price if available --}}
-                                                            <del
-                                                                class="text-gray-500">{{ $lowest }}</del> {{ $ccy }} {{ $lowestPromotionalPrice }}
+                                                            <del class="text-gray-500">{{ $lowest }}</del> {{ $ccy }} {{ $lowestPromotionalPrice }}
                                                         @else
                                                             {{-- Display lowest price if no promotional price --}}
                                                             {{ $ccy }} {{ $lowest }}
@@ -498,7 +496,7 @@
                                                 <x-fas-clock class="w-4 h-4 text-red-500"/>
 
                                                 @if($eventDate = $event->eventDates?->first())
-                                                    <div class="flex flex-col gap-y-0.5 pb-5">
+                                                    <div class="flex flex-col gap-y-0.5" style="padding-bottom: 20px;">
                                                         <p class="truncate text-sm">
                                                             {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('l') }}
                                                             ,
