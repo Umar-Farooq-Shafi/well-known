@@ -1,5 +1,5 @@
 @php
-    use App\Models\CategoryTranslation;use Illuminate\Support\Carbon;use Illuminate\Support\Facades\Storage;
+    use App\Models\CategoryTranslation;use Illuminate\Support\Carbon;use Illuminate\Support\Facades\DB;use Illuminate\Support\Facades\Storage;
 
     $eventCategoryTranslation = CategoryTranslation::whereTranslatableId($eventTranslation->event->category_id)
         ->where('locale', app()->getLocale())
@@ -522,40 +522,93 @@
                                                             </td>
 
                                                             <td class="border-t-0 text-left">
-                                                                @if (!$ticket->isOnSale())
-                                                                    <span
-                                                                        class="badge {{ $ticket->stringifyStatusClass() }}">{{ __($ticket->stringifyStatus()) }}</span>
-                                                                @else
-                                                                    @if($ticket->free)
-                                                                        <span>Free</span>
-                                                                    @elseif($ticket->promotionalprice)
-                                                                        @php
-                                                                            $isStartDate = $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
-                                                                            $isEndDate = $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
-                                                                        @endphp
+                                                                @if($countEventDates = count($event->eventDates))
+                                                                    @php
+                                                                        $ccy = $event->eventDates->first()->getCurrencyCode();
+                                                                        $mixed = false;
+                                                                        $lowest = $event->eventDates->first()?->getTotalTicketFees();
 
-                                                                        @if($isStartDate && $isEndDate)
-                                                                            <del class="text-gray-500">
-                                                                                {{ $ticket->price }}
-                                                                            </del>
+                                                                        // Check for both free and paid tickets
+                                                                        $freeCount = DB::table('eventic_event_date_ticket')
+                                                                            ->whereIn('eventdate_id', $event->eventDates->pluck('id')->toArray())
+                                                                            ->where('free', true)
+                                                                            ->where('active', 1)
+                                                                            ->count();
 
-                                                                            <span>
-                                                                                @if($ticket->currency_symbol_position === 'left')
-                                                                                    {{ $ticket->currency->symbol }}
-                                                                                @endif
-                                                                                {{ $ticket->price - $ticket->promotionalprice }}
-                                                                                @if($ticket->currency_symbol_position === 'right')
-                                                                                    {{ $ticket->currency->symbol }}
-                                                                                @endif
-                                                                            </span>
+                                                                        $paidTickets = DB::table('eventic_event_date_ticket')
+                                                                            ->whereIn('eventdate_id', $event->eventDates->pluck('id')->toArray())
+                                                                            ->where('free', false)
+                                                                            ->where('active', 1)
+                                                                            ->get();
+
+                                                                        $paidCount = $paidTickets->count();
+
+                                                                        // Determine isFree and isPartialFree based on the counts
+                                                                        $isFree = $freeCount > 0 && $paidCount === 0; // Only free tickets
+                                                                        $isPartialFree = $freeCount > 0 && $paidCount > 0; // Both free and paid tickets
+
+                                                                        // Check for mixed currency codes
+                                                                        if ($paidCount > 0 && $freeCount !== 1) {
+                                                                            $currencies = $paidTickets->pluck('currency_code_id')->unique();
+                                                                            $mixed = $currencies->count() > 1; // Set mixed to true if there are multiple currency codes
+                                                                        }
+
+                                                                        // Calculate the lowest ticket price among paid tickets
+                                                                        $lowest = $paidTickets->min('price');
+
+                                                                        // Check for the lowest promotional price and its validity based on dates
+                                                                        $lowestPromotionalPrice = null;
+
+                                                                        // Get current date and time based on event timezone
+                                                                        $eventTimezone = $event->eventtimezone ?? $timezone[0];
+                                                                        $currentDateTime = now()->timezone($eventTimezone);
+
+                                                                        foreach ($paidTickets as $paidTicket) {
+                                                                            // Check for promotional price validity
+                                                                            $salesStartDate = \Carbon\Carbon::parse($paidTicket->salesstartdate);
+                                                                            $salesEndDate = \Carbon\Carbon::parse($paidTicket->salesenddate);
+
+                                                                            $isStartDate = $salesStartDate->timezone($eventTimezone)->lessThanOrEqualTo($currentDateTime);
+                                                                            $isEndDate = $salesEndDate->timezone($eventTimezone)->greaterThanOrEqualTo($currentDateTime);
+
+                                                                            if ($isStartDate && $isEndDate && $ticket->promotionalprice) {
+                                                                                // If the promotional price is valid, check if it's the lowest
+                                                                                if (is_null($lowestPromotionalPrice) || $ticket->promotionalprice < $lowestPromotionalPrice) {
+                                                                                    $lowestPromotionalPrice = $ticket->promotionalprice; // Set to promotional price directly
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                        // If no valid promotional price, fall back to normal lowest price
+                                                                        $finalPrice = $lowestPromotionalPrice ?? $lowest;
+                                                                    @endphp
+
+                                                                    <div class="mb-1 text-sm">
+                                                                        @if($mixed)
+                                                                            <p class="text-nowrap font-bold">Mixed
+                                                                                Currency</p>
+                                                                        @elseif($isFree)
+                                                                            <p class="text-nowrap font-bold">Free</p>
+                                                                        @elseif($isPartialFree)
+                                                                            <p class="text-nowrap font-bold">Free
+                                                                                Options Available</p>
                                                                         @else
-                                                                            <span>
-                                                                                {{ $ticket->price }}
-                                                                            </span>
+                                                                            <p class="text-nowrap font-bold">
+                                                                                @if($paidCount > 1)
+                                                                                    <span class="font-bold">From</span>
+                                                                                @endif
+
+                                                                                @if($lowestPromotionalPrice !== null && $lowestPromotionalPrice < $lowest)
+                                                                                    {{-- Display promotional price if available --}}
+                                                                                    <del
+                                                                                        class="text-gray-500">{{ $lowest }}</del> {{ $ccy }} {{ $lowestPromotionalPrice }}
+                                                                                @else
+                                                                                    {{-- Display lowest price if no promotional price --}}
+                                                                                    {{ $ccy }} {{ $lowest }}
+                                                                                @endif
+                                                                            </p>
                                                                         @endif
-                                                                    @else
-                                                                        <span>{{ $ticket->price }}</span>
-                                                                    @endif
+                                                                    </div>
                                                                 @endif
                                                             </td>
                                                         </tr>
