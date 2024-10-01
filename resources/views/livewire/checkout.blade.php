@@ -1,5 +1,5 @@
 @php
-    use Carbon\Carbon;
+    use App\Models\PaymentGateway;use Carbon\Carbon;
 
     $event = $eventTranslation->event;
 
@@ -119,7 +119,7 @@
                                                    aria-describedby="credit-card-text"
                                                    type="radio"
                                                    value="{{ $paymentGateway->id }}"
-                                                   wire:model="paymentGateway"
+                                                   wire:model.live="paymentGateway"
                                                    class="h-4 w-4 border-gray-300 bg-white text-primary-600 focus:ring-2 focus:ring-primary-600 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
                                             />
                                         </div>
@@ -220,37 +220,51 @@
                                 @endif
                             </p>
                         </div>
+
+                        @if($this->paymentGateway)
+                            @php
+                                $paymentGateway = PaymentGateway::find($this->paymentGateway);
+                            @endphp
+
+                            @if($this->stripe && $paymentGateway->factory_name === 'stripe_checkout')
+                                <div class="mt-8">
+                                    <x-input
+                                        label="Name"
+                                        placeholder="Card Holder Name"
+                                        id="card-holder-name"
+                                    />
+
+                                    <div id="card-element" class="my-4">
+
+                                    </div>
+
+                                    <x-button spinner="purchase" label="Place Order" id="card-button"/>
+                                </div>
+                            @endif
+                        @endif
                     </div>
                 </div>
             </div>
 
-            <div class="flex justify-end mt-4 flex-row-reverse gap-x-4">
-                <x-button flat label="Cancel" x-on:click="close"/>
+            @if($this->paymentGateway)
+                @php
+                    $paymentGateway = PaymentGateway::find($this->paymentGateway);
+                @endphp
 
-                <x-button
-                    primary
-                    label="Place Order"
-                    spinner="placeOrder"
-                    wire:click="placeOrder"
-                />
-            </div>
+                @if($paymentGateway->factory_name !== 'stripe_checkout')
+                    <div class="flex justify-end mt-4 flex-row-reverse gap-x-4">
+                        <x-button flat label="Cancel" x-on:click="close"/>
+
+                        <x-button
+                            primary
+                            label="Place Order"
+                            spinner="placeOrder"
+                            wire:click="placeOrder"
+                        />
+                    </div>
+                @endif
+            @endif
         </div>
-
-        @if($this->stripe)
-            <x-modal-card :title="$eventTranslation->name" name="stripeModal" blur="md">
-                <x-input
-                    label="Name"
-                    placeholder="Card Holder Name"
-                    id="card-holder-name"
-                />
-
-                <div id="card-element" class="my-4">
-
-                </div>
-
-                <x-button spinner="purchase" label="Process Payment" id="card-button"/>
-            </x-modal-card>
-        @endif
 
     </div>
 
@@ -275,9 +289,7 @@
             });
 
             document.addEventListener('livewire:init', function () {
-                Livewire.on('openModal', () => {
-                    $openModal('stripeModal');
-
+                Livewire.on('showStrip', () => {
                     setTimeout(() => {
                         const stripConfig = @js($stripe);
 

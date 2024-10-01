@@ -99,9 +99,9 @@ class Checkout extends Component
 
         EmptyCard::dispatch($this->tickets)->delay(now()->addSeconds((int)$this->sessionTime));
 
-        $this->stripe = $this->eventTranslation->event->organizer->paymentGateways()
-            ->where('factory_name', 'stripe_checkout')
-            ->first();
+//        $this->stripe = $this->eventTranslation->event->organizer->paymentGateways()
+//            ->where('factory_name', 'stripe_checkout')
+//            ->first();
 
         if (!$this->stripe) {
             $this->stripe = PaymentGateway::query()
@@ -401,6 +401,14 @@ class Checkout extends Component
             ]);
         }
 
+    }
+
+    public function updatedPaymentGateway($id)
+    {
+        $paymentGateway = PaymentGateway::find($id);
+
+        if ($paymentGateway->factory_name === 'stripe_checkout')
+            $this->dispatch('showStrip');
     }
 
     protected function updateDotEnv($key, $newValue, $delim = ''): void
