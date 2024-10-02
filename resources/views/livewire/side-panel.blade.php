@@ -35,34 +35,41 @@
                         <h1 class="text-3xl font-bold mb-4 text-center drop-shadow-md text-shadow:_0_2px_4px_rgb(99_102_241_/_0.8)] leading-snug">{{ $trans->name }}</h1>
 
                         @if($saleEvent = $sliderContent->getFirstOnSaleEventDate())
-                            <p class="text-lg mb-4 flex items-center text-center gap-x-2">
-                                <x-fas-map-marker-alt class="w-4 h-4"/>
+                            <div class="text-lg mb-4 flex items-center text-center gap-x-2">
+                                <x-fas-map-marker-alt class="w-4 h-5"/>
 
                                 @if($saleEvent->eventDates?->first()?->online)
                                     {{ __('This is an online event') }}
-                                @elseif($venue = $saleEvent->eventDates?->first()?->venue)
-                                    <div class="flex flex-col gap-y-0.5">
+                                @elseif($venue = $saleEvent?->venue)
+                                    <div class="flex flex-col items-start gap-y-0.5">
                                         <p class="truncate">{{ $venue->name }}</p>
                                         <p class="truncate">{{ $venue->city }}
-                                            , {{ $venue->country->name }}</p>
+                                            , {{ $venue->country->name }}
+                                        </p>
                                     </div>
                                 @endif
 
-                            </p>
-                            <p class="text-lg mb-8 flex items-center text-center gap-x-2">
-                                <x-fas-clock class="w-4 h-4"/>
+                            </div>
 
-                                @if($saleEvent?->startdate)
-                                    <span>
-                                        {{ $saleEvent->startdate->timezone($timezone[0])->format('l') }}
-                                        ,
-                                        Start {{ $saleEvent->startdate->timezone($timezone[0])->format('g:i a') }}
-                                    </span>
-                                @endif
+                            <p class="text-lg mb-8 flex items-center gap-x-2">
+                                <x-fas-clock class="w-4 h-4" style="margin-top: -25px;"/>
+
+                                <span class="text-left">
+                                    @if($saleEvent?->startdate)
+                                        <span>
+                                            {{ $saleEvent->startdate->timezone($timezone[0])->format('jS M Y') }},
+                                            {{ $saleEvent->startdate->timezone($timezone[0])->format('l') }},
+                                            Start {{ $saleEvent->startdate->timezone($timezone[0])->format('g:i a') }}
+                                        </span>
+                                        <br>
+                                        <span>Timezone ({{ $timezone[0] }})</span>
+                                    @endif
+                                </span>
                             </p>
 
-                            <a href="{{ route('event', ['slug' => $trans->slug]) }}"
-                               class="bg-white text-gray-800 py-2 px-4 rounded-full flex items-center gap-x-2">
+                            <a
+                                href="{{ route('event', ['slug' => $trans->slug]) }}"
+                                class="bg-white text-gray-800 py-2 px-4 rounded-full flex items-center gap-x-2">
                                 <x-fas-ticket-alt class="w-4 h-4"/>
 
                                 BUY TICKETS
@@ -72,10 +79,12 @@
                 </div>
             @endforeach
         </div>
+
         <div class="swiper-button-next"></div>
         <div class="swiper-button-prev"></div>
         <div class="swiper-pagination"></div>
     </div>
+
     @push('scripts')
         <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
         <script>

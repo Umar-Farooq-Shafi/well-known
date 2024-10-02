@@ -121,22 +121,24 @@ class PaymentGatewayResource extends Resource
                 Forms\Components\Radio::make('config.sandbox')
                     ->label('Sandbox')
                     ->boolean()
+                    ->live()
                     ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
                     ->required(),
 
                 Forms\Components\TextInput::make('config.username')
-                    ->label('Username')
+                    ->label('App ID')
                     ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
+                    ->hidden(fn (Forms\Get $get) => $get('config.sandbox'))
                     ->required(),
 
                 Forms\Components\TextInput::make('config.password')
-                    ->label('Password')
+                    ->label('Secret key')
                     ->password()
                     ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
                     ->required(),
 
                 Forms\Components\TextInput::make('config.signature')
-                    ->label('Signature')
+                    ->label('Client ID')
                     ->visible(fn(Forms\Get $get) => $get('gateway_name') === 'paypal_express_checkout')
                     ->required(),
 

@@ -75,7 +75,10 @@ class Checkout extends Component
                     $this->eventDatePick = $cartElement->chosen_event_date;
                 }
 
-                foreach ($ticket->paymentGateways as $paymentGateway) {
+                foreach (
+                    $ticket->paymentGateways()->where('enabled', true)->get()
+                         as $paymentGateway
+                ) {
                     $found = false;
 
                     foreach ($this->paymentGateways ?? [] as $gt) {
@@ -99,9 +102,9 @@ class Checkout extends Component
 
         EmptyCard::dispatch($this->tickets)->delay(now()->addSeconds((int)$this->sessionTime));
 
-//        $this->stripe = $this->eventTranslation->event->organizer->paymentGateways()
-//            ->where('factory_name', 'stripe_checkout')
-//            ->first();
+        $this->stripe = $this->eventTranslation->event->organizer->paymentGateways()
+            ->where('factory_name', 'stripe_checkout')
+            ->first();
 
         if (!$this->stripe) {
             $this->stripe = PaymentGateway::query()
@@ -195,20 +198,20 @@ class Checkout extends Component
         $paymentGateway = PaymentGateway::find($this->paymentGateway);
 
         if ($paymentGateway->factory_name === 'stripe_checkout') {
-            $this->dispatch('openModal');
-
             return;
         }
 
         if ($paymentGateway->factory_name === 'paypal_express_checkout') {
             $paypal = $this->eventTranslation->event->organizer->paymentGateways()
                 ->where('factory_name', 'paypal_express_checkout')
+                ->where('enabled', true)
                 ->first();
 
             if (!$paypal) {
                 $paypal = PaymentGateway::query()
                     ->where('factory_name', 'paypal_express_checkout')
                     ->whereNull('organizer_id')
+                    ->where('enabled', true)
                     ->first();
             }
 
@@ -225,20 +228,19 @@ class Checkout extends Component
                 }
             }
 
-            $provider = new PayPalClient;
-            $provider->setApiCredentials(credentials: [
+            $config = [
                 'mode' => app()->isProduction() ? 'live' : 'sandbox',
 
                 'sandbox' => [
-                    'client_id' => $paypal->config['secret_key'],
-                    'client_secret' => $paypal->config['signature'],
+                    'client_id' => $paypal->config['signature'],
+                    'client_secret' => $paypal->config['password'],
                     'app_id' => 'APP-80W284485P519543T',
                 ],
 
                 'live' => [
-                    'client_id' => env('PAYPAL_LIVE_CLIENT_ID', ''),
-                    'client_secret' => $paypal->config['signature'],
-                    'app_id' => env('PAYPAL_LIVE_APP_ID', ''),
+                    'client_id' => $paypal->config['signature'],
+                    'client_secret' => $paypal->config['password'],
+                    'app_id' => $paypal->config['username'],
                 ],
 
                 'payment_action' => 'Sale',
@@ -246,7 +248,9 @@ class Checkout extends Component
                 'notify_url' => 'https://your-site.com/paypal/notify',
                 'locale' => 'en_US',
                 'validate_ssl' => true,
-            ]);
+            ];
+
+            $provider = new PayPalClient($config);
 
             $provider->getAccessToken();
 
@@ -270,7 +274,10 @@ class Checkout extends Component
                 // redirect to approve href
                 foreach ($response['links'] as $links) {
                     if ($links['rel'] == 'approve') {
+
+                        
                         $this->redirect($links['href']);
+                        return;
                     }
                 }
 
@@ -286,6 +293,8 @@ class Checkout extends Component
                     'description' => $response['message'] ?? 'Something went wrong.',
                 ]);
             }
+
+            return;
         }
 
         if ('eseva' === $paymentGateway->factory_name) {
