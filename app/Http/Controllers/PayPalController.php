@@ -36,8 +36,6 @@ class PayPalController extends Controller
         $response = $provider->capturePaymentOrder($request['token']);
 
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
-            $order = Session::get('order_payload');
-
             $this->createOrder(
                 $order['tickets'],
                 $order['user_id'],
@@ -51,13 +49,13 @@ class PayPalController extends Controller
                     'type' => 'success',
                     'message' => 'Transaction complete.'
                 ]);
-        } else {
-            return redirect()
-                ->route('events', [
-                    'type' => 'error',
-                    'message' => $response['message'] ?? 'Something went wrong.'
-                ]);
         }
+
+        return redirect()
+            ->route('events', [
+                'type' => 'error',
+                'message' => $response['message'] ?? 'Something went wrong.'
+            ]);
     }
 
     /**

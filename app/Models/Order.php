@@ -9,9 +9,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -76,6 +77,21 @@ class Order extends Model
         'currency_ccy',
         'currency_symbol'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        self::creating(function ($model) {
+            $uniqueStr = Str::random(15);
+
+            while(EventDate::where('reference', $uniqueStr)->exists()) {
+                $uniqueStr = Str::random(15);
+            }
+
+            $model->reference = $uniqueStr;
+        });
+    }
 
     public function stringifyStatus(): string
     {

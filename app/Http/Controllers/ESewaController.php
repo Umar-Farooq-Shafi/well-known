@@ -27,23 +27,20 @@ class ESewaController extends Controller
         $decodedString = base64_decode($request->get('data'));
         $data = json_decode($decodedString, true);
 
-        if (array_key_exists("status", $data)) {
-            $status = $data["status"];
-            if ($status === "COMPLETE") {
-                $this->createOrder(
-                    $order['tickets'],
-                    $order['user_id'],
-                    $order['payload'],
-                    $order['subtotal'],
-                    $data
-                );
+        if (data_get($data, 'status', '') === "COMPLETE") {
+            $this->createOrder(
+                $order['tickets'],
+                $order['user_id'],
+                $order['payload'],
+                $order['subtotal'],
+                $data
+            );
 
-                return redirect()
-                    ->route('events', [
-                        'type' => 'success',
-                        'message' => 'Transaction complete.'
-                    ]);
-            }
+            return redirect()
+                ->route('events', [
+                    'type' => 'success',
+                    'message' => 'Transaction complete.'
+                ]);
         }
 
         return redirect()

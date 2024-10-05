@@ -37,6 +37,10 @@ trait CreateOrder
                 $chosenDate = $ce->chosen_event_date;
             }
 
+            $ticket->cartElements()
+                ->where('user_id', $userId)
+                ->delete();
+
             OrderElement::create([
                 'order_id' => $order->id,
                 'eventticket_id' => $ticket->id,

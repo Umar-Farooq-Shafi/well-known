@@ -14,12 +14,15 @@ class EmptyCard implements ShouldQueue
 
     public $tickets;
 
+    public $userId;
+
     /**
      * Create a new job instance.
      */
-    public function __construct($tickets)
+    public function __construct($tickets, $userId)
     {
         $this->tickets = $tickets;
+        $this->userId = $userId;
     }
 
     /**
@@ -28,7 +31,9 @@ class EmptyCard implements ShouldQueue
     public function handle(): void
     {
         foreach ($this->tickets as $ticket) {
-            $ticket->cartElements()->delete();
+            $ticket->cartElements()
+                ->where('user_id', $this->userId)
+                ->delete();
         }
     }
 }

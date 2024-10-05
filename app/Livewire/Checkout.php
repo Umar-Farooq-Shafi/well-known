@@ -3,14 +3,11 @@
 namespace App\Livewire;
 
 use App\Jobs\EmptyCard;
-use App\Models\CartElement;
 use App\Models\EventTranslation;
 use App\Models\PaymentGateway;
 use App\Models\Setting;
-use App\Models\User;
 use App\Traits\CreateOrder;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Stripe\Customer;
@@ -81,7 +78,7 @@ class Checkout extends Component
 
                 foreach (
                     $ticket->paymentGateways()->where('enabled', true)->get()
-                         as $paymentGateway
+                    as $paymentGateway
                 ) {
                     $found = false;
 
@@ -104,7 +101,7 @@ class Checkout extends Component
 
         $this->sessionTime = Setting::query()->where('key', 'checkout_timeleft')->first()?->value;
 
-        EmptyCard::dispatch($this->tickets)->delay(now()->addSeconds((int)$this->sessionTime));
+        EmptyCard::dispatch($this->tickets, auth()->id())->delay(now()->addSeconds((int)$this->sessionTime));
 
         $this->stripe = $this->eventTranslation->event->organizer->paymentGateways()
             ->where('factory_name', 'stripe_checkout')
@@ -202,8 +199,8 @@ class Checkout extends Component
         $paymentGateway = PaymentGateway::find($this->paymentGateway);
 
         auth()->user()->update([
-            'first_name' => $this->firstName,
-            'last_name' => $this->lastName,
+            'firstname' => $this->firstName,
+            'lastname' => $this->lastName,
             'email' => $this->email,
             'phone' => $this->phone,
         ]);
@@ -226,11 +223,11 @@ class Checkout extends Component
         $orderPayload = [
             'user_id' => auth()->id(),
             'paymentgateway_id' => $paymentGateway->id,
-            'reference' => Str::uuid()->toString(),
             'status' => 0,
             'ticket_fee' => $fee,
             'currency_ccy' => $ccy,
-            'currency_symbol' => $currencySymbol
+            'currency_symbol' => $currencySymbol,
+            'ticket_price_percentage_cut' => 0
         ];
 
         if ($paymentGateway->factory_name === 'stripe_checkout') {
@@ -397,7 +394,9 @@ class Checkout extends Component
     public function clearCart(): void
     {
         foreach ($this->tickets as $ticket) {
-            $ticket->cartElements()->delete();
+            $ticket->cartElements()
+                ->where('user_id', auth()->id())
+                ->delete();
         }
     }
 

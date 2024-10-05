@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\CategoryTranslation;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
 
@@ -13,16 +14,25 @@ class Events extends Component
 
     public $categoryTrans;
 
-    public function mount(?string $category = null, ?string $type = null, ?string $message = null)
+    #[Url]
+    public ?string $category = null;
+
+    #[Url]
+    public ?string $type = null;
+
+    #[Url]
+    public ?string $message = null;
+
+    public function mount()
     {
-        if ($type && $message) {
+        if ($this->type && $this->message) {
             $this->notification()->send([
-                'icon' => $type,
-                'title' => $message
+                'icon' => $this->type,
+                'title' => $this->message
             ]);
         }
 
-        $this->categoryTrans = CategoryTranslation::whereName($category)->first();
+        $this->categoryTrans = CategoryTranslation::whereName($this->category)->first();
     }
 
     #[Title("Events | 'Aafno Ticket Nepal'")]

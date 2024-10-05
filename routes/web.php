@@ -42,7 +42,7 @@ Route::get('/event/{slug}', Event::class)->name('event');
 
 Route::get('/event/{slug}/checkout', Checkout::class)->name('event-checkout');
 
-Route::get('/events/{category?}/{type?}/{message?}', Events::class)->name('events');
+Route::get('/events', Events::class)->name('events');
 
 Route::get('/organizer/{slug}', OrganizerProfile::class)->name('organizer-profile');
 
