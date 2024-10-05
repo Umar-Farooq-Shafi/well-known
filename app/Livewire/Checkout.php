@@ -31,6 +31,8 @@ class Checkout extends Component
 
     public $tickets = [];
 
+    public $promotions = [];
+
     public $firstName;
 
     public $lastName;
@@ -47,6 +49,10 @@ class Checkout extends Component
 
     public $stripe;
 
+    public $couponType;
+
+    public $couponDiscount;
+
     public function mount(string $slug): void
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
@@ -61,6 +67,8 @@ class Checkout extends Component
             abort(404);
         }
 
+        $promoCode = null;
+
         foreach ($this->eventTranslation->event->eventDates as $eventDate) {
             foreach ($eventDate->eventDateTickets as $ticket) {
 
@@ -74,6 +82,7 @@ class Checkout extends Component
 
                 foreach ($cartElements as $cartElement) {
                     $this->eventDatePick = $cartElement->chosen_event_date;
+                    $promoCode = $cartElement->code;
                 }
 
                 foreach (
@@ -120,6 +129,28 @@ class Checkout extends Component
             $this->email = auth()->user()->email;
             $this->confirmEmail = auth()->user()->email;
             $this->phone = auth()->user()->phone;
+        }
+
+        $promotion = null;
+
+        foreach ($this->eventTranslation->event->promotions as $eventPromotion) {
+            $now = now()->timezone($eventPromotion->timezone);
+
+            if ($eventPromotion->start_date->lessThanOrEqualTo($now) && $eventPromotion->end_date->greaterThanOrEqualTo($now)) {
+                $promotion = $eventPromotion;
+            }
+        }
+
+        $this->promotions = $promotion?->promotionQuantities?->pluck('discount', 'quantity')?->toArray() ?? [];
+
+        if ($promoCode) {
+            $coupon = $this->eventTranslation->event->coupons()
+                ->whereDate('expire_date', '>=', now())
+                ->where('code', $promoCode)
+                ->first();
+
+            $this->couponType = $coupon->type;
+            $this->couponDiscount = $coupon->discount;
         }
     }
 
@@ -209,15 +240,47 @@ class Checkout extends Component
         $fee = 0;
         $ccy = null;
         $currencySymbol = null;
+        $country = $this->eventTranslation->event?->country?->code;
+        $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country);
 
         foreach ($this->tickets as $ticket) {
             foreach ($ticket->cartElements as $cartElement) {
                 $ccy = $ticket->currency->ccy;
                 $currencySymbol = $ticket->currency->symbol;
 
-                $subtotal += $ticket->price * $cartElement->quantity;
+                $price = $ticket->price;
+
+                if ($ticket->promotionalprice) {
+                    $isStartDate = $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
+                    $isEndDate = $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
+
+                    if ($isStartDate && $isEndDate) {
+                        $price = $ticket->price - $ticket->promotionalprice;
+                    }
+                }
+
+                if (array_key_exists($cartElement->quantity, $this->promotions)) {
+                    $discountPercentage = $this->promotions[$cartElement->quantity];
+                    $discountAmount = ($price * $discountPercentage) / 100;
+                    $price -= $discountAmount;
+                }
+
+                $subtotal += $price * $cartElement->quantity;
                 $fee += $ticket->ticket_fee * $cartElement->quantity;
             }
+        }
+
+        if ($this->couponType === 'percentage') {
+            $discount = ($subtotal * $this->couponDiscount) / 100;
+            $subtotal -= $discount;
+        }
+
+        if ($this->couponType === 'fixed_amount') {
+            $subtotal -= $this->couponDiscount;
+        }
+
+        if ($subtotal < 0) {
+            $subtotal = 0;
         }
 
         $orderPayload = [
@@ -227,7 +290,7 @@ class Checkout extends Component
             'ticket_fee' => $fee,
             'currency_ccy' => $ccy,
             'currency_symbol' => $currencySymbol,
-            'ticket_price_percentage_cut' => 0
+            'ticket_price_percentage_cut' => $this->couponType === 'percentage' ? $this->couponDiscount : 0
         ];
 
         if ($paymentGateway->factory_name === 'stripe_checkout') {
@@ -468,31 +531,6 @@ class Checkout extends Component
 
         if ($paymentGateway->factory_name === 'stripe_checkout')
             $this->dispatch('showStrip');
-    }
-
-    protected function updateDotEnv($key, $newValue, $delim = ''): void
-    {
-        $path = base_path('.env');
-        // get old value from current env
-        $oldValue = env($key);
-
-        // was there any change?
-        if ($oldValue === $newValue) {
-            return;
-        }
-
-        // rewrite file content with changed data
-        if (file_exists($path)) {
-            // replace current value with new value
-            file_put_contents(
-                $path,
-                str_replace(
-                    $key . '=' . $delim . $oldValue . $delim,
-                    $key . '=' . $delim . $newValue . $delim,
-                    file_get_contents($path),
-                ),
-            );
-        }
     }
 
     public function render()

@@ -78,7 +78,7 @@ class Event extends Component
 
         $coupon = $event->coupons()
             ->whereDate('expire_date', '>=', now())
-            ->where('code', 'test123')
+            ->where('code', $this->promoCode)
             ->first();
 
         if (!$coupon) {

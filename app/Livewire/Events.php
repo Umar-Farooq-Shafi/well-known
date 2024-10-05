@@ -30,6 +30,9 @@ class Events extends Component
                 'icon' => $this->type,
                 'title' => $this->message
             ]);
+
+            $this->type = null;
+            $this->message = null;
         }
 
         $this->categoryTrans = CategoryTranslation::whereName($this->category)->first();

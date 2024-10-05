@@ -2,10 +2,13 @@
     use App\Models\PaymentGateway;use Carbon\Carbon;
 
     $event = $eventTranslation->event;
+    $country = $event?->country?->code;
 
     $subtotal = 0;
     $fee = 0;
     $ccy = null;
+
+    $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country);
 @endphp
 
 <div x-data="checkoutData">
@@ -161,9 +164,38 @@
                             @foreach ($ticket->cartElements as $cartElement)
                                 @php
                                     $ccy = $ticket->currency->ccy;
+                                    $price = $ticket->price;
 
-                                    $subtotal += $ticket->price * $cartElement->quantity;
+                                    if ($ticket->promotionalprice) {
+                                        $isStartDate = $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
+                                        $isEndDate = $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
+
+                                        if ($isStartDate && $isEndDate) {
+                                            $price = $ticket->price - $ticket->promotionalprice;
+                                        }
+                                    }
+
+                                    if (array_key_exists($cartElement->quantity, $this->promotions)) {
+                                        $discountPercentage = $this->promotions[$cartElement->quantity];
+                                        $discountAmount = ($price * $discountPercentage) / 100;
+                                        $price -= $discountAmount;
+                                    }
+
+                                    $subtotal += $price * $cartElement->quantity;
                                     $fee += $ticket->ticket_fee * $cartElement->quantity;
+
+                                    if ($this->couponType === 'percentage') {
+                                         $discount = ($subtotal * $this->couponDiscount) / 100;
+                                         $subtotal -= $discount;
+                                    }
+
+                                    if ($this->couponType === 'fixed_amount') {
+                                        $subtotal -= $this->couponDiscount;
+                                    }
+
+                                    if ($subtotal < 0) {
+                                        $subtotal = 0;
+                                    }
                                 @endphp
 
                                 <div class="flex justify-between items-center m-2">
