@@ -10,6 +10,7 @@
     @stack('styles')
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
 
     <wireui:scripts />
     @vite('resources/css/app.css')
@@ -17,7 +18,7 @@
 
     @stack('styles')
 </head>
-<body class="bg-sky-50">
+<body class="bg-sky-50 {{ app()->isLocal() ? 'debug-screens' : '' }}">
 <x-notifications />
 
 @include('components.layouts.nav')

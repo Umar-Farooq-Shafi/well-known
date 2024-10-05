@@ -20,7 +20,9 @@ export default {
     plugins: [
         require('@tailwindcss/forms'),
         require('@tailwindcss/aspect-ratio'),
-        require('@tailwindcss/typography')
+        require('@tailwindcss/typography'),
+        require('tailwindcss-debug-screens'),
+        require("tailwindcss-animate"),
     ],
     presets: [
         require('./vendor/wireui/wireui/tailwind.config.js')
