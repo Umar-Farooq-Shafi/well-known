@@ -21,6 +21,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\HtmlString;
 use RyanChandler\FilamentProgressColumn\ProgressColumn;
@@ -302,6 +303,7 @@ class EventResource extends Resource
                 Forms\Components\Select::make('eventtimezone')
                     ->label('Time Zone')
                     ->required()
+                    ->live()
                     ->options(function (Forms\Get $get) {
                         $country_id = $get('country_id');
 
@@ -327,16 +329,49 @@ class EventResource extends Resource
                     ->required()
                     ->relationship('eventDates')
                     ->columnSpanFull()
+                    ->mutateRelationshipDataBeforeSaveUsing(function ($data, Forms\Get $get) {
+                        if (data_get($data, 'recurrent_startdate')) {
+                            $data['recurrent_startdate'] = Carbon::make($data['recurrent_startdate'])->timezone($get('eventtimezone'));
+                        }
+
+                        if (data_get($data, 'recurrent_enddate')) {
+                            $data['recurrent_enddate'] = Carbon::make($data['recurrent_enddate'])->timezone($get('eventtimezone'));
+                        }
+
+                        if (data_get($data, 'startdate')) {
+                            $data['startdate'] = Carbon::make($data['startdate'])->timezone($get('eventtimezone'));
+                        }
+
+                        if (data_get($data, 'enddate')) {
+                            $data['enddate'] = Carbon::make($data['enddate'])->timezone($get('eventtimezone'));
+                        }
+
+                        return $data;
+                    })
                     ->schema([
                         Forms\Components\Radio::make('recurrent')
                             ->label('Is this event recurring?')
                             ->boolean()
-                            ->live()
+//                            ->hidden(function (Forms\Get $get) {
+//                                $counter = 0;
+//
+//                                foreach ($get('../../eventDates') as $eventDates) {
+//                                    if ($eventDates['recurrent'] && $counter === 0) {
+//                                        return true;
+//                                    }
+//
+//                                    $counter++;
+//                                }
+//
+//                                return false;
+//                            })
+//                            ->live()
                             ->required(),
 
                         Forms\Components\DateTimePicker::make('recurrent_startdate')
                             ->label('Calendar Starts On')
                             ->required()
+                            ->dehydrateStateUsing(fn ($state, Forms\Get $get) => dd($state))
                             ->visible(fn(Forms\Get $get) => $get('recurrent')),
 
                         Forms\Components\DateTimePicker::make('recurrent_enddate')
@@ -550,10 +585,29 @@ class EventResource extends Resource
                                 Forms\Components\DateTimePicker::make('salesenddate')
                                     ->label('Promotion Ends On'),
                             ])
-                            ->mutateRelationshipDataBeforeCreateUsing(function ($data) {
+                            ->mutateRelationshipDataBeforeSaveUsing(function ($data, Forms\Get $get) {
+                                if (data_get($data, 'salesstartdate')) {
+                                    $data['salesstartdate'] = Carbon::make($data['salesstartdate'])->timezone($get('eventtimezone'));
+                                }
+
+                                if (data_get($data, 'salesenddate')) {
+                                    $data['salesenddate'] = Carbon::make($data['salesenddate'])->timezone($get('eventtimezone'));
+                                }
+
+                                return $data;
+                            })
+                            ->mutateRelationshipDataBeforeCreateUsing(function ($data, Forms\Get $get) {
                                 $data['position'] = 0;
                                 $data['currency_symbol_position'] = $data['currency_symbol_position'] ?? 'left';
                                 $data['ticket_fee'] = $data['ticket_fee'] ?? 0;
+
+                                if (data_get($data, 'salesstartdate')) {
+                                    $data['salesstartdate'] = Carbon::make($data['salesstartdate'])->timezone($get('eventtimezone'));
+                                }
+
+                                if (data_get($data, 'salesenddate')) {
+                                    $data['salesenddate'] = Carbon::make($data['salesenddate'])->timezone($get('eventtimezone'));
+                                }
 
                                 return $data;
                             }),
