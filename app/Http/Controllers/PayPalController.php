@@ -2,51 +2,90 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\CreateOrder;
+use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use Throwable;
 
 class PayPalController extends Controller
 {
+    use CreateOrder;
+
     /**
      * success transaction.
      *
+     * @param Request $request
      * @return RedirectResponse
-     * @throws \Exception|\Throwable
+     * @throws Throwable
      */
     public function successTransaction(Request $request): RedirectResponse
     {
-        $paypalConfig = Session::get('paypal_config');
-        Session::forget('paypal_config');
+        if (!Session::has('order_payload')) {
+            abort(404);
+        }
 
-        $provider = new PayPalClient($paypalConfig);
+        $order = Session::get('order_payload');
+
+        Session::forget('order_payload');
+
+        $provider = new PayPalClient($order['config']);
         $provider->getAccessToken();
         $response = $provider->capturePaymentOrder($request['token']);
 
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
-            $userID = Session::get('paypal_user_id');
-            Session::forget('paypal_user_id');
+            $order = Session::get('order_payload');
+
+            $this->createOrder(
+                $order['tickets'],
+                $order['user_id'],
+                $order['payload'],
+                $order['subtotal'],
+                $response
+            );
 
             return redirect()
-                ->route('createTransaction')
-                ->with('success', 'Transaction complete.');
+                ->route('events', [
+                    'type' => 'success',
+                    'message' => 'Transaction complete.'
+                ]);
         } else {
             return redirect()
-                ->route('createTransaction')
-                ->with('error', $response['message'] ?? 'Something went wrong.');
+                ->route('events', [
+                    'type' => 'error',
+                    'message' => $response['message'] ?? 'Something went wrong.'
+                ]);
         }
     }
 
     /**
      * cancel transaction.
      *
+     * @param Request $request
      * @return RedirectResponse
+     * @throws Exception
+     * @throws Throwable
      */
-    public function cancelTransaction(Request $request)
+    public function cancelTransaction(Request $request): RedirectResponse
     {
+        if (!Session::has('order_payload')) {
+            abort(404);
+        }
+
+        $order = Session::get('order_payload');
+
+        Session::forget('order_payload');
+
+        $provider = new PayPalClient($order['config']);
+        $provider->getAccessToken();
+        $response = $provider->capturePaymentOrder($request['token']);
+
         return redirect()
-            ->route('createTransaction')
-            ->with('error', $response['message'] ?? 'You have canceled the transaction.');
+            ->route('events', [
+                'type' => 'error',
+                'message' => $response['message'] ?? 'You have canceled the transaction.'
+            ]);
     }
 }

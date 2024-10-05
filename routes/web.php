@@ -16,6 +16,7 @@ use App\Livewire\HelpCenterArticle;
 use App\Livewire\HelpCenterCategory;
 use App\Livewire\Home;
 use App\Livewire\Movies;
+use App\Livewire\OrderTransaction;
 use App\Livewire\OrganizerProfile;
 use App\Livewire\Pages;
 use App\Livewire\ToursAndAdventure;
@@ -41,7 +42,7 @@ Route::get('/event/{slug}', Event::class)->name('event');
 
 Route::get('/event/{slug}/checkout', Checkout::class)->name('event-checkout');
 
-Route::get('/events/{category?}', Events::class)->name('events');
+Route::get('/events/{category?}/{type?}/{message?}', Events::class)->name('events');
 
 Route::get('/organizer/{slug}', OrganizerProfile::class)->name('organizer-profile');
 

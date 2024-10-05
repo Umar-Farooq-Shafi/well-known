@@ -7,8 +7,12 @@ use App\Models\EventDate;
 use App\Models\EventDateTicket;
 use App\Models\EventTranslation;
 use App\Models\Organizer;
+use App\Models\User;
 use App\Traits\RatingTrait;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
 
@@ -131,22 +135,32 @@ class Event extends Component
             ]);
         } else {
             if (!auth()->check()) {
-                $userId = rand(1, 100000);
+                $email = fake()->unique()->safeEmail;
+                $password = fake()->password;
+                $username = fake()->userName;
 
-                while (CartElement::whereUserId($userId)->exists()) {
-                    $userId = rand(1, 100000);
-                }
+                User::create([
+                    'username' => $username,
+                    'username_canonical' => $username,
+                    'email' => $email,
+                    'email_canonical' => $email,
+                    'enabled' => 1,
+                    'password' => Hash::make($password),
+                    'roles' => 'a:1:{i:0;s:13:"ROLE_ATTENDEE";}',
+                    'slug' => Str::slug($username),
+                ]);
 
-                Session::put('user_id', $userId);
-            } else {
-                $userId = auth()->id();
+                Auth::attempt([
+                    'email' => $email,
+                    'password' => $password
+                ]);
             }
 
             foreach ($this->quantity as $ticketId => $quantity) {
                 $ticket = EventDateTicket::find($ticketId);
 
                 CartElement::create([
-                    'user_id' => $userId,
+                    'user_id' => auth()->id(),
                     'eventticket_id' => $ticketId,
                     'quantity' => $quantity,
                     'ticket_fee' => $ticket->ticket_fee,

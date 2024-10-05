@@ -7,7 +7,10 @@ use App\Models\CartElement;
 use App\Models\EventTranslation;
 use App\Models\PaymentGateway;
 use App\Models\Setting;
+use App\Models\User;
+use App\Traits\CreateOrder;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Stripe\Customer;
@@ -21,6 +24,7 @@ use Srmklive\PayPal\Services\PayPal as PayPalClient;
 class Checkout extends Component
 {
     use WireUiActions;
+    use CreateOrder;
 
     public $eventTranslation;
 
@@ -197,7 +201,46 @@ class Checkout extends Component
 
         $paymentGateway = PaymentGateway::find($this->paymentGateway);
 
+        auth()->user()->update([
+            'first_name' => $this->firstName,
+            'last_name' => $this->lastName,
+            'email' => $this->email,
+            'phone' => $this->phone,
+        ]);
+
+        $subtotal = 0;
+        $fee = 0;
+        $ccy = null;
+        $currencySymbol = null;
+
+        foreach ($this->tickets as $ticket) {
+            foreach ($ticket->cartElements as $cartElement) {
+                $ccy = $ticket->currency->ccy;
+                $currencySymbol = $ticket->currency->symbol;
+
+                $subtotal += $ticket->price * $cartElement->quantity;
+                $fee += $ticket->ticket_fee * $cartElement->quantity;
+            }
+        }
+
+        $orderPayload = [
+            'user_id' => auth()->id(),
+            'paymentgateway_id' => $paymentGateway->id,
+            'reference' => Str::uuid()->toString(),
+            'status' => 0,
+            'ticket_fee' => $fee,
+            'currency_ccy' => $ccy,
+            'currency_symbol' => $currencySymbol
+        ];
+
         if ($paymentGateway->factory_name === 'stripe_checkout') {
+            $orderPayload['status'] = 1;
+
+            Session::put('order_payload', [
+                'payload' => $orderPayload,
+                'subtotal' => $subtotal
+            ]);
+
             return;
         }
 
@@ -213,19 +256,6 @@ class Checkout extends Component
                     ->whereNull('organizer_id')
                     ->where('enabled', true)
                     ->first();
-            }
-
-            $subtotal = 0;
-            $fee = 0;
-            $ccy = null;
-
-            foreach ($this->tickets as $ticket) {
-                foreach ($ticket->cartElements as $cartElement) {
-                    $ccy = $ticket->currency->ccy;
-
-                    $subtotal += $ticket->price * $cartElement->quantity;
-                    $fee += $ticket->ticket_fee * $cartElement->quantity;
-                }
             }
 
             $config = [
@@ -274,8 +304,16 @@ class Checkout extends Component
                 // redirect to approve href
                 foreach ($response['links'] as $links) {
                     if ($links['rel'] == 'approve') {
+                        $orderPayload['status'] = 1;
 
-                        
+                        Session::put('order_payload', [
+                            'config' => $config,
+                            'payload' => $orderPayload,
+                            'subtotal' => $subtotal,
+                            'user_id' => auth()->id(),
+                            'tickets' => $this->tickets,
+                        ]);
+
                         $this->redirect($links['href']);
                         return;
                     }
@@ -309,19 +347,6 @@ class Checkout extends Component
                     ->first();
             }
 
-            $subtotal = 0;
-            $fee = 0;
-            $ccy = null;
-
-            foreach ($this->tickets as $ticket) {
-                foreach ($ticket->cartElements as $cartElement) {
-                    $ccy = $ticket->currency->ccy;
-
-                    $subtotal += $ticket->price * $cartElement->quantity;
-                    $fee += $ticket->ticket_fee * $cartElement->quantity;
-                }
-            }
-
             if (app()->isProduction()) {
                 $key = $eseva?->config['secret_key'];
             } else {
@@ -347,11 +372,25 @@ class Checkout extends Component
                 "currency" => $ccy
             ];
 
+            $orderPayload['status'] = 1;
+
+            Session::put('order_payload', [
+                'payload' => $orderPayload,
+                'subtotal' => $subtotal,
+                'user_id' => auth()->id(),
+                'tickets' => $this->tickets,
+            ]);
+
             $this->dispatch("redirectToEsewaPage", $dataArray);
             return;
         }
 
-        dd($paymentGateway);
+        $this->createOrder(
+            $this->tickets,
+            auth()->id(),
+            $orderPayload,
+            $subtotal,
+        );
     }
 
     #[On('clear-cart')]
@@ -399,6 +438,18 @@ class Checkout extends Component
                 'icon' => 'success',
                 'title' => 'Payment successful!',
             ]);
+
+            $orderPayload = Session::get('order_payload');
+
+            $this->createOrder(
+                $this->tickets,
+                auth()->id(),
+                $orderPayload['payload'],
+                $orderPayload['subtotal'],
+                $paymentIntent->toArray()
+            );
+
+            Session::forget('order_payload');
 
             $this->clearCart();
             $this->returnToCart();
