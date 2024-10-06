@@ -329,7 +329,26 @@ class EventResource extends Resource
                     ->required()
                     ->relationship('eventDates')
                     ->columnSpanFull()
-                    ->mutateRelationshipDataBeforeSaveUsing(function ($data, Forms\Get $get) {
+                    ->mutateRelationshipDataBeforeSaveUsing(function ($data) {
+                        if (data_get($data, 'recurrent_startdate')) {
+                            $data['recurrent_startdate'] = Carbon::make($data['recurrent_startdate'])->timezone('UTC');
+                        }
+
+                        if (data_get($data, 'recurrent_enddate')) {
+                            $data['recurrent_enddate'] = Carbon::make($data['recurrent_enddate'])->timezone('UTC');
+                        }
+
+                        if (data_get($data, 'startdate')) {
+                            $data['startdate'] = Carbon::make($data['startdate'])->timezone('UTC');
+                        }
+
+                        if (data_get($data, 'enddate')) {
+                            $data['enddate'] = Carbon::make($data['enddate'])->timezone('UTC');
+                        }
+
+                        return $data;
+                    })
+                    ->mutateRelationshipDataBeforeFillUsing(function ($data, Forms\Get $get) {
                         if (data_get($data, 'recurrent_startdate')) {
                             $data['recurrent_startdate'] = Carbon::make($data['recurrent_startdate'])->timezone($get('eventtimezone'));
                         }
@@ -585,7 +604,18 @@ class EventResource extends Resource
                                 Forms\Components\DateTimePicker::make('salesenddate')
                                     ->label('Promotion Ends On'),
                             ])
-                            ->mutateRelationshipDataBeforeSaveUsing(function ($data, Forms\Get $get) {
+                            ->mutateRelationshipDataBeforeSaveUsing(function ($data) {
+                                if (data_get($data, 'salesstartdate')) {
+                                    $data['salesstartdate'] = Carbon::make($data['salesstartdate'])->timezone('UTC');
+                                }
+
+                                if (data_get($data, 'salesenddate')) {
+                                    $data['salesenddate'] = Carbon::make($data['salesenddate'])->timezone('UTC');
+                                }
+
+                                return $data;
+                            })
+                            ->mutateRelationshipDataBeforeFillUsing(function ($data, Forms\Get $get) {
                                 if (data_get($data, 'salesstartdate')) {
                                     $data['salesstartdate'] = Carbon::make($data['salesstartdate'])->timezone($get('eventtimezone'));
                                 }
@@ -596,17 +626,17 @@ class EventResource extends Resource
 
                                 return $data;
                             })
-                            ->mutateRelationshipDataBeforeCreateUsing(function ($data, Forms\Get $get) {
+                            ->mutateRelationshipDataBeforeCreateUsing(function ($data) {
                                 $data['position'] = 0;
                                 $data['currency_symbol_position'] = $data['currency_symbol_position'] ?? 'left';
                                 $data['ticket_fee'] = $data['ticket_fee'] ?? 0;
 
                                 if (data_get($data, 'salesstartdate')) {
-                                    $data['salesstartdate'] = Carbon::make($data['salesstartdate'])->timezone($get('eventtimezone'));
+                                    $data['salesstartdate'] = Carbon::make($data['salesstartdate'])->timezone('UTC');
                                 }
 
                                 if (data_get($data, 'salesenddate')) {
-                                    $data['salesenddate'] = Carbon::make($data['salesenddate'])->timezone($get('eventtimezone'));
+                                    $data['salesenddate'] = Carbon::make($data['salesenddate'])->timezone('UTC');
                                 }
 
                                 return $data;
