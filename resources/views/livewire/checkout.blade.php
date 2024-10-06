@@ -37,7 +37,7 @@
 
         <div class="flex items-center flex-col mt-8">
             <div class="grid w-2/3 grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-3 md:grid-flow-dense">
-                <div class="md:col-span-2 lg:col-span-5">
+                <div class="md:col-span-2 lg:col-span-5 md:order-last">
                     <div class="flex flex-col gap-y-1 font-medium text-base pb-2">
                         <p>{{ $eventTranslation->name }}</p>
 
@@ -149,7 +149,7 @@
                     </x-card>
                 </div>
 
-                <div class="lg:col-span-3 md:col-span-2 md:order-last">
+                <div class="lg:col-span-3 md:col-span-2">
                     <img
                         src="{{ Storage::url('events/' . $event->image_name) }}"
                         alt="{{ $eventTranslation->name }}"

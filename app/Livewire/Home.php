@@ -29,7 +29,7 @@ class Home extends Component
     {
         $this->country = $country;
 
-        $this->redirect('?country=' . $country . '&category=' . $this->category);
+        return redirect()->to('?country=' . $country . '&category=' . $this->category . '&scroll-to-category=true');
     }
 
     public function loadMore()

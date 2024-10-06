@@ -70,36 +70,36 @@
         </section>
 
         <nav>
-            <div class="max-w-screen-xl px-4 py-3">
+            <div class="max-w-screen-xl px-4 py-3" id="scroll-to-category">
                 <div class="flex items-center">
                     <ul class="flex flex-row font-medium mt-0 space-x-8 rtl:space-x-reverse text-sm">
                         <li>
-                            <a href="?country={{ $country }}"
+                            <a href="?country={{ $country }}&scroll-to-category=true"
                                class="{{ $category === '' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-blue-700 text-base  dark:text-white hover:underline"
                                aria-current="page">
                                 All
                             </a>
                         </li>
                         <li>
-                            <a href="?category=online&country={{ $country }}"
+                            <a href="?category=online&country={{ $country }}&scroll-to-category=true"
                                class="{{ $category === 'online' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                 Online
                             </a>
                         </li>
                         <li>
-                            <a href="?category=today&country={{ $country }}"
+                            <a href="?category=today&country={{ $country }}&scroll-to-category=true"
                                class="{{ $category === 'today' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                 Today
                             </a>
                         </li>
                         <li>
-                            <a href="?category=this-weekend&country={{ $country }}"
+                            <a href="?category=this-weekend&country={{ $country }}&scroll-to-category=true"
                                class="{{ $category === 'this-weekend' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                 This Weekend
                             </a>
                         </li>
                         <li>
-                            <a href="?category=free&country={{ $country }}"
+                            <a href="?category=free&country={{ $country }}&scroll-to-category=true"
                                class="{{ $category === 'free' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                 Free
                             </a>
@@ -252,7 +252,8 @@
 
                                                             @if($lowestPromotionalPrice !== null && $lowestPromotionalPrice < $lowest)
                                                                 {{-- Display promotional price if available --}}
-                                                                <del class="text-gray-500">{{ $lowest }}</del> {{ $ccy }} {{ $lowestPromotionalPrice }}
+                                                                <del
+                                                                    class="text-gray-500">{{ $lowest }}</del> {{ $ccy }} {{ $lowestPromotionalPrice }}
                                                             @else
                                                                 {{-- Display lowest price if no promotional price --}}
                                                                 {{ $ccy }} {{ $lowest }}
@@ -464,7 +465,8 @@
 
                                                         @if($lowestPromotionalPrice !== null && $lowestPromotionalPrice < $lowest)
                                                             {{-- Display promotional price if available --}}
-                                                            <del class="text-gray-500">{{ $lowest }}</del> {{ $ccy }} {{ $lowestPromotionalPrice }}
+                                                            <del
+                                                                class="text-gray-500">{{ $lowest }}</del> {{ $ccy }} {{ $lowestPromotionalPrice }}
                                                         @else
                                                             {{-- Display lowest price if no promotional price --}}
                                                             {{ $ccy }} {{ $lowest }}
@@ -547,6 +549,23 @@
                         countries: Object.values(@js($countries))
                     }
                 });
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const scrollToCategory = urlParams.get('scroll-to-category');
+
+                if (scrollToCategory === 'true') {
+                    const el = document.querySelector('#scroll-to-category');
+
+                    if (el) {
+                        el.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                    }
+                }
             });
 
             new Swiper(".eventSlider", {
