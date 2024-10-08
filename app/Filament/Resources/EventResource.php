@@ -329,40 +329,28 @@ class EventResource extends Resource
                     ->required()
                     ->relationship('eventDates')
                     ->columnSpanFull()
-                    ->mutateRelationshipDataBeforeSaveUsing(function ($data) {
-                        if (data_get($data, 'recurrent_startdate')) {
-                            $data['recurrent_startdate'] = Carbon::make($data['recurrent_startdate'])->timezone('UTC');
-                        }
+                    ->mutateRelationshipDataBeforeSaveUsing(function ($data, Forms\Get $get) {
+                        $eventtimezone = $get('eventtimezone');
+                        $dateKeys = ['recurrent_startdate', 'recurrent_enddate', 'startdate', 'enddate'];
 
-                        if (data_get($data, 'recurrent_enddate')) {
-                            $data['recurrent_enddate'] = Carbon::make($data['recurrent_enddate'])->timezone('UTC');
-                        }
-
-                        if (data_get($data, 'startdate')) {
-                            $data['startdate'] = Carbon::make($data['startdate'])->timezone('UTC');
-                        }
-
-                        if (data_get($data, 'enddate')) {
-                            $data['enddate'] = Carbon::make($data['enddate'])->timezone('UTC');
+                        foreach ($dateKeys as $key) {
+                            if (data_get($data, $key)) {
+                                $data[$key] = Carbon::parse($data[$key], $eventtimezone)->setTimezone('UTC');
+                            }
                         }
 
                         return $data;
                     })
                     ->mutateRelationshipDataBeforeFillUsing(function ($data, Forms\Get $get) {
-                        if (data_get($data, 'recurrent_startdate')) {
-                            $data['recurrent_startdate'] = Carbon::make($data['recurrent_startdate'])->timezone($get('eventtimezone'));
-                        }
+                        $eventtimezone = $get('eventtimezone');
+                        $dateKeys = ['recurrent_startdate', 'recurrent_enddate', 'startdate', 'enddate'];
 
-                        if (data_get($data, 'recurrent_enddate')) {
-                            $data['recurrent_enddate'] = Carbon::make($data['recurrent_enddate'])->timezone($get('eventtimezone'));
-                        }
-
-                        if (data_get($data, 'startdate')) {
-                            $data['startdate'] = Carbon::make($data['startdate'])->timezone($get('eventtimezone'));
-                        }
-
-                        if (data_get($data, 'enddate')) {
-                            $data['enddate'] = Carbon::make($data['enddate'])->timezone($get('eventtimezone'));
+                        foreach ($dateKeys as $key) {
+                            if (data_get($data, $key)) {
+                                $data[$key] = Carbon::parse($data[$key], 'UTC')
+                                    ->setTimezone($eventtimezone)
+                                    ->format('Y-m-d H:i:s');
+                            }
                         }
 
                         return $data;
@@ -371,26 +359,12 @@ class EventResource extends Resource
                         Forms\Components\Radio::make('recurrent')
                             ->label('Is this event recurring?')
                             ->boolean()
-//                            ->hidden(function (Forms\Get $get) {
-//                                $counter = 0;
-//
-//                                foreach ($get('../../eventDates') as $eventDates) {
-//                                    if ($eventDates['recurrent'] && $counter === 0) {
-//                                        return true;
-//                                    }
-//
-//                                    $counter++;
-//                                }
-//
-//                                return false;
-//                            })
-//                            ->live()
+                            ->live()
                             ->required(),
 
                         Forms\Components\DateTimePicker::make('recurrent_startdate')
                             ->label('Calendar Starts On')
                             ->required()
-                            ->dehydrateStateUsing(fn ($state, Forms\Get $get) => dd($state))
                             ->visible(fn(Forms\Get $get) => $get('recurrent')),
 
                         Forms\Components\DateTimePicker::make('recurrent_enddate')
@@ -449,7 +423,7 @@ class EventResource extends Resource
                             ->relationship('scanners')
                             ->getSearchResultsUsing(
                                 fn(string $query)
-                                    => Scanner::whereOrganizerId(auth()->user()->organizer_id)
+                                => Scanner::whereOrganizerId(auth()->user()->organizer_id)
                                     ->where('name', 'like', "%{$query}%")
                                     ->pluck('name', 'id'),
                             )
@@ -464,7 +438,7 @@ class EventResource extends Resource
                             ->relationship('pointOfSales')
                             ->getSearchResultsUsing(
                                 fn(string $query)
-                                    => PointsOfSale::whereOrganizerId(auth()->user()->organizer_id)
+                                => PointsOfSale::whereOrganizerId(auth()->user()->organizer_id)
                                     ->where('name', 'like', "%{$query}%")
                                     ->pluck('name', 'id'),
                             )
@@ -524,7 +498,7 @@ class EventResource extends Resource
                                                 ->when(
                                                     auth()->user()->membership_type === 'Membership',
                                                     fn(Builder $query)
-                                                        => $query
+                                                    => $query
                                                         ->where(
                                                             'organizer_id',
                                                             auth()->user()->organizer_id,
@@ -604,28 +578,33 @@ class EventResource extends Resource
                                 Forms\Components\DateTimePicker::make('salesenddate')
                                     ->label('Promotion Ends On'),
                             ])
-                            ->mutateRelationshipDataBeforeSaveUsing(function ($data) {
-                                if (data_get($data, 'salesstartdate')) {
-                                    $data['salesstartdate'] = Carbon::make($data['salesstartdate'])->timezone('UTC');
-                                }
+                            ->mutateRelationshipDataBeforeSaveUsing(function ($data, Forms\Get $get) {
+                                $eventtimezone = $get('../../eventtimezone');
+                                $dateKeys = ['salesstartdate', 'salesenddate'];
 
-                                if (data_get($data, 'salesenddate')) {
-                                    $data['salesenddate'] = Carbon::make($data['salesenddate'])->timezone('UTC');
+                                foreach ($dateKeys as $key) {
+                                    if (data_get($data, $key)) {
+                                        $data[$key] = Carbon::parse($data[$key], $eventtimezone)->setTimezone('UTC');
+                                    }
                                 }
 
                                 return $data;
                             })
                             ->mutateRelationshipDataBeforeFillUsing(function ($data, Forms\Get $get) {
-                                if (data_get($data, 'salesstartdate')) {
-                                    $data['salesstartdate'] = Carbon::make($data['salesstartdate'])->timezone($get('eventtimezone'));
-                                }
+                                $eventtimezone = $get('../../eventtimezone');
+                                $dateKeys = ['salesstartdate', 'salesenddate'];
 
-                                if (data_get($data, 'salesenddate')) {
-                                    $data['salesenddate'] = Carbon::make($data['salesenddate'])->timezone($get('eventtimezone'));
+                                foreach ($dateKeys as $key) {
+                                    if (data_get($data, $key)) {
+                                        $data[$key] = Carbon::parse($data[$key], 'UTC')
+                                            ->setTimezone($eventtimezone)
+                                            ->format('Y-m-d H:i:s');
+                                    }
                                 }
 
                                 return $data;
                             })
+
                             ->mutateRelationshipDataBeforeCreateUsing(function ($data) {
                                 $data['position'] = 0;
                                 $data['currency_symbol_position'] = $data['currency_symbol_position'] ?? 'left';
@@ -724,7 +703,7 @@ class EventResource extends Resource
                             ->when(
                                 auth()->user()->hasRole('ROLE_ORGANIZER'),
                                 fn(Builder $query)
-                                    => $query->whereHas(
+                                => $query->whereHas(
                                     'event',
                                     fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id),
                                 ),
@@ -733,7 +712,7 @@ class EventResource extends Resource
                     })
                     ->query(
                         fn(Builder $query, array $data)
-                            => $query->when(
+                        => $query->when(
                             $data['value'],
                             fn(Builder $query, $value) => $query->where('id', $value),
                         ),
@@ -771,7 +750,7 @@ class EventResource extends Resource
                                     ->where('locale', App::getLocale())->first()?->name . ' : Payout request',
                         )
                         ->modalContent(fn(Event $record)
-                            => view(
+                        => view(
                             'filament.resources.event-resource.payout-request',
                             ['record' => $record],
                         ))
@@ -1008,7 +987,7 @@ class EventResource extends Resource
             ->when(
                 auth()->user()->hasRole('ROLE_SCANNER'),
                 fn(Builder $query)
-                    => $query->whereHas(
+                => $query->whereHas(
                     'eventDates.scanners',
                     fn(Builder $query) => $query->where('scanner_id', auth()->user()->scanner->id),
                 ),
@@ -1016,7 +995,7 @@ class EventResource extends Resource
             ->when(
                 auth()->user()->hasRole('ROLE_POINTOFSALE'),
                 fn(Builder $query)
-                    => $query->whereHas(
+                => $query->whereHas(
                     'eventDates.pointOfSales',
                     fn(Builder $query) => $query->where('pointofsale_id', auth()->user()->pointOfSale->id),
                 ),

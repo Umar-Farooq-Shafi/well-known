@@ -53,18 +53,23 @@
 
                             <p class="text-lg mb-8 flex items-center gap-x-2">
                                 <x-fas-clock class="w-4 h-4" style="margin-top: -25px;"/>
-
                                 <span class="text-left">
-                                    @if($saleEvent?->startdate)
-                                        <span>
-                                            {{ $saleEvent->startdate->timezone($timezone[0])->format('jS M Y') }},
-                                            {{ $saleEvent->startdate->timezone($timezone[0])->format('l') }},
-                                            Start {{ $saleEvent->startdate->timezone($timezone[0])->format('g:i a') }}
-                                        </span>
-                                        <br>
-                                        <span>Timezone ({{ $timezone[0] }})</span>
+                                        @if($saleEvent)
+                                        @php
+                                            // Determine the start date based on recurrence
+                                            $startDate = $saleEvent->recurrent ? $saleEvent->recurrent_startdate : $saleEvent->startdate;
+                                        @endphp
+                                        @if($startDate)
+                                            <span>
+                                                    {{ $startDate->timezone($timezone[0])->format('jS M Y') }},
+                                                    {{ $startDate->timezone($timezone[0])->format('l') }},
+                                                    Start {{ $startDate->timezone($timezone[0])->format('g:i a') }}
+                                                </span>
+                                            <br>
+                                            <span>Timezone ({{ $timezone[0] }})</span>
+                                        @endif
                                     @endif
-                                </span>
+                                    </span>
                             </p>
 
                             <a
