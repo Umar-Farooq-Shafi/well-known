@@ -35,9 +35,18 @@
             <x-breadcrumbs/>
         </div>
 
+        <div>
+            <div class="timer" x-data="timer(new Date().setDate(new Date().getDate() + parseInt(@js($sessionTime)) * 1000))" x-init="init();">
+                <h1 x-text="time().days"></h1>
+                <h1 x-text="time().hours"></h1>
+                <h1 x-text="time().minutes"></h1>
+                <h1 x-text="time().seconds"></h1>
+            </div>
+        </div>
+
         <div class="flex items-center flex-col mt-8">
-            <div class="grid w-2/3 grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-3 md:grid-flow-dense">
-                <div class="md:col-span-2 lg:col-span-5 md:order-last">
+            <div class="grid w-2/3 grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-3">
+                <div class="md:col-span-2 lg:col-span-5 order-last md:order-none">
                     <div class="flex flex-col gap-y-1 font-medium text-base pb-2">
                         <p>{{ $eventTranslation->name }}</p>
 
@@ -305,6 +314,57 @@
 
         <script>
             document.addEventListener('alpine:init', () => {
+                function timer(expiry) {
+                    return {
+                        expiry: expiry,
+                        remaining:null,
+                        init() {
+                            this.setRemaining()
+                            setInterval(() => {
+                                this.setRemaining();
+                            }, 1000);
+                        },
+                        setRemaining() {
+                            const diff = this.expiry - new Date().getTime();
+                            this.remaining =  parseInt(diff / 1000);
+                        },
+                        days() {
+                            return {
+                                value:this.remaining / 86400,
+                                remaining:this.remaining % 86400
+                            };
+                        },
+                        hours() {
+                            return {
+                                value:this.days().remaining / 3600,
+                                remaining:this.days().remaining % 3600
+                            };
+                        },
+                        minutes() {
+                            return {
+                                value:this.hours().remaining / 60,
+                                remaining:this.hours().remaining % 60
+                            };
+                        },
+                        seconds() {
+                            return {
+                                value:this.minutes().remaining,
+                            };
+                        },
+                        format(value) {
+                            return ("0" + parseInt(value)).slice(-2)
+                        },
+                        time(){
+                            return {
+                                days:this.format(this.days().value),
+                                hours:this.format(this.hours().value),
+                                minutes:this.format(this.minutes().value),
+                                seconds:this.format(this.seconds().value),
+                            }
+                        },
+                    }
+                }
+
                 Alpine.data('checkoutData', () => {
                     return {
                         isExpired: false,
