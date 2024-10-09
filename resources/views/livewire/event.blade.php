@@ -30,7 +30,7 @@
             <div class="mt-8 p-6">
                 <div class="flex gap-x-4">
                     @foreach ($event->eventDates as $eventDate)
-                        @if ($eventDate->isOnSale())
+                        @if ($eventDate->isOnSale() && $event->eventDates->count() == 1)
                             <div id="eventDate-{{ $eventDate->reference }}-wrapper" class="event-eventDate-wrapper">
                                 <dl class="mb-4">
                                     <dd>
@@ -96,67 +96,96 @@
                                                     $eventenddate = $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i');
                                                 @endphp
                                             @endif
-
-                                            <div x-data="{modalIsOpen: false}">
-                                                <button @click="modalIsOpen = true" type="button"
-                                                        class="cursor-pointer bg-yellow-400 whitespace-nowrap rounded-md px-4 py-2 text-center text-sm font-medium tracking-wide text-white transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 active:opacity-100 active:outline-offset-0 dark:bg-sky-600 dark:text-white dark:focus-visible:outline-sky-600">
-                                                    {{ __('Add to calendar') }}
-                                                </button>
-
-                                                <div x-cloak x-show="modalIsOpen" x-transition.opacity.duration.200ms
-                                                     x-trap.inert.noscroll="modalIsOpen"
-                                                     @keydown.esc.window="modalIsOpen = false"
-                                                     @click.self="modalIsOpen = false"
-                                                     class="fixed inset-0 z-30 flex items-end justify-center bg-black/20 p-4 pb-8 backdrop-blur-md sm:items-center lg:p-8"
-                                                     role="dialog" aria-modal="true"
-                                                     aria-labelledby="defaultModalTitle">
-                                                    <!-- Modal Dialog -->
-                                                    <div x-show="modalIsOpen"
-                                                         x-transition:enter="transition ease-out duration-200 delay-100 motion-reduce:transition-opacity"
-                                                         x-transition:enter-start="opacity-0 scale-50"
-                                                         x-transition:enter-end="opacity-100 scale-100"
-                                                         class="flex max-w-lg min-w-96 flex-col gap-4 overflow-hidden rounded-md border border-zinc-300 bg-red-50 text-neutral-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                                                        <!-- Dialog Header -->
-                                                        <div
-                                                            class="flex items-center justify-between border-b border-zinc-300 bg-zinc-100/60 p-4 dark:border-zinc-700 dark:bg-zinc-900/20">
-                                                            <h3 id="defaultModalTitle"
-                                                                class="font-semibold flex gap-x-2 items-center tracking-wide text-neutral-900 dark:text-zinc-50">
-                                                                <x-fas-calendar-plus class="w-4 h-4"/>
-
-                                                                {{ __('Add to calendar') }}
-                                                            </h3>
-                                                            <button @click="modalIsOpen = false"
-                                                                    aria-label="close modal">
-                                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                                     viewBox="0 0 24 24" aria-hidden="true"
-                                                                     stroke="currentColor" fill="none"
-                                                                     stroke-width="1.4" class="w-5 h-5">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                          d="M6 18L18 6M6 6l12 12"/>
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-
-                                                        <livewire:add-to-calendar :event="$event"/>
-
-                                                        <div
-                                                            class="flex flex-col-reverse justify-between gap-2 border-t border-zinc-300 bg-zinc-100/60 p-4 dark:border-zinc-700 dark:bg-zinc-900/20 sm:flex-row sm:items-center md:justify-end">
-                                                            <button @click="modalIsOpen = false" type="button"
-                                                                    class="cursor-pointer whitespace-nowrap rounded-md bg-sky-700 px-4 py-2 text-center text-sm font-medium tracking-wide text-white transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 active:opacity-100 active:outline-offset-0 dark:bg-sky-600 dark:text-white dark:focus-visible:outline-sky-600">
-                                                                Close
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </dd>
                                 </dl>
 
                             </div>
+
+                        @elseif ($eventDate->isOnSale() && $event->eventDates->count() > 1 && $event->eventDates->every(fn($ed) => $ed->recurrent == 0))
+                            <div id="eventDate-{{ $eventDate->reference }}-wrapper" class="event-eventDate-wrapper">
+                                <dl class="mb-4">
+                                    <dd>
+                                        <div class="text-center">
+                                            @foreach ($event->eventDates as $eventDate)
+                                                @php
+                                                    $eventstartdate = '';
+                                                    $eventenddate = '';
+                                                    $eventlocation = $eventDate->venue ? $eventDate->venue->name . ': ' . $eventDate->venue->stringifyAddress : __('Online');
+                                                    $startDate = $eventDate->startdate;
+                                                    $endDate = $eventDate->enddate;
+                                                @endphp
+
+                                                @if ($startDate || $endDate)
+                                                    <div class="inline-block cursor-pointer event-date"
+                                                         data-event-date-id="{{ $eventDate->reference }}"
+                                                         style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; background-color: #f9f9f9;"
+                                                         onclick="changeColor(this);">
+                                                        <div class="flex space-x-4"> 
+                                                            <div class="inline-block">
+                                                                @if ($startDate)
+                                                                    <span class="text-5xl">
+                                                                {{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}
+                                                            </span>
+                                                                    <div>
+                                                                        <span class="text-sm">{{ ucfirst($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-sm">{{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
+                                                                    </div>
+                                                                    <div class="mb-2">
+                                                                <span class="text-gray-500 font-bold">
+                                                                    {{ strtoupper($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
+                                                                    @if ($endDate && Carbon::make($endDate)->timezone($event->eventtimezone ?? $timezone[0])->equalTo($startDate->timezone($event->eventtimezone ?? $timezone[0])))
+                                                                        - {{ strtoupper($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
+                                                                    @endif
+                                                                </span>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+
+                                                            @if ($endDate && !$endDate->timezone($event->eventtimezone ?? $timezone[0])->equalTo($startDate->timezone($event->eventtimezone ?? $timezone[0])))
+                                                                <div class="inline-block">
+                                                                    <span class="text-5xl">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}</span>
+                                                                    <div>
+                                                                        <span class="text-sm">{{ ucfirst($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-sm">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
+                                                                    </div>
+                                                                    <div class="mb-2">
+                                                                <span class="text-gray-500 font-bold">
+                                                                    {{ strtoupper($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
+                                                                </span>
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+
+                                                    <script>
+                                                        function changeColor(clickedElement) {
+                                                            // Get all boxes with the class 'event-date'
+                                                            const boxes = document.querySelectorAll('.event-date');
+
+                                                            // Reset background color for all boxes
+                                                            boxes.forEach(box => {
+                                                                box.style.backgroundColor = '#f9f9f9'; // Original color
+                                                            });
+
+                                                            // Change the background color of the clicked box
+                                                            clickedElement.style.backgroundColor = 'rgb(243, 229, 118)'; // New color
+                                                        }
+                                                    </script>
+                                                @endif
+                                            @endforeach
+
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
                         @endif
                     @endforeach
-
                     <div>
                         <h1 class="text-4xl font-bold mb-4">{{ $eventTranslation->name }}</h1>
 
@@ -172,6 +201,58 @@
                             </div>
 
                             <span class="ml-2 text-gray-600">({{ count($reviews) }} review)</span>
+                        </div>
+                        <div x-data="{modalIsOpen: false}">
+                            <button @click="modalIsOpen = true" type="button"
+                                    class="cursor-pointer bg-yellow-400 whitespace-nowrap rounded-md px-4 py-2 text-center text-sm font-medium tracking-wide text-white transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 active:opacity-100 active:outline-offset-0 dark:bg-sky-600 dark:text-white dark:focus-visible:outline-sky-600">
+                                {{ __('Add to calendar') }}
+                            </button>
+
+                            <div x-cloak x-show="modalIsOpen" x-transition.opacity.duration.200ms
+                                 x-trap.inert.noscroll="modalIsOpen"
+                                 @keydown.esc.window="modalIsOpen = false"
+                                 @click.self="modalIsOpen = false"
+                                 class="fixed inset-0 z-30 flex items-end justify-center bg-black/20 p-4 pb-8 backdrop-blur-md sm:items-center lg:p-8"
+                                 role="dialog" aria-modal="true"
+                                 aria-labelledby="defaultModalTitle">
+                                <!-- Modal Dialog -->
+                                <div x-show="modalIsOpen"
+                                     x-transition:enter="transition ease-out duration-200 delay-100 motion-reduce:transition-opacity"
+                                     x-transition:enter-start="opacity-0 scale-50"
+                                     x-transition:enter-end="opacity-100 scale-100"
+                                     class="flex max-w-lg min-w-96 flex-col gap-4 overflow-hidden rounded-md border border-zinc-300 bg-red-50 text-neutral-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+                                    <!-- Dialog Header -->
+                                    <div
+                                        class="flex items-center justify-between border-b border-zinc-300 bg-zinc-100/60 p-4 dark:border-zinc-700 dark:bg-zinc-900/20">
+                                        <h3 id="defaultModalTitle"
+                                            class="font-semibold flex gap-x-2 items-center tracking-wide text-neutral-900 dark:text-zinc-50">
+                                            <x-fas-calendar-plus class="w-4 h-4"/>
+
+                                            {{ __('Add to calendar') }}
+                                        </h3>
+                                        <button @click="modalIsOpen = false"
+                                                aria-label="close modal">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 viewBox="0 0 24 24" aria-hidden="true"
+                                                 stroke="currentColor" fill="none"
+                                                 stroke-width="1.4" class="w-5 h-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <livewire:add-to-calendar :event="$event"/>
+
+                                    <div
+                                        class="flex flex-col-reverse justify-between gap-2 border-t border-zinc-300 bg-zinc-100/60 p-4 dark:border-zinc-700 dark:bg-zinc-900/20 sm:flex-row sm:items-center md:justify-end">
+                                        <button @click="modalIsOpen = false" type="button"
+                                                class="cursor-pointer whitespace-nowrap rounded-md bg-sky-700 px-4 py-2 text-center text-sm font-medium tracking-wide text-white transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 active:opacity-100 active:outline-offset-0 dark:bg-sky-600 dark:text-white dark:focus-visible:outline-sky-600">
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -501,49 +582,130 @@
 
                                     <dd class="mr-0 my-2">
                                         <div class="overflow-x-auto">
-                                            <table class="table-auto w-full">
-                                                <tbody>
-                                                @foreach ($eventDate->eventDateTickets as $ticket)
-                                                    @if ($ticket->active)
-                                                        <tr class="bg-gray-200 flex w-full justify-between my-2 px-0.5">
-                                                            <td class="border-t-0">
-                                                                {{ $ticket->name }}
-                                                            </td>
+                                            @if ($event->eventDates->count() > 1)
+                                                <div class="overflow-x-auto" id="ticket-info-container">
+                                                    <p id="default-message">Please select your event date.</p>
+                                                    @foreach ($event->eventDates as $eventDate)
+                                                        @php
+                                                            $tickets = $eventDate->eventDateTickets->where('active', true); // Get active tickets for the event date
+                                                        @endphp
 
-                                                            <td>
-                                                                @if($ticket->free)
-                                                                    {{ 'Free' }}
-                                                                @else
-                                                                    {{ $ticket->currency->ccy }}
-                                                                @endif
-                                                            </td>
+                                                        <div class="inline-block cursor-pointer event-date" data-event-date-id="{{ $eventDate->reference }}">
+                                                        </div>
 
-                                                            <td class="border-t-0 text-left">
-                                                                <p class="text-nowrap font-semibold">
-                                                                    @if($ticket->free == 1)
-                                                                        Free
-                                                                    @elseif($ticket->promotionalprice)
-                                                                        @php
-                                                                            $isStartDate = $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
-                                                                            $isEndDate = $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
-                                                                        @endphp
+                                                        <div class="hidden ticket-info" id="ticket-info-{{ $eventDate->reference }}">
+                                                            @if ($tickets->isNotEmpty())
+                                                                <table class="table-auto w-full">
+                                                                    <tbody id="ticket-info-body-{{ $eventDate->id }}">
+                                                                    @foreach ($tickets as $ticket)
+                                                                        <tr class="bg-gray-200 flex w-full justify-between my-2 px-0.5">
+                                                                            Selected Date {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('d M Y') }}
+                                                                            <td class="border-t-0">{{ $ticket->name }}</td>
+                                                                            <td>
+                                                                                @if($ticket->free)
+                                                                                    {{ 'Free' }}
+                                                                                @else
+                                                                                    {{ $ticket->currency->ccy }}
+                                                                                @endif
+                                                                            </td>
+                                                                            <td class="border-t-0 text-left">
+                                                                                <p class="text-nowrap font-semibold">
+                                                                                    @if($ticket->free == 1)
+                                                                                        Free
+                                                                                    @elseif($ticket->promotionalprice)
+                                                                                        @php
+                                                                                            $isStartDate = $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
+                                                                                            $isEndDate = $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
+                                                                                        @endphp
 
-                                                                        @if($isStartDate && $isEndDate)
-                                                                            <del class="font-bold">{{ $ticket->price }} </del>
-                                                                            {{ $ticket->promotionalprice }}
+                                                                                        @if($isStartDate && $isEndDate)
+                                                                                            <del class="font-bold">{{ $ticket->price }}</del> {{ $ticket->promotionalprice }}
+                                                                                        @else
+                                                                                            {{ $ticket->price }}
+                                                                                        @endif
+                                                                                    @else
+                                                                                        {{ $ticket->price }}
+                                                                                    @endif
+                                                                                </p>
+                                                                            </td>
+                                                                        </tr>
+                                                                    @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            @else
+                                                                <p>No available tickets for this date.</p>
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                                <script>
+                                                    const defaultMessage = document.getElementById('default-message');
+
+                                                    document.querySelectorAll('.event-date').forEach(function (element) {
+                                                        element.addEventListener('click', function () {
+                                                            const eventDateId = this.getAttribute('data-event-date-id');
+                                                            const ticketInfo = document.getElementById('ticket-info-' + eventDateId);
+
+                                                            // Hide the default message
+                                                            defaultMessage.classList.add('hidden');
+
+                                                            // Hide all other ticket info
+                                                            document.querySelectorAll('.ticket-info').forEach(function (info) {
+                                                                if (info !== ticketInfo) {
+                                                                    info.classList.add('hidden');
+                                                                }
+                                                            });
+
+                                                            // Toggle the visibility of the clicked ticket info
+                                                            ticketInfo.classList.toggle('hidden');
+                                                        });
+                                                    });
+                                                </script>
+                                            @else
+                                                <table class="table-auto w-full">
+                                                    <tbody>
+                                                    @foreach ($eventDate->eventDateTickets as $ticket)
+                                                        @if ($ticket->active)
+                                                            <tr class="bg-gray-200 flex w-full justify-between my-2 px-0.5">
+                                                                <td class="border-t-0">
+                                                                    {{ $ticket->name }}
+                                                                </td>
+
+                                                                <td>
+                                                                    @if($ticket->free)
+                                                                        {{ 'Free' }}
+                                                                    @else
+                                                                        {{ $ticket->currency->ccy }}
+                                                                    @endif
+                                                                </td>
+
+                                                                <td class="border-t-0 text-left">
+                                                                    <p class="text-nowrap font-semibold">
+                                                                        @if($ticket->free == 1)
+                                                                            Free
+                                                                        @elseif($ticket->promotionalprice)
+                                                                            @php
+                                                                                $isStartDate = $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
+                                                                                $isEndDate = $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
+                                                                            @endphp
+
+                                                                            @if($isStartDate && $isEndDate)
+                                                                                <del class="font-bold">{{ $ticket->price }} </del>
+                                                                                {{ $ticket->promotionalprice }}
+                                                                            @else
+                                                                                {{ $ticket->price }}
+                                                                            @endif
                                                                         @else
                                                                             {{ $ticket->price }}
                                                                         @endif
-                                                                    @else
-                                                                        {{ $ticket->price }}
-                                                                    @endif
-                                                                </p>
-                                                            </td>
-                                                        </tr>
-                                                    @endif
-                                                @endforeach
-                                                </tbody>
-                                            </table>
+                                                                    </p>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+                                                    @endforeach
+                                                    </tbody>
+                                                </table>
+                                            @endif
                                         </div>
 
                                         @if ($eventDate->recurrent)
