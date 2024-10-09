@@ -332,18 +332,28 @@
                             this.updateTime();  // Set the initial values
                             setInterval(() => {
                                 this.setRemaining();
-                                this.updateTime();  // Update the time display
+                                this.updateTime();
                             }, 1000);
 
                             setTimeout(() => {
-                                this.isExpired = true;
-                                Livewire.dispatch('clear-cart');
+                                if (!this.isExpired) {
+                                    this.isExpired = true;
+                                    localStorage.removeItem('session_left_time');
+                                    Livewire.dispatch('clear-cart');
+                                }
                             }, parseInt(@js($sessionTime)) * 1000);
                         },
 
                         setRemaining() {
                             const diff = this.expiry - new Date().getTime();
                             this.remaining = parseInt(diff / 1000);
+
+                            if (this.remaining <= 0) {
+                                this.remaining = 0;  // Ensure it doesn't go negative
+                                this.isExpired = true;
+                                localStorage.removeItem('session_left_time');
+                                Livewire.dispatch('clear-cart');
+                            }
                         },
                         days() {
                             return {
