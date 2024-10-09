@@ -322,7 +322,7 @@
 
                 Alpine.data('checkoutData', () => {
                     return {
-                        expiry: new Date().getTime() + (parseInt(@js($sessionTime)) * 1000),
+                        expiry: Alpine.$persist(new Date().getTime() + (parseInt(@js($sessionTime)) * 1000)).as('session_left_time'),
                         remaining: null,
                         time: {},
                         isExpired: false,
@@ -381,6 +381,7 @@
                         }
                     };
                 });
+
             });
 
             document.addEventListener('livewire:init', function () {
