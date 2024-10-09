@@ -35,14 +35,19 @@
             <x-breadcrumbs/>
         </div>
 
-        <div>
-            <div class="timer" x-data="timer(new Date().setDate(new Date().getDate() + parseInt(@js($sessionTime)) * 1000))" x-init="init();">
-                <h1 x-text="time().days"></h1>
-                <h1 x-text="time().hours"></h1>
-                <h1 x-text="time().minutes"></h1>
-                <h1 x-text="time().seconds"></h1>
+        <div
+             class="fixed top-0 left-0 w-full bg-red-400 text-white text-center py-2 shadow-lg z-50">
+            <div class="timer flex justify-center space-x-2">
+                <h1 class="text-lg font-bold" x-text="time.days"></h1>
+                <span class="text-lg font-bold">:</span>
+                <h1 class="text-lg font-bold" x-text="time.hours"></h1>
+                <span class="text-lg font-bold">:</span>
+                <h1 class="text-lg font-bold" x-text="time.minutes"></h1>
+                <span class="text-lg font-bold">:</span>
+                <h1 class="text-lg font-bold" x-text="time.seconds"></h1>
             </div>
         </div>
+
 
         <div class="flex items-center flex-col mt-8">
             <div class="grid w-2/3 grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-3">
@@ -314,67 +319,65 @@
 
         <script>
             document.addEventListener('alpine:init', () => {
-                function timer(expiry) {
+
+                Alpine.data('checkoutData', () => {
                     return {
-                        expiry: expiry,
-                        remaining:null,
+                        expiry: new Date().getTime() + (parseInt(@js($sessionTime)) * 1000),
+                        remaining: null,
+                        time: {},
+                        isExpired: false,
+
                         init() {
-                            this.setRemaining()
+                            this.setRemaining();
+                            this.updateTime();  // Set the initial values
                             setInterval(() => {
                                 this.setRemaining();
+                                this.updateTime();  // Update the time display
                             }, 1000);
+
+                            setTimeout(() => {
+                                this.isExpired = true;
+                                Livewire.dispatch('clear-cart');
+                            }, parseInt(@js($sessionTime)) * 1000);
                         },
+
                         setRemaining() {
                             const diff = this.expiry - new Date().getTime();
-                            this.remaining =  parseInt(diff / 1000);
+                            this.remaining = parseInt(diff / 1000);
                         },
                         days() {
                             return {
-                                value:this.remaining / 86400,
-                                remaining:this.remaining % 86400
+                                value: this.remaining / 86400,
+                                remaining: this.remaining % 86400
                             };
                         },
                         hours() {
                             return {
-                                value:this.days().remaining / 3600,
-                                remaining:this.days().remaining % 3600
+                                value: this.days().remaining / 3600,
+                                remaining: this.days().remaining % 3600
                             };
                         },
                         minutes() {
                             return {
-                                value:this.hours().remaining / 60,
-                                remaining:this.hours().remaining % 60
+                                value: this.hours().remaining / 60,
+                                remaining: this.hours().remaining % 60
                             };
                         },
                         seconds() {
                             return {
-                                value:this.minutes().remaining,
+                                value: this.minutes().remaining
                             };
                         },
                         format(value) {
-                            return ("0" + parseInt(value)).slice(-2)
+                            return ("0" + parseInt(value)).slice(-2);
                         },
-                        time(){
-                            return {
-                                days:this.format(this.days().value),
-                                hours:this.format(this.hours().value),
-                                minutes:this.format(this.minutes().value),
-                                seconds:this.format(this.seconds().value),
-                            }
-                        },
-                    }
-                }
-
-                Alpine.data('checkoutData', () => {
-                    return {
-                        isExpired: false,
-
-                        init() {
-                            setTimeout(() => {
-                                this.isExpired = true;
-
-                                Livewire.dispatch('clear-cart');
-                            }, parseInt(@js($sessionTime)) * 1000);
+                        updateTime() {
+                            this.time = {
+                                days: this.format(this.days().value),
+                                hours: this.format(this.hours().value),
+                                minutes: this.format(this.minutes().value),
+                                seconds: this.format(this.seconds().value),
+                            };
                         }
                     };
                 });

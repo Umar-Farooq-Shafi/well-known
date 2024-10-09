@@ -121,7 +121,7 @@
                                                          data-event-date-id="{{ $eventDate->reference }}"
                                                          style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; background-color: #f9f9f9;"
                                                          onclick="changeColor(this);">
-                                                        <div class="flex space-x-4"> 
+                                                        <div class="flex space-x-4">
                                                             <div class="inline-block">
                                                                 @if ($startDate)
                                                                     <span class="text-5xl">
