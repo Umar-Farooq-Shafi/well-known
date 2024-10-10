@@ -106,7 +106,7 @@
                             <div id="eventDate-{{ $eventDate->reference }}-wrapper" class="event-eventDate-wrapper">
                                 <dl class="mb-4">
                                     <dd>
-                                        <div class="text-center">
+                                        <div class="text-center flex flex-col gap-1">
                                             @foreach ($event->eventDates as $eventDate)
                                                 @php
                                                     $eventstartdate = '';
@@ -708,7 +708,7 @@
                                             @endif
                                         </div>
 
-                                        @if ($eventDate->recurrent)
+                                        @if ($eventDate->recurrent || $totalEventDates > 1)
                                             <div class="form-group my-2">
                                                 <x-datetime-picker
                                                     wire:model.live="eventDatePick"
@@ -716,8 +716,9 @@
                                                     placeholder="Select Event Date"
                                                     without-timezone
                                                     without-time
-                                                    :min="$eventDate->recurrent_startdate->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
-                                                    :max="$eventDate->recurrent_enddate->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
+                                                    :allowed-dates="$allowedDates"
+                                                    :min="$eventDate->recurrent_startdate?->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
+                                                    :max="$eventDate->recurrent_enddate?->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
                                                 />
                                             </div>
                                         @endif

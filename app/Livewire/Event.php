@@ -35,6 +35,10 @@ class Event extends Component
 
     public $couponDiscount;
 
+    public $allowedDates = [];
+
+    public $totalEventDates = 0;
+
     public ?EventTranslation $eventTranslation = null;
 
     public function mount(string $slug)
@@ -45,7 +49,27 @@ class Event extends Component
             ->where('recurrent', true)
             ->exists();
 
-        if (!$isRecurrent) {
+        $eventDates = [];
+
+        foreach ($this->eventTranslation->event->eventDates as $eventDate) {
+            $startDate = $eventDate->startdate?->timezone($this->eventTranslation->event->eventtimezone)->toDateString();
+            $endDate = $eventDate->enddate?->timezone($this->eventTranslation->event->eventtimezone)->toDateString();
+            $this->totalEventDates++;
+
+            if ($startDate || $endDate) {
+                if (!in_array($startDate, $eventDates, true)) {
+                    $eventDates[] = $startDate;
+                }
+
+                if (!in_array($endDate, $eventDates, true)) {
+                    $eventDates[] = $endDate;
+                }
+            }
+        }
+
+        if ($this->totalEventDates > 1) {
+            $this->allowedDates = $eventDates;
+        } else if (!$isRecurrent) {
             $this->eventDatePick = EventDate::whereEventId($this->eventTranslation->translatable_id)
                 ->first()->startdate;
         }
