@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Event;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 class AddToCalendar extends Component
@@ -76,6 +77,7 @@ class AddToCalendar extends Component
         ]);
     }
 
+    #[Title("Add To Review | 'Aafno Ticket Nepal'")]
     public function render()
     {
         return view('livewire.add-to-calendar');

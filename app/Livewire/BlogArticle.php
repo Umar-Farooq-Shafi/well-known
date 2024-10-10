@@ -6,6 +6,7 @@ use App\Models\BlogPost;
 use App\Models\BlogPostCategory;
 use App\Models\BlogPostTranslation;
 use Illuminate\Support\Facades\App;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 class BlogArticle extends Component
@@ -24,6 +25,7 @@ class BlogArticle extends Component
         $this->blogPost->update(['views' => $this->blogPost->views + 1]);
     }
 
+    #[Title("Blog Article | 'Aafno Ticket Nepal'")]
     public function render()
     {
         $blogPostCategories = BlogPostCategory::limit(5)

@@ -69,6 +69,7 @@ class AddReview extends Component
         $this->redirect(route(Url::previous()));
     }
 
+    #[Title("Add Review | 'Aafno Ticket Nepal'")]
     public function render()
     {
         $averageRating = $this->calculateAverageRating();

@@ -7,6 +7,7 @@ use App\Livewire\AddReview;
 use App\Livewire\AllCategories;
 use App\Livewire\Blog;
 use App\Livewire\BlogArticle;
+use App\Livewire\Cart;
 use App\Livewire\Checkout;
 use App\Livewire\ConcertMusic;
 use App\Livewire\Event;
@@ -91,6 +92,8 @@ Route::get('/venue/{slug}', Venue::class)->name('venue');
 Route::middleware('auth')->group(function () {
     Route::get('/event/my-reviews/{slug}/add', AddReview::class)->name('add-review');
 });
+
+Route::get('/cart', Cart::class)->name('cart');
 
 Route::get('/calendar.ics', function () {
     $event = new IEvent();

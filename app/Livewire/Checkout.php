@@ -9,6 +9,7 @@ use App\Models\Setting;
 use App\Traits\CreateOrder;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 use Stripe\Customer;
 use Stripe\Exception\ApiErrorException;
@@ -533,6 +534,7 @@ class Checkout extends Component
             $this->dispatch('showStrip');
     }
 
+    #[Title("Checkout | 'Aafno Ticket Nepal'")]
     public function render()
     {
         return view('livewire.checkout');
