@@ -35,10 +35,6 @@ class Event extends Component
 
     public $couponDiscount;
 
-    public $allowedDates = [];
-
-    public $totalEventDates = 0;
-
     public ?EventTranslation $eventTranslation = null;
 
     public function mount(string $slug)
@@ -49,27 +45,7 @@ class Event extends Component
             ->where('recurrent', true)
             ->exists();
 
-        $eventDates = [];
-
-        foreach ($this->eventTranslation->event->eventDates as $eventDate) {
-            $startDate = $eventDate->startdate?->timezone($this->eventTranslation->event->eventtimezone)->toDateString();
-            $endDate = $eventDate->enddate?->timezone($this->eventTranslation->event->eventtimezone)->toDateString();
-            $this->totalEventDates++;
-
-            if ($startDate || $endDate) {
-                if (!in_array($startDate, $eventDates, true)) {
-                    $eventDates[] = $startDate;
-                }
-
-                if (!in_array($endDate, $eventDates, true)) {
-                    $eventDates[] = $endDate;
-                }
-            }
-        }
-
-        if ($this->totalEventDates > 1) {
-            $this->allowedDates = $eventDates;
-        } else if (!$isRecurrent) {
+        if (!$isRecurrent) {
             $this->eventDatePick = EventDate::whereEventId($this->eventTranslation->translatable_id)
                 ->first()->startdate;
         }
@@ -85,6 +61,15 @@ class Event extends Component
         }
 
         $this->promotions = $promotion?->promotionQuantities?->pluck('discount', 'quantity')?->toArray() ?? [];
+    }
+
+    public function updateSelectedEventDate($date)
+    {
+        if ($date === $this->eventDatePick) {
+            $this->eventDatePick = null;
+        } else {
+            $this->eventDatePick = $date;
+        }
     }
 
     public function promoApply()

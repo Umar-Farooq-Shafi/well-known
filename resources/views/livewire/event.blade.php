@@ -13,7 +13,7 @@
     $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country);
 @endphp
 
-<div class="mt-36">
+<div class="mt-36" x-data="{ selectedEventDateId: null }">
     <div class="w-full">
         <img src="{{ Storage::url('events/' . $event->image_name) }}" alt="Canyon Swing"
              loading="lazy"
@@ -55,10 +55,12 @@
                                                     </div>
                                                     <div class="inline-block mr-3">
                                                         <div>
-                                                            <span class="text-sm">{{ ucfirst($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
+                                                            <span
+                                                                class="text-sm">{{ ucfirst($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
                                                         </div>
                                                         <div>
-                                                            <span class="text-sm">{{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
+                                                            <span
+                                                                class="text-sm">{{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="mb-2">
@@ -78,12 +80,16 @@
                                             @if ($endDate && !$endDate->timezone($event->eventtimezone ?? $timezone[0])->equalTo($startDate->timezone($event->eventtimezone ?? $timezone[0])))
                                                 <div class="inline-block">
                                                     <div class="inline-block">
-                                                        <span class="text-5xl">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}</span>
+                                                        <span
+                                                            class="text-5xl">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}</span>
                                                     </div>
                                                     <div class="inline-block">
-                                                        <div><span class="text-sm">{{ ucfirst($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span></div>
+                                                        <div><span
+                                                                class="text-sm">{{ ucfirst($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
+                                                        </div>
                                                         <div>
-                                                            <span class="text-sm">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
+                                                            <span
+                                                                class="text-sm">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="mb-2">
@@ -117,10 +123,14 @@
                                                 @endphp
 
                                                 @if ($startDate || $endDate)
-                                                    <div class="inline-block cursor-pointer event-date"
-                                                         data-event-date-id="{{ $eventDate->reference }}"
-                                                         style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; background-color: #f9f9f9;"
-                                                         onclick="changeColor(this);">
+                                                    <div
+                                                        class="inline-block cursor-pointer event-date"
+                                                        data-event-date-id="{{ $eventDate->reference }}"
+                                                        @click="selectedEventDateId = selectedEventDateId === '{{ $eventDate->reference }}' ? null : '{{ $eventDate->reference }}'"
+                                                        x-bind:class="selectedEventDateId == '{{ $eventDate->reference }}' ? 'bg-yellow-500' : 'bg-gray-50'"
+                                                        wire:click="updateSelectedEventDate('{{ $eventDate->startdate }}')"
+                                                        style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;"
+                                                    >
                                                         <div class="flex space-x-4">
                                                             <div class="inline-block">
                                                                 @if ($startDate)
@@ -128,10 +138,12 @@
                                                                 {{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}
                                                             </span>
                                                                     <div>
-                                                                        <span class="text-sm">{{ ucfirst($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
+                                                                        <span
+                                                                            class="text-sm">{{ ucfirst($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
                                                                     </div>
                                                                     <div>
-                                                                        <span class="text-sm">{{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
+                                                                        <span
+                                                                            class="text-sm">{{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
                                                                     </div>
                                                                     <div class="mb-2">
                                                                 <span class="text-gray-500 font-bold">
@@ -146,12 +158,15 @@
 
                                                             @if ($endDate && !$endDate->timezone($event->eventtimezone ?? $timezone[0])->equalTo($startDate->timezone($event->eventtimezone ?? $timezone[0])))
                                                                 <div class="inline-block">
-                                                                    <span class="text-5xl">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}</span>
+                                                                    <span
+                                                                        class="text-5xl">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}</span>
                                                                     <div>
-                                                                        <span class="text-sm">{{ ucfirst($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
+                                                                        <span
+                                                                            class="text-sm">{{ ucfirst($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
                                                                     </div>
                                                                     <div>
-                                                                        <span class="text-sm">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
+                                                                        <span
+                                                                            class="text-sm">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
                                                                     </div>
                                                                     <div class="mb-2">
                                                                 <span class="text-gray-500 font-bold">
@@ -583,23 +598,35 @@
                                     <dd class="mr-0 my-2">
                                         <div class="overflow-x-auto">
                                             @if ($event->eventDates->count() > 1)
-                                                <div class="overflow-x-auto" id="ticket-info-container">
-                                                    <p id="default-message">Please select your event date.</p>
+                                                <div class="overflow-x-auto"
+                                                     id="ticket-info-container">
+                                                    <p id="default-message" x-show="!selectedEventDateId">
+                                                        Please select your event date.
+                                                    </p>
+
                                                     @foreach ($event->eventDates as $eventDate)
                                                         @php
                                                             $tickets = $eventDate->eventDateTickets->where('active', true); // Get active tickets for the event date
                                                         @endphp
 
-                                                        <div class="inline-block cursor-pointer event-date" data-event-date-id="{{ $eventDate->reference }}">
+                                                        <div
+                                                            class="inline-block cursor-pointer event-date"
+                                                            data-event-date-id="{{ $eventDate->reference }}"
+                                                            x-show="selectedEventDateId === '{{ $eventDate->reference }}'"
+                                                        >
+                                                            Event
+                                                            Date {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('d M Y') }}
                                                         </div>
 
-                                                        <div class="hidden ticket-info" id="ticket-info-{{ $eventDate->reference }}">
+                                                        <!-- Ticket Info for the event date -->
+                                                        <div class="ticket-info"
+                                                             x-show="@js($event->eventDates->count()) < 2"
+                                                             id="ticket-info-{{ $eventDate->reference }}">
                                                             @if ($tickets->isNotEmpty())
                                                                 <table class="table-auto w-full">
                                                                     <tbody id="ticket-info-body-{{ $eventDate->id }}">
                                                                     @foreach ($tickets as $ticket)
                                                                         <tr class="bg-gray-200 flex w-full justify-between my-2 px-0.5">
-                                                                            Selected Date {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('d M Y') }}
                                                                             <td class="border-t-0">{{ $ticket->name }}</td>
                                                                             <td>
                                                                                 @if($ticket->free)
@@ -619,7 +646,8 @@
                                                                                         @endphp
 
                                                                                         @if($isStartDate && $isEndDate)
-                                                                                            <del class="font-bold">{{ $ticket->price }}</del> {{ $ticket->promotionalprice }}
+                                                                                            <del
+                                                                                                class="font-bold">{{ $ticket->price }}</del> {{ $ticket->promotionalprice }}
                                                                                         @else
                                                                                             {{ $ticket->price }}
                                                                                         @endif
@@ -638,29 +666,7 @@
                                                         </div>
                                                     @endforeach
                                                 </div>
-                                                <script>
-                                                    const defaultMessage = document.getElementById('default-message');
 
-                                                    document.querySelectorAll('.event-date').forEach(function (element) {
-                                                        element.addEventListener('click', function () {
-                                                            const eventDateId = this.getAttribute('data-event-date-id');
-                                                            const ticketInfo = document.getElementById('ticket-info-' + eventDateId);
-
-                                                            // Hide the default message
-                                                            defaultMessage.classList.add('hidden');
-
-                                                            // Hide all other ticket info
-                                                            document.querySelectorAll('.ticket-info').forEach(function (info) {
-                                                                if (info !== ticketInfo) {
-                                                                    info.classList.add('hidden');
-                                                                }
-                                                            });
-
-                                                            // Toggle the visibility of the clicked ticket info
-                                                            ticketInfo.classList.toggle('hidden');
-                                                        });
-                                                    });
-                                                </script>
                                             @else
                                                 <table class="table-auto w-full">
                                                     <tbody>
@@ -690,7 +696,8 @@
                                                                             @endphp
 
                                                                             @if($isStartDate && $isEndDate)
-                                                                                <del class="font-bold">{{ $ticket->price }} </del>
+                                                                                <del
+                                                                                    class="font-bold">{{ $ticket->price }} </del>
                                                                                 {{ $ticket->promotionalprice }}
                                                                             @else
                                                                                 {{ $ticket->price }}
@@ -708,7 +715,7 @@
                                             @endif
                                         </div>
 
-                                        @if ($eventDate->recurrent || $totalEventDates > 1)
+                                        @if ($eventDate->recurrent)
                                             <div class="form-group my-2">
                                                 <x-datetime-picker
                                                     wire:model.live="eventDatePick"
@@ -716,7 +723,6 @@
                                                     placeholder="Select Event Date"
                                                     without-timezone
                                                     without-time
-                                                    :allowed-dates="$allowedDates"
                                                     :min="$eventDate->recurrent_startdate?->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
                                                     :max="$eventDate->recurrent_enddate?->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
                                                 />
@@ -736,7 +742,8 @@
                                 </dl>
 
                                 <x-modal-card :title="$eventTranslation->name" name="cardModal" blur="md" width="5xl">
-                                    <div class="grid grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-4 animate-in fade-in">
+                                    <div
+                                        class="grid grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-4 animate-in fade-in">
                                         <div class="md:col-span-2 lg:col-span-5">
                                             <div class="flex flex-col gap-y-1 font-medium text-base">
                                                 <p>
