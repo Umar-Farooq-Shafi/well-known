@@ -35,6 +35,8 @@ class Event extends Component
 
     public $couponDiscount;
 
+    public $eventDateId;
+
     public ?EventTranslation $eventTranslation = null;
 
     public function mount(string $slug)
@@ -63,16 +65,18 @@ class Event extends Component
         $this->promotions = $promotion?->promotionQuantities?->pluck('discount', 'quantity')?->toArray() ?? [];
     }
 
-    public function updateSelectedEventDate($date)
+    public function updateSelectedEventDate($date, $eventDateId): void
     {
         if ($date === $this->eventDatePick) {
             $this->eventDatePick = null;
+            $this->eventDateId = null;
         } else {
             $this->eventDatePick = $date;
+            $this->eventDateId = $eventDateId;
         }
     }
 
-    public function promoApply()
+    public function promoApply(): void
     {
         if ($this->promoCode === null || $this->promoCode === '') {
             $this->notification()->send([
