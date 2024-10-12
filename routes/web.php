@@ -17,7 +17,6 @@ use App\Livewire\HelpCenterArticle;
 use App\Livewire\HelpCenterCategory;
 use App\Livewire\Home;
 use App\Livewire\Movies;
-use App\Livewire\OrderTransaction;
 use App\Livewire\OrganizerProfile;
 use App\Livewire\Pages;
 use App\Livewire\ToursAndAdventure;
@@ -41,7 +40,7 @@ Route::get('/', Home::class)->name('home');
 
 Route::get('/event/{slug}', Event::class)->name('event');
 
-Route::get('/event/{slug}/checkout', Checkout::class)->name('event-checkout');
+Route::get('/{slug?}/checkout', Checkout::class)->name('event-checkout');
 
 Route::get('/events', Events::class)->name('events');
 
@@ -92,8 +91,6 @@ Route::get('/venue/{slug}', Venue::class)->name('venue');
 Route::middleware('auth')->group(function () {
     Route::get('/event/my-reviews/{slug}/add', AddReview::class)->name('add-review');
 });
-
-Route::get('/cart', Cart::class)->name('cart');
 
 Route::get('/calendar.ics', function () {
     $event = new IEvent();

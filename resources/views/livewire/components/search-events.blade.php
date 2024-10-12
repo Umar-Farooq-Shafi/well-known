@@ -89,9 +89,15 @@
             </div>
         </form>
 
-        <a href="{{ route('cart') }}">
-            <x-heroicon-o-shopping-cart class="h-8 w-8 text-white" />
-        </a>
+        @if(auth()->check())
+            <a href="{{ route('event-checkout') }}" class="relative w-fit text-neutral-600 dark:text-neutral-300" aria-label="notifications">
+                <x-heroicon-o-shopping-cart class="h-8 w-8 text-white" />
+
+                <span class="absolute left-1/2 -top-1 rounded-full bg-red-500 px-1 leading-4 text-xs font-medium text-white">
+                    {{ $cartElements }}
+                </span>
+            </a>
+        @endif
     </div>
 
     @push('scripts')

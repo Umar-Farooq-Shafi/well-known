@@ -506,6 +506,7 @@ class EventResource extends Resource
                                                 );
                                         },
                                     )
+                                    ->preload()
                                     ->saveRelationshipsUsing(function ($record, $state) {
                                         $record->paymentGateways()->detach();
 

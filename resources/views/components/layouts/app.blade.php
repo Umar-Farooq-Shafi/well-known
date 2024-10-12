@@ -32,5 +32,14 @@
 @vite(['resources/js/app.js'])
 @stack('scripts')
 
+<script>
+    setInterval(() => {
+        const storedExpiry = localStorage.getItem('session_left_time');
+        if (storedExpiry && new Date().getTime() > parseInt(storedExpiry)) {
+            localStorage.removeItem('session_left_time');
+        }
+    }, 1000);
+</script>
+
 </body>
 </html>

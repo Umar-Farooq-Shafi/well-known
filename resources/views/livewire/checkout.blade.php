@@ -328,8 +328,13 @@
                         isExpired: false,
 
                         init() {
+                            const storedExpiry = localStorage.getItem('session_left_time');
+                            if (storedExpiry && new Date().getTime() > parseInt(storedExpiry)) {
+                                localStorage.removeItem('session_left_time');
+                            }
+
                             this.setRemaining();
-                            this.updateTime();  // Set the initial values
+                            this.updateTime();
                             setInterval(() => {
                                 this.setRemaining();
                                 this.updateTime();

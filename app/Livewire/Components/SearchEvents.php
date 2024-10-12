@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Components;
 
+use App\Models\CartElement;
 use App\Models\EventTranslation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,6 +17,15 @@ class SearchEvents extends Component
     public $country;
 
     public $dates;
+
+    public $cartElements;
+
+    public function mount()
+    {
+        $this->cartElements = CartElement::query()
+            ->where('user_id', auth()->id())
+            ->count();
+    }
 
     public function submit()
     {
