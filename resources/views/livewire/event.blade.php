@@ -736,13 +736,26 @@
                                         class="grid grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-4 animate-in fade-in">
                                         <div class="md:col-span-2 lg:col-span-5">
                                             <div class="flex flex-col gap-y-1 font-medium text-base">
-                                                <p>
-                                                    {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
-                                                    - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
-                                                    ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
-                                                    - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
-                                                    )
-                                                </p>
+                                                @if($eventDateId)
+                                                    @php
+                                                        $selectedEventDate = $event->eventDates()->where('id', $eventDateId)->first();
+                                                        $startDate = Carbon::make($selectedEventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                        $endDate = Carbon::make($selectedEventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                    @endphp
+
+                                                    <p>
+                                                        {{ $startDate->format('F d Y') }} - {{ $endDate->format('F d Y') }}
+                                                        ({{ $startDate->format('H:i A') }} - {{ $endDate->format('H:i A') }})
+                                                    </p>
+                                                @else
+                                                    <p>
+                                                        {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
+                                                        - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
+                                                        ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
+                                                        - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
+                                                        )
+                                                    </p>
+                                                @endif
 
                                                 <p>
                                                     Selected Date:
@@ -800,7 +813,10 @@
                                                                                 </p>
 
                                                                                 <div class="font-semibold">
-                                                                                    @if($eventTicket->free)
+                                                                                    @if (!$eventTicket->isOnSale())
+                                                                                        <span
+                                                                                            class="badge {{ $eventTicket->stringifyStatusClass() }}">No tickets on sales</span>
+                                                                                    @elseif($eventTicket->free)
                                                                                         {{ __('Free') }}
                                                                                     @elseif($eventTicket->promotionalprice)
                                                                                         @php
@@ -852,7 +868,7 @@
                                                                                     label="Quantity"
                                                                                     placeholder=""
                                                                                     wire:model.live="quantity.{{ $eventTicket->id }}"
-                                                                                    :disabled="$ccy !== null && $ccy !== $eventTicket->currency->ccy"
+                                                                                    :disabled="($ccy !== null && $ccy !== $eventTicket->currency->ccy) || !$eventTicket->isOnSale()"
                                                                                     :options="$options"
                                                                                 />
                                                                             </div>
