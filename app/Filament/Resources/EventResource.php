@@ -374,14 +374,19 @@ class EventResource extends Resource
                             ->live()
                             ->hidden(function (Forms\Components\Radio $component): bool {
                                 $state = $component->getParentRepeater()->getState();
-
                                 $currentPath = $component->getStatePath();
 
-                                if (count($state) > 1) {
-                                    $array_keys = array_keys($state);
-                                    foreach (array_splice($array_keys, 1) as $key) {
-                                        if (Str::contains($currentPath, $key))
-                                            return true;
+                                if (count($state) <= 1) {
+                                    return false;
+                                }
+
+                                foreach (array_keys($state) as $key) {
+                                    if ($key === array_key_first($state)) {
+                                        continue;
+                                    }
+
+                                    if (Str::contains($currentPath, $key)) {
+                                        return true;
                                     }
                                 }
 
