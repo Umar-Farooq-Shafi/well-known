@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use RyanChandler\FilamentProgressColumn\ProgressColumn;
 
 class EventResource extends Resource
@@ -371,19 +372,26 @@ class EventResource extends Resource
                             ->label('Is this event recurring?')
                             ->boolean()
                             ->live()
-//                            ->hidden(function (Forms\Components\Radio $component): bool {
-//                                $id = "data.eventDates.4c79b90d-da88-416a-8a97-54fb3524a5fc.recurrent";
-//
-//                                $state = $component->getParentRepeater()->getState();
-//
-//                                if (count($state) > 1) {
-//                                    dump($component->getState());
-//                                    dump($component->getId());
-//                                    dd(array_slice($state, 1, 1, true));
-//                                }
-//
-//                                return count($state) > 1;
-//                            })
+                            ->hidden(function (Forms\Components\Radio $component): bool {
+                                $state = $component->getParentRepeater()->getState();
+
+                                $currentPath = $component->getStatePath();
+
+                                if (count($state) > 1) {
+                                    $array_keys = array_keys($state);
+                                    foreach (array_splice($array_keys, 1) as $key) {
+                                        if (Str::contains($currentPath, $key))
+                                            return true;
+                                    }
+                                }
+
+                                return false;
+                            })
+                            ->disabled(function (Forms\Components\Radio $component): bool {
+                                $state = $component->getParentRepeater()->getState();
+
+                                return count($state) > 1;
+                            })
                             ->required(),
 
                         Forms\Components\DateTimePicker::make('recurrent_startdate')
