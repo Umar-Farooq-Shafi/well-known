@@ -329,6 +329,17 @@ class EventResource extends Resource
                     ->required()
                     ->relationship('eventDates')
                     ->columnSpanFull()
+                    ->addable(function (Forms\Components\Repeater $component): bool {
+                        $state = $component->getState();
+
+                        foreach ($state as $form) {
+                            if (data_get($form, 'recurrent')) {
+                                return $form['recurrent'] === false;
+                            }
+                        }
+
+                        return true;
+                    })
                     ->mutateRelationshipDataBeforeSaveUsing(function ($data, Forms\Get $get) {
                         $eventtimezone = $get('eventtimezone');
                         $dateKeys = ['recurrent_startdate', 'recurrent_enddate', 'startdate', 'enddate'];
@@ -360,6 +371,19 @@ class EventResource extends Resource
                             ->label('Is this event recurring?')
                             ->boolean()
                             ->live()
+//                            ->hidden(function (Forms\Components\Radio $component): bool {
+//                                $id = "data.eventDates.4c79b90d-da88-416a-8a97-54fb3524a5fc.recurrent";
+//
+//                                $state = $component->getParentRepeater()->getState();
+//
+//                                if (count($state) > 1) {
+//                                    dump($component->getState());
+//                                    dump($component->getId());
+//                                    dd(array_slice($state, 1, 1, true));
+//                                }
+//
+//                                return count($state) > 1;
+//                            })
                             ->required(),
 
                         Forms\Components\DateTimePicker::make('recurrent_startdate')

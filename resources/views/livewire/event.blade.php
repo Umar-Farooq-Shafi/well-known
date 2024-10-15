@@ -738,35 +738,112 @@
                                             <div class="flex flex-col gap-y-1 font-medium text-base">
                                                 @if($eventDateId)
                                                     @php
+                                                        // Attempt to fetch the selected event date where 'startdate' is less than or equal to the picked date
                                                         $selectedEventDate = $event->eventDates()->where('id', $eventDateId)->first();
-                                                        $startDate = Carbon::make($selectedEventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0]);
-                                                        $endDate = Carbon::make($selectedEventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0]);
                                                     @endphp
 
-                                                    <p>
-                                                        {{ $startDate->format('F d Y') }} - {{ $endDate->format('F d Y') }}
-                                                        ({{ $startDate->format('H:i A') }} - {{ $endDate->format('H:i A') }})
-                                                    </p>
-                                                @else
-                                                    <p>
-                                                        {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
-                                                        - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
-                                                        ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
-                                                        - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
-                                                        )
-                                                    </p>
-                                                @endif
+                                                    {{-- Check if $selectedEventDate is not null --}}
+                                                    @if($selectedEventDate)
+                                                        @php
+                                                            // Check if the event is recurrent and use the appropriate date fields
+                                                            if ($selectedEventDate->recurrent) {
+                                                                $startDate = Carbon::make($selectedEventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                                $endDate = Carbon::make($selectedEventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                            } else {
+                                                                $startDate = Carbon::make($selectedEventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                                $endDate = Carbon::make($selectedEventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                            }
+                                                        @endphp
 
+                                                        {{-- Check if startDate and endDate are not null before trying to format them --}}
+                                                        @if($startDate && $endDate)
+                                                            <p>
+                                                                {{ $startDate->format('F d Y') }}
+                                                                - {{ $endDate->format('F d Y') }}
+                                                                ({{ $startDate->format('h:i A') }}
+                                                                - {{ $endDate->format('h:i A') }})
+                                                            </p>
+                                                        @else
+                                                            <p>Start date or end date is missing for the selected
+                                                                event.</p>
+                                                        @endif
+                                                    @else
+                                                        <p>No event found for the selected date ID.</p>
+                                                    @endif
+                                                @else
+                                                    {{-- Handle case where no eventDateId is provided --}}
+                                                    @if($eventDate)
+                                                        @php
+                                                            // Check if the event is recurrent and use the appropriate date fields
+                                                            if ($eventDate->recurrent) {
+                                                                $startDate = Carbon::make($eventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                                $endDate = Carbon::make($eventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                            } else {
+                                                                $startDate = Carbon::make($eventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                                $endDate = Carbon::make($eventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                            }
+                                                        @endphp
+
+                                                        {{-- Check if startDate and endDate are not null before trying to format them --}}
+                                                        @if($startDate && $endDate)
+                                                            <p>
+                                                                {{ $startDate->format('F d Y') }}
+                                                                - {{ $endDate->format('F d Y') }}
+                                                                ({{ $startDate->format('h:i A') }}
+                                                                - {{ $endDate->format('h:i A') }})
+                                                            </p>
+                                                        @else
+                                                            <p>Start date or end date is missing for this event.</p>
+                                                        @endif
+                                                    @else
+                                                        <p>No event date available.</p>
+                                                    @endif
+                                                @endif
                                                 <p>
                                                     Selected Date:
                                                     @if($eventDatePick)
-                                                        {{  Carbon::make($eventDatePick)->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
-                                                        ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
-                                                        - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('H:i A') }}
-                                                        )
+                                                        {{ Carbon::make($eventDatePick)->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
+                                                        {{-- Adjusting time display to use recurrent fields if necessary --}}
+                                                        @if($eventDateId)
+                                                            @php
+                                                                $selectedEventDate = $event->eventDates()->where('id', $eventDateId)->first();
+                                                            @endphp
+                                                            @if($selectedEventDate)
+                                                                @if($selectedEventDate->recurrent)
+                                                                    {{-- Use recurrent fields for time display --}}
+                                                                    ({{ Carbon::make($selectedEventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                    - {{ Carbon::make($selectedEventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                    )
+                                                                @else
+                                                                    {{-- Use standard start and end dates for time display --}}
+                                                                    ({{ Carbon::make($selectedEventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                    - {{ Carbon::make($selectedEventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                    )
+                                                                @endif
+                                                            @endif
+                                                        @else
+                                                            {{-- Fallback to eventDate if eventDateId is not provided --}}
+                                                            @if($eventDate)
+                                                                @if($eventDate->recurrent)
+                                                                    {{-- Use recurrent fields for time display --}}
+                                                                    ({{ Carbon::make($eventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                    - {{ Carbon::make($eventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                    )
+                                                                @else
+                                                                    {{-- Use standard start and end dates for time display --}}
+                                                                    ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                    - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                    )
+                                                @endif
+                                                @else
+                                                    <p>No event date available.</p>
                                                     @endif
-                                                </p>
+                                                    @endif
+                                                    @endif
+                                                    </p>
+
                                             </div>
+
 
                                             <div class="px-8 py-4">
                                                 <x-input
@@ -914,12 +991,12 @@
                                                                                         <del class="text-gray-500">
                                                                                             {{ $eventTicket->currency->ccy }} {{ $eventTicket->price }}
                                                                                         </del>
-
                                                                                         <span>
                                                                                             @if($eventTicket->currency_symbol_position === 'left')
                                                                                                 {{ $eventTicket->currency->ccy }}
                                                                                             @endif
-                                                                                            {{ $eventTicket->price - $eventTicket->promotionalprice }}
+                                                                                            {{-- {{ $eventTicket->price - $eventTicket->promotionalprice }} --}} <!-- Display the discounted price-->
+                                                                                            {{ $eventTicket->promotionalprice }} <!-- Display the promotional price -->
                                                                                             @if($eventTicket->currency_symbol_position === 'right')
                                                                                                 {{ $eventTicket->currency->ccy }}
                                                                                             @endif
@@ -990,9 +1067,13 @@
                                                                 if ($eventDateTicket->promotionalprice) {
                                                                     $isStartDate = $eventDateTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
                                                                     $isEndDate = $eventDateTicket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
-
                                                                     if ($isStartDate && $isEndDate) {
-                                                                        $price = $eventDateTicket->price - $eventDateTicket->promotionalprice;
+                                                                        // Check if promotional price exists and set price accordingly
+                                                                        if ($eventDateTicket->promotionalprice) {
+                                                                            $price = $eventDateTicket->promotionalprice; // Set price to promotional price
+                                                                        } else {
+                                                                            $price = $eventDateTicket->price; // Fallback to original price
+                                                                        }
                                                                     }
                                                                 }
 
