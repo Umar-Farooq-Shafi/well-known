@@ -1,4 +1,4 @@
-<div class="mt-24">
+<div class="mt-[25%] lg:mt-[12%] md:mt-[17%] container mx-auto">
     @push('metas')
         <meta name="description" content="{{ Str::limit(strip_tags(nl2br($blogPostTranslation->content)), 200) }}..."/>
         @if($blogPostTranslation->tags)

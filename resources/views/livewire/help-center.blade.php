@@ -1,4 +1,4 @@
-<div class="bg-gray-100 mt-36 h-screen">
+<div class="bg-gray-100 mt-[25%] lg:mt-[12%] md:mt-[17%] container mx-auto h-screen">
     <div class="bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 py-16">
         <div class="container mx-auto text-center">
             <h1 class="text-4xl font-bold text-white mb-4">How can we help?</h1>
