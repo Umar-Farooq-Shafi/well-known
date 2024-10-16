@@ -43,7 +43,7 @@
 
         <div class="flex flex-col lg:flex-row justify-between mb-4 mt-8">
             <div
-                class="w-full lg:w-1/5 mb-4 lg:mb-0 h-fit space-y-2 mx-4 divide-y divide-slate-300 overflow-hidden rounded border border-slate-300 bg-slate-100/40 text-slate-700">
+                class="w-full lg:w-1/5 mb-4 lg:mb-0 h-fit space-y-2 lg:mx-4 divide-y divide-slate-300 overflow-hidden rounded border border-slate-300 bg-slate-100/40 text-slate-700">
                 <div x-data="{ isExpanded: true }" class="divide-y divide-slate-300 dark:divide-slate-700">
                     <button id="controlsAccordionItemOne" type="button"
                             class="flex w-full items-center justify-between gap-4 bg-slate-100 p-4 text-left underline-offset-2 hover:bg-slate-100/75 focus-visible:bg-slate-100/75 focus-visible:underline focus-visible:outline-none dark:bg-slate-800 dark:hover:bg-slate-800/75 dark:focus-visible:bg-slate-800/75"

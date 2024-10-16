@@ -25,8 +25,8 @@
         </div>
     </div>
 
-    <div class="flex justify-center rounded-lg shadow-lg bg-white mx-8 md:mx-8 lg:mx-44 my-8">
-        <div class="container w-[65%]">
+    <div class="flex flex-col divide-y-2 md:divide-x-2 md:flex-row justify-center rounded-lg shadow-lg bg-white container mx-auto">
+        <div class="container mx-auto">
             <div class="mt-8 p-6">
                 <div class="flex gap-x-4">
                     @foreach ($event->eventDates as $eventDate)
@@ -540,10 +540,7 @@
             </div>
         </div>
 
-        <div
-            class="inline-block h-screen w-0.5 self-stretch bg-neutral-100 dark:bg-white/10"></div>
-
-        <div class="w-[30%] p-8">
+        <div class="container md:w-[30%] p-8">
             @if($event->hasAnEventDateOnSale())
                 @if ($event->hasTwoOrMoreEventDatesOnSale())
                     @php
