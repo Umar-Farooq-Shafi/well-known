@@ -20,8 +20,7 @@
               content="{{ Str::limit(strip_tags(nl2br($blogPostTranslation->content)), 200) }}..."/>
     @endpush
 
-    <div
-        class="flex flex-col gap-y-1 md:flex-row justify-between bg-gray-300 px-4 py-2 md:rounded md:mx-16 lg:mx-32 my-4">
+    <div class="flex flex-col gap-y-1 md:flex-row justify-between bg-gray-300 px-4 py-2 md:rounded my-4">
         <div class="font-bold text-xl">{{ $blogPostTranslation->name }}</div>
 
         <x-breadcrumbs/>
