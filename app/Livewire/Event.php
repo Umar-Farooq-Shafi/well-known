@@ -57,7 +57,10 @@ class Event extends Component
         foreach ($this->eventTranslation->event->promotions as $eventPromotion) {
             $now = now()->timezone($eventPromotion->timezone);
 
-            if ($eventPromotion->start_date->lessThanOrEqualTo($now) && $eventPromotion->end_date->greaterThanOrEqualTo($now)) {
+            if (
+                $eventPromotion->start_date->timezone($eventPromotion->timezone)->lessThanOrEqualTo($now) &&
+                $eventPromotion->end_date->timezone($eventPromotion->timezone)->greaterThanOrEqualTo($now)
+            ) {
                 $promotion = $eventPromotion;
             }
         }
@@ -89,10 +92,23 @@ class Event extends Component
 
         $event = $this->eventTranslation->event;
 
-        $coupon = $event->coupons()
-            ->whereDate('expire_date', '>=', now())
+        $coupons = $event->coupons()
             ->where('code', $this->promoCode)
-            ->first();
+            ->get();
+
+        $coupon = null;
+
+        foreach ($coupons as $c) {
+            $now = now()->timezone($c->timezone);
+
+            if (
+                $c->start_date->timezone($c->timezone)->lessThanOrEqualTo($now) &&
+                $c->expire_date->timezone($c->timezone)->greaterThanOrEqualTo($now)
+            ) {
+                $coupon = $c;
+                break;
+            }
+        }
 
         if (!$coupon) {
             $this->notification()->send([

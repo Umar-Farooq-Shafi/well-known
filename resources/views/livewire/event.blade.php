@@ -31,169 +31,164 @@
                 <div class="flex gap-x-4">
                     @foreach ($event->eventDates as $eventDate)
                         @if ($eventDate->isOnSale() && $event->eventDates->count() == 1)
-                            <div id="eventDate-{{ $eventDate->reference }}-wrapper" class="event-eventDate-wrapper">
-                                <dl class="mb-4">
-                                    <dd>
-                                        <div class="text-center">
-                                            {{-- For the add to calendar link --}}
-                                            @php
-                                                $eventstartdate = '';
-                                                $eventenddate = '';
-                                                $eventlocation = $eventDate->venue ? $eventDate->venue->name . ': ' . $eventDate->venue->stringifyAddress : __('Online');
+                            <dl class="mb-4">
+                                <dd>
+                                    <div class="text-center">
+                                        {{-- For the add to calendar link --}}
+                                        @php
+                                            $eventstartdate = '';
+                                            $eventenddate = '';
+                                            $eventlocation = $eventDate->venue ? $eventDate->venue->name . ': ' . $eventDate->venue->stringifyAddress : __('Online');
 
-                                                // Use recurrent_startdate if recurrent is set
-                                                $startDate = $eventDate->recurrent ? $eventDate->recurrent_startdate : $eventDate->startdate;
-                                                $endDate = $eventDate->recurrent ? $eventDate->recurrent_enddate : $eventDate->enddate; // Check for recurrent_enddate
-                                            @endphp
+                                            // Use recurrent_startdate if recurrent is set
+                                            $startDate = $eventDate->recurrent ? $eventDate->recurrent_startdate : $eventDate->startdate;
+                                            $endDate = $eventDate->recurrent ? $eventDate->recurrent_enddate : $eventDate->enddate; // Check for recurrent_enddate
+                                        @endphp
 
-                                            @if ($startDate)
+                                        @if ($startDate)
+                                            <div class="inline-block">
                                                 <div class="inline-block">
-                                                    <div class="inline-block">
                                                     <span class="text-5xl">
                                                         {{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}
                                                     </span>
-                                                    </div>
-                                                    <div class="inline-block mr-3">
-                                                        <div>
+                                                </div>
+                                                <div class="inline-block mr-3">
+                                                    <div>
                                                             <span
                                                                 class="text-sm">{{ ucfirst($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
-                                                        </div>
-                                                        <div>
+                                                    </div>
+                                                    <div>
                                                             <span
                                                                 class="text-sm">{{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
-                                                        </div>
                                                     </div>
-                                                    <div class="mb-2">
+                                                </div>
+                                                <div class="mb-2">
                                                     <span class="text-gray-500 font-bold">
                                                         {{ strtoupper($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
                                                         @if ($endDate && Carbon::make($endDate)->timezone($event->eventtimezone ?? $timezone[0])->equalTo($startDate->timezone($event->eventtimezone ?? $timezone[0])))
                                                             - {{ strtoupper($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
                                                         @endif
                                                     </span>
-                                                    </div>
                                                 </div>
-                                                @php
-                                                    $eventstartdate = $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i');
-                                                @endphp
-                                            @endif
+                                            </div>
+                                            @php
+                                                $eventstartdate = $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i');
+                                            @endphp
+                                        @endif
 
-                                            @if ($endDate && !$endDate->timezone($event->eventtimezone ?? $timezone[0])->equalTo($startDate->timezone($event->eventtimezone ?? $timezone[0])))
+                                        @if ($endDate && !$endDate->timezone($event->eventtimezone ?? $timezone[0])->equalTo($startDate->timezone($event->eventtimezone ?? $timezone[0])))
+                                            <div class="inline-block">
                                                 <div class="inline-block">
-                                                    <div class="inline-block">
                                                         <span
                                                             class="text-5xl">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}</span>
+                                                </div>
+                                                <div class="inline-block">
+                                                    <div><span
+                                                            class="text-sm">{{ ucfirst($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
                                                     </div>
-                                                    <div class="inline-block">
-                                                        <div><span
-                                                                class="text-sm">{{ ucfirst($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
-                                                        </div>
-                                                        <div>
+                                                    <div>
                                                             <span
                                                                 class="text-sm">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
-                                                        </div>
                                                     </div>
-                                                    <div class="mb-2">
+                                                </div>
+                                                <div class="mb-2">
                                                     <span class="text-gray-500 font-bold">
                                                         {{ strtoupper($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
                                                     </span>
-                                                    </div>
                                                 </div>
-                                                @php
-                                                    $eventenddate = $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i');
-                                                @endphp
-                                            @endif
-                                        </div>
-                                    </dd>
-                                </dl>
-
-                            </div>
+                                            </div>
+                                            @php
+                                                $eventenddate = $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('F d, Y H:i');
+                                            @endphp
+                                        @endif
+                                    </div>
+                                </dd>
+                            </dl>
 
                         @elseif ($eventDate->isOnSale() && $event->eventDates->count() > 1 && $event->eventDates->every(fn($ed) => $ed->recurrent == 0))
-                            <div id="eventDate-{{ $eventDate->reference }}-wrapper" class="event-eventDate-wrapper">
-                                <dl class="mb-4">
-                                    <dd>
-                                        <div class="text-center flex flex-col gap-1">
-                                            @foreach ($event->eventDates as $eventDate)
-                                                @php
-                                                    $eventstartdate = '';
-                                                    $eventenddate = '';
-                                                    $eventlocation = $eventDate->venue ? $eventDate->venue->name . ': ' . $eventDate->venue->stringifyAddress : __('Online');
-                                                    $startDate = $eventDate->startdate;
-                                                    $endDate = $eventDate->enddate;
-                                                @endphp
+                            <dl class="mb-4">
+                                <dd>
+                                    <div class="text-center flex flex-col gap-1">
+                                        @foreach ($event->eventDates as $eventDate)
+                                            @php
+                                                $eventstartdate = '';
+                                                $eventenddate = '';
+                                                $eventlocation = $eventDate->venue ? $eventDate->venue->name . ': ' . $eventDate->venue->stringifyAddress : __('Online');
+                                                $startDate = $eventDate->startdate;
+                                                $endDate = $eventDate->enddate;
+                                            @endphp
 
-                                                @if ($startDate || $endDate)
-                                                    <div
-                                                        class="inline-block cursor-pointer event-date"
-                                                        @click="selectedEventDateId = selectedEventDateId === '{{ $eventDate->reference }}' ? null : '{{ $eventDate->reference }}'"
-                                                        x-bind:class="selectedEventDateId == '{{ $eventDate->reference }}' ? 'bg-yellow-500' : 'bg-gray-50'"
-                                                        wire:click="updateSelectedEventDate('{{ $eventDate->startdate }}', '{{ $eventDate->id }}')"
-                                                        style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;"
-                                                    >
-                                                        <div class="flex space-x-4">
-                                                            <div class="inline-block">
-                                                                @if ($startDate)
-                                                                    <span class="text-5xl">
+                                            @if ($startDate || $endDate)
+                                                <div
+                                                    class="inline-block cursor-pointer event-date"
+                                                    @click="selectedEventDateId = selectedEventDateId === '{{ $eventDate->reference }}' ? null : '{{ $eventDate->reference }}'"
+                                                    x-bind:class="selectedEventDateId == '{{ $eventDate->reference }}' ? 'bg-yellow-500' : 'bg-gray-50'"
+                                                    wire:click="updateSelectedEventDate('{{ $eventDate->startdate }}', '{{ $eventDate->id }}')"
+                                                    style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;"
+                                                >
+                                                    <div class="flex space-x-4">
+                                                        <div class="inline-block">
+                                                            @if ($startDate)
+                                                                <span class="text-5xl">
                                                                         {{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}
                                                                     </span>
-                                                                    <div class="text-sm">
-                                                                        {{ ucfirst($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}
-                                                                    </div>
-                                                                    <div class="text-sm">
-                                                                        {{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}
-                                                                    </div>
-                                                                    <div class="mb-2 text-gray-500 font-bold">
-                                                                        {{ strtoupper($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
-                                                                        @if ($endDate && Carbon::make($endDate)->timezone($event->eventtimezone ?? $timezone[0])->equalTo($startDate->timezone($event->eventtimezone ?? $timezone[0])))
-                                                                            - {{ strtoupper($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
-                                                                        @endif
-                                                                    </div>
-                                                                @endif
-                                                            </div>
-
-                                                            @if ($endDate && !$endDate->timezone($event->eventtimezone ?? $timezone[0])->equalTo($startDate->timezone($event->eventtimezone ?? $timezone[0])))
-                                                                <div class="inline-block">
-                                                                    <span
-                                                                        class="text-5xl">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}</span>
-                                                                    <div>
-                                                                        <span
-                                                                            class="text-sm">{{ ucfirst($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
-                                                                    </div>
-                                                                    <div>
-                                                                        <span
-                                                                            class="text-sm">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
-                                                                    </div>
-                                                                    <div class="mb-2">
-                                                                <span class="text-gray-500 font-bold">
-                                                                    {{ strtoupper($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
-                                                                </span>
-                                                                    </div>
+                                                                <div class="text-sm">
+                                                                    {{ ucfirst($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}
+                                                                </div>
+                                                                <div class="text-sm">
+                                                                    {{ $startDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}
+                                                                </div>
+                                                                <div class="mb-2 text-gray-500 font-bold">
+                                                                    {{ strtoupper($startDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
+                                                                    @if ($endDate && Carbon::make($endDate)->timezone($event->eventtimezone ?? $timezone[0])->equalTo($startDate->timezone($event->eventtimezone ?? $timezone[0])))
+                                                                        - {{ strtoupper($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
+                                                                    @endif
                                                                 </div>
                                                             @endif
                                                         </div>
+
+                                                        @if ($endDate && !$endDate->timezone($event->eventtimezone ?? $timezone[0])->equalTo($startDate->timezone($event->eventtimezone ?? $timezone[0])))
+                                                            <div class="inline-block">
+                                                                    <span
+                                                                        class="text-5xl">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('d') }}</span>
+                                                                <div>
+                                                                        <span
+                                                                            class="text-sm">{{ ucfirst($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('M')) }}</span>
+                                                                </div>
+                                                                <div>
+                                                                        <span
+                                                                            class="text-sm">{{ $endDate->timezone($event->eventtimezone ?? $timezone[0])->format('Y') }}</span>
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                <span class="text-gray-500 font-bold">
+                                                                    {{ strtoupper($endDate->timezone($event->eventtimezone ?? $timezone[0])->format('g:i a')) }}
+                                                                </span>
+                                                                </div>
+                                                            </div>
+                                                        @endif
                                                     </div>
+                                                </div>
 
-                                                    <script>
-                                                        function changeColor(clickedElement) {
-                                                            // Get all boxes with the class 'event-date'
-                                                            const boxes = document.querySelectorAll('.event-date');
+                                                <script>
+                                                    function changeColor(clickedElement) {
+                                                        // Get all boxes with the class 'event-date'
+                                                        const boxes = document.querySelectorAll('.event-date');
 
-                                                            // Reset background color for all boxes
-                                                            boxes.forEach(box => {
-                                                                box.style.backgroundColor = '#f9f9f9'; // Original color
-                                                            });
+                                                        // Reset background color for all boxes
+                                                        boxes.forEach(box => {
+                                                            box.style.backgroundColor = '#f9f9f9'; // Original color
+                                                        });
 
-                                                            // Change the background color of the clicked box
-                                                            clickedElement.style.backgroundColor = 'rgb(243, 229, 118)'; // New color
-                                                        }
-                                                    </script>
-                                                @endif
-                                            @endforeach
+                                                        // Change the background color of the clicked box
+                                                        clickedElement.style.backgroundColor = 'rgb(243, 229, 118)'; // New color
+                                                    }
+                                                </script>
+                                            @endif
+                                        @endforeach
 
-                                        </div>
-                                    </dd>
-                                </dl>
-                            </div>
+                                    </div>
+                                </dd>
+                            </dl>
                         @endif
                     @endforeach
                     <div>
@@ -587,375 +582,288 @@
 
                     @foreach ($event->eventDates as $eventDate)
                         @if ($eventDate->isOnSale())
-                            <div id="eventDate-{{ $eventDate->reference }}-wrapper" class="event-eventDate-wrapper">
-                                <dl class="mt-4">
-                                    <dt class="text-gray-500">{{ __('Tickets') }}</dt>
+                            <dl class="mt-4">
+                                <dt class="text-gray-500">{{ __('Tickets') }}</dt>
 
-                                    <dd class="mr-0 my-2">
-                                        <div class="overflow-x-auto">
-                                            @if ($event->eventDates->count() > 1)
-                                                <div class="overflow-x-auto">
-                                                    <p id="default-message" x-show="!selectedEventDateId">
-                                                        Please select your event date.
-                                                    </p>
+                                <dd class="mr-0 my-2">
+                                    <div class="overflow-x-auto">
+                                        @if ($event->eventDates->count() > 1)
+                                            <div class="overflow-x-auto">
+                                                <p id="default-message" x-show="!selectedEventDateId">
+                                                    Please select your event date.
+                                                </p>
 
-                                                    @foreach ($event->eventDates as $eventDate)
-                                                        @php
-                                                            $tickets = $eventDate->eventDateTickets->where('active', true); // Get active tickets for the event date
-                                                        @endphp
+                                                @foreach ($event->eventDates as $eventDate)
+                                                    @php
+                                                        $tickets = $eventDate->eventDateTickets->where('active', true); // Get active tickets for the event date
+                                                    @endphp
 
-                                                        <div class="inline-block cursor-pointer event-date"
-                                                             x-show="selectedEventDateId === '{{ $eventDate->reference }}'">
-                                                            Event
-                                                            Date {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('d M Y') }}
-                                                        </div>
+                                                    <div class="inline-block cursor-pointer event-date"
+                                                         x-show="selectedEventDateId === '{{ $eventDate->reference }}'">
+                                                        Event
+                                                        Date {{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('d M Y') }}
+                                                    </div>
 
-                                                        <!-- Ticket Info for the event date -->
-                                                        <div class="ticket-info"
-                                                             x-show="@js($event->eventDates->count()) < 2">
-                                                            @if ($tickets->isNotEmpty())
-                                                                <table class="table-auto w-full">
-                                                                    <tbody>
-                                                                    @foreach ($tickets as $ticket)
-                                                                        <tr class="bg-gray-200 flex w-full justify-between my-2 px-0.5">
-                                                                            <td class="border-t-0">{{ $ticket->name }}</td>
-                                                                            <td>
-                                                                                @if($ticket->free)
-                                                                                    {{ 'Free' }}
-                                                                                @else
-                                                                                    {{ $ticket->currency->ccy }}
-                                                                                @endif
-                                                                            </td>
-                                                                            <td class="border-t-0 text-left">
-                                                                                <p class="text-nowrap font-semibold">
-                                                                                    @if($ticket->free == 1)
-                                                                                        Free
-                                                                                    @elseif($ticket->promotionalprice)
-                                                                                        @php
-                                                                                            $isStartDate = $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
-                                                                                            $isEndDate = $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
-                                                                                        @endphp
+                                                    <!-- Ticket Info for the event date -->
+                                                    <div class="ticket-info"
+                                                         x-show="@js($event->eventDates->count()) < 2">
+                                                        @if ($tickets->isNotEmpty())
+                                                            <table class="table-auto w-full">
+                                                                <tbody>
+                                                                @foreach ($tickets as $ticket)
+                                                                    <tr class="bg-gray-200 flex w-full justify-between my-2 px-0.5">
+                                                                        <td class="border-t-0">{{ $ticket->name }}</td>
+                                                                        <td>
+                                                                            @if($ticket->free)
+                                                                                {{ 'Free' }}
+                                                                            @else
+                                                                                {{ $ticket->currency->ccy }}
+                                                                            @endif
+                                                                        </td>
+                                                                        <td class="border-t-0 text-left">
+                                                                            <p class="text-nowrap font-semibold">
+                                                                                @if($ticket->free == 1)
+                                                                                    Free
+                                                                                @elseif($ticket->promotionalprice)
+                                                                                    @php
+                                                                                        $isStartDate = $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
+                                                                                        $isEndDate = $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
+                                                                                    @endphp
 
-                                                                                        @if($isStartDate && $isEndDate)
-                                                                                            <del
-                                                                                                class="font-bold">{{ $ticket->price }}</del> {{ $ticket->promotionalprice }}
-                                                                                        @else
-                                                                                            {{ $ticket->price }}
-                                                                                        @endif
+                                                                                    @if($isStartDate && $isEndDate)
+                                                                                        <del
+                                                                                            class="font-bold">{{ $ticket->price }}</del> {{ $ticket->promotionalprice }}
                                                                                     @else
                                                                                         {{ $ticket->price }}
                                                                                     @endif
-                                                                                </p>
-                                                                            </td>
-                                                                        </tr>
-                                                                    @endforeach
-                                                                    </tbody>
-                                                                </table>
-                                                            @else
-                                                                <p>No available tickets for this date.</p>
-                                                            @endif
-                                                        </div>
-                                                    @endforeach
-                                                </div>
+                                                                                @else
+                                                                                    {{ $ticket->price }}
+                                                                                @endif
+                                                                            </p>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                                </tbody>
+                                                            </table>
+                                                        @else
+                                                            <p>No available tickets for this date.</p>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
 
-                                            @else
-                                                <table class="table-auto w-full">
-                                                    <tbody>
-                                                    @foreach ($eventDate->eventDateTickets as $ticket)
-                                                        @if ($ticket->active)
-                                                            <tr class="bg-gray-200 flex w-full justify-between my-2 px-0.5">
-                                                                <td class="border-t-0">
-                                                                    {{ $ticket->name }}
-                                                                </td>
+                                        @else
+                                            <table class="table-auto w-full">
+                                                <tbody>
+                                                @foreach ($eventDate->eventDateTickets as $ticket)
+                                                    @if ($ticket->active)
+                                                        <tr class="bg-gray-200 flex w-full justify-between my-2 px-0.5">
+                                                            <td class="border-t-0">
+                                                                {{ $ticket->name }}
+                                                            </td>
 
-                                                                <td>
-                                                                    @if($ticket->free)
-                                                                        {{ 'Free' }}
-                                                                    @else
-                                                                        {{ $ticket->currency->ccy }}
-                                                                    @endif
-                                                                </td>
+                                                            <td>
+                                                                @if($ticket->free)
+                                                                    {{ 'Free' }}
+                                                                @else
+                                                                    {{ $ticket->currency->ccy }}
+                                                                @endif
+                                                            </td>
 
-                                                                <td class="border-t-0 text-left">
-                                                                    <p class="text-nowrap font-semibold">
-                                                                        @if($ticket->free == 1)
-                                                                            Free
-                                                                        @elseif($ticket->promotionalprice)
-                                                                            @php
-                                                                                $isStartDate = $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
-                                                                                $isEndDate = $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
-                                                                            @endphp
+                                                            <td class="border-t-0 text-left">
+                                                                <p class="text-nowrap font-semibold">
+                                                                    @if($ticket->free == 1)
+                                                                        Free
+                                                                    @elseif($ticket->promotionalprice)
+                                                                        @php
+                                                                            $isStartDate = $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
+                                                                            $isEndDate = $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
+                                                                        @endphp
 
-                                                                            @if($isStartDate && $isEndDate)
-                                                                                <del
-                                                                                    class="font-bold">{{ $ticket->price }} </del>
-                                                                                {{ $ticket->promotionalprice }}
-                                                                            @else
-                                                                                {{ $ticket->price }}
-                                                                            @endif
+                                                                        @if($isStartDate && $isEndDate)
+                                                                            <del
+                                                                                class="font-bold">{{ $ticket->price }} </del>
+                                                                            {{ $ticket->promotionalprice }}
                                                                         @else
                                                                             {{ $ticket->price }}
                                                                         @endif
-                                                                    </p>
-                                                                </td>
-                                                            </tr>
-                                                        @endif
-                                                    @endforeach
-                                                    </tbody>
-                                                </table>
-                                            @endif
-                                        </div>
-
-                                        @if ($eventDate->recurrent)
-                                            <div class="form-group my-2">
-                                                <x-datetime-picker
-                                                    wire:model.live="eventDatePick"
-                                                    label="Event Date"
-                                                    placeholder="Select Event Date"
-                                                    without-timezone
-                                                    without-time
-                                                    :min="$eventDate->recurrent_startdate?->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
-                                                    :max="$eventDate->recurrent_enddate?->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
-                                                />
-                                            </div>
+                                                                    @else
+                                                                        {{ $ticket->price }}
+                                                                    @endif
+                                                                </p>
+                                                            </td>
+                                                        </tr>
+                                                    @endif
+                                                @endforeach
+                                                </tbody>
+                                            </table>
                                         @endif
+                                    </div>
 
-                                        <div class="flex items-center justify-center w-full py-2">
-                                            <x-button
-                                                wire:click="buyTicket"
-                                                spinner="buyTicket"
-                                                yellow
-                                                label="Buy Tickets"
+                                    @if ($eventDate->recurrent)
+                                        <div class="form-group my-2">
+                                            <x-datetime-picker
+                                                wire:model.live="eventDatePick"
+                                                label="Event Date"
+                                                placeholder="Select Event Date"
+                                                without-timezone
+                                                without-time
+                                                :min="$eventDate->recurrent_startdate?->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
+                                                :max="$eventDate->recurrent_enddate?->timezone($event->eventtimezone ?? $timezone[0])->format('Y-m-d')"
                                             />
                                         </div>
+                                    @endif
 
-                                    </dd>
-                                </dl>
+                                    <div class="flex items-center justify-center w-full py-2">
+                                        <x-button
+                                            wire:click="buyTicket"
+                                            spinner="buyTicket"
+                                            yellow
+                                            label="Buy Tickets"
+                                        />
+                                    </div>
 
-                                <x-modal-card :title="$eventTranslation->name" name="cardModal" blur="md" width="5xl">
-                                    <div
-                                        class="grid grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-4 animate-in fade-in">
-                                        <div class="md:col-span-2 lg:col-span-5">
-                                            <div class="flex flex-col gap-y-1 font-medium text-base">
-                                                @if($eventDateId)
+                                </dd>
+                            </dl>
+
+                            <x-modal-card :title="$eventTranslation->name" name="cardModal" blur="md" width="5xl">
+                                <div
+                                    class="grid grid-cols-1 md:gap-2 lg:gap-4 lg:grid-cols-8 md:grid-cols-4 animate-in fade-in">
+                                    <div class="md:col-span-2 lg:col-span-5">
+                                        <div class="flex flex-col gap-y-1 font-medium text-base">
+                                            @if($eventDateId)
+                                                @php
+                                                    // Attempt to fetch the selected event date where 'startdate' is less than or equal to the picked date
+                                                    $selectedEventDate = $event->eventDates()->where('id', $eventDateId)->first();
+                                                @endphp
+
+                                                {{-- Check if $selectedEventDate is not null --}}
+                                                @if($selectedEventDate)
                                                     @php
-                                                        // Attempt to fetch the selected event date where 'startdate' is less than or equal to the picked date
-                                                        $selectedEventDate = $event->eventDates()->where('id', $eventDateId)->first();
+                                                        // Check if the event is recurrent and use the appropriate date fields
+                                                        if ($selectedEventDate->recurrent) {
+                                                            $startDate = Carbon::make($selectedEventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                            $endDate = Carbon::make($selectedEventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                        } else {
+                                                            $startDate = Carbon::make($selectedEventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                            $endDate = Carbon::make($selectedEventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                        }
                                                     @endphp
 
-                                                    {{-- Check if $selectedEventDate is not null --}}
-                                                    @if($selectedEventDate)
-                                                        @php
-                                                            // Check if the event is recurrent and use the appropriate date fields
-                                                            if ($selectedEventDate->recurrent) {
-                                                                $startDate = Carbon::make($selectedEventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0]);
-                                                                $endDate = Carbon::make($selectedEventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0]);
-                                                            } else {
-                                                                $startDate = Carbon::make($selectedEventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0]);
-                                                                $endDate = Carbon::make($selectedEventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0]);
-                                                            }
-                                                        @endphp
-
-                                                        {{-- Check if startDate and endDate are not null before trying to format them --}}
-                                                        @if($startDate && $endDate)
-                                                            <p>
-                                                                {{ $startDate->format('F d Y') }}
-                                                                - {{ $endDate->format('F d Y') }}
-                                                                ({{ $startDate->format('h:i A') }}
-                                                                - {{ $endDate->format('h:i A') }})
-                                                            </p>
-                                                        @else
-                                                            <p>Start date or end date is missing for the selected
-                                                                event.</p>
-                                                        @endif
+                                                    {{-- Check if startDate and endDate are not null before trying to format them --}}
+                                                    @if($startDate && $endDate)
+                                                        <p>
+                                                            {{ $startDate->format('F d Y') }}
+                                                            - {{ $endDate->format('F d Y') }}
+                                                            ({{ $startDate->format('h:i A') }}
+                                                            - {{ $endDate->format('h:i A') }})
+                                                        </p>
                                                     @else
-                                                        <p>No event found for the selected date ID.</p>
+                                                        <p>Start date or end date is missing for the selected
+                                                            event.</p>
                                                     @endif
                                                 @else
-                                                    {{-- Handle case where no eventDateId is provided --}}
-                                                    @if($eventDate)
-                                                        @php
-                                                            // Check if the event is recurrent and use the appropriate date fields
-                                                            if ($eventDate->recurrent) {
-                                                                $startDate = Carbon::make($eventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0]);
-                                                                $endDate = Carbon::make($eventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0]);
-                                                            } else {
-                                                                $startDate = Carbon::make($eventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0]);
-                                                                $endDate = Carbon::make($eventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0]);
-                                                            }
-                                                        @endphp
+                                                    <p>No event found for the selected date ID.</p>
+                                                @endif
+                                            @else
+                                                {{-- Handle case where no eventDateId is provided --}}
+                                                @if($eventDate)
+                                                    @php
+                                                        // Check if the event is recurrent and use the appropriate date fields
+                                                        if ($eventDate->recurrent) {
+                                                            $startDate = Carbon::make($eventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                            $endDate = Carbon::make($eventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                        } else {
+                                                            $startDate = Carbon::make($eventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                            $endDate = Carbon::make($eventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0]);
+                                                        }
+                                                    @endphp
 
-                                                        {{-- Check if startDate and endDate are not null before trying to format them --}}
-                                                        @if($startDate && $endDate)
-                                                            <p>
-                                                                {{ $startDate->format('F d Y') }}
-                                                                - {{ $endDate->format('F d Y') }}
-                                                                ({{ $startDate->format('h:i A') }}
-                                                                - {{ $endDate->format('h:i A') }})
-                                                            </p>
-                                                        @else
-                                                            <p>Start date or end date is missing for this event.</p>
-                                                        @endif
+                                                    {{-- Check if startDate and endDate are not null before trying to format them --}}
+                                                    @if($startDate && $endDate)
+                                                        <p>
+                                                            {{ $startDate->format('F d Y') }}
+                                                            - {{ $endDate->format('F d Y') }}
+                                                            ({{ $startDate->format('h:i A') }}
+                                                            - {{ $endDate->format('h:i A') }})
+                                                        </p>
                                                     @else
-                                                        <p>No event date available.</p>
+                                                        <p>Start date or end date is missing for this event.</p>
                                                     @endif
-                                                @endif
-                                                <p>
-                                                    Selected Date:
-                                                    @if($eventDatePick)
-                                                        {{ Carbon::make($eventDatePick)->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
-                                                        {{-- Adjusting time display to use recurrent fields if necessary --}}
-                                                        @if($eventDateId)
-                                                            @php
-                                                                $selectedEventDate = $event->eventDates()->where('id', $eventDateId)->first();
-                                                            @endphp
-                                                            @if($selectedEventDate)
-                                                                @if($selectedEventDate->recurrent)
-                                                                    {{-- Use recurrent fields for time display --}}
-                                                                    ({{ Carbon::make($selectedEventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
-                                                                    - {{ Carbon::make($selectedEventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
-                                                                    )
-                                                                @else
-                                                                    {{-- Use standard start and end dates for time display --}}
-                                                                    ({{ Carbon::make($selectedEventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
-                                                                    - {{ Carbon::make($selectedEventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
-                                                                    )
-                                                                @endif
-                                                            @endif
-                                                        @else
-                                                            {{-- Fallback to eventDate if eventDateId is not provided --}}
-                                                            @if($eventDate)
-                                                                @if($eventDate->recurrent)
-                                                                    {{-- Use recurrent fields for time display --}}
-                                                                    ({{ Carbon::make($eventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
-                                                                    - {{ Carbon::make($eventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
-                                                                    )
-                                                                @else
-                                                                    {{-- Use standard start and end dates for time display --}}
-                                                                    ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
-                                                                    - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
-                                                                    )
-                                                @endif
                                                 @else
                                                     <p>No event date available.</p>
-                                                    @endif
-                                                    @endif
-                                                    @endif
-                                                    </p>
-
-                                            </div>
-
-
-                                            <div class="px-8 py-4">
-                                                <x-input
-                                                    label="Promo Code"
-                                                    wire:model="promoCode"
-                                                    placeholder="Promo Code"
-                                                >
-                                                    <x-slot name="append">
-                                                        <x-button
-                                                            class="h-full"
-                                                            label="Apply"
-                                                            rounded="rounded-r-md"
-                                                            primary
-                                                            spinner="promoApply"
-                                                            wire:click="promoApply"
-                                                            flat
-                                                        />
-                                                    </x-slot>
-                                                </x-input>
-                                            </div>
-
-                                            <div class="flex flex-col gap-y-2 divide-y-2 my-4 mx-2">
-                                                @foreach($event->eventDates as $ed)
+                                                @endif
+                                            @endif
+                                            <p>
+                                                Selected Date:
+                                                @if($eventDatePick)
+                                                    {{ Carbon::make($eventDatePick)->timezone($event->eventtimezone ?? $timezone[0])->format('F d Y') }}
+                                                    {{-- Adjusting time display to use recurrent fields if necessary --}}
                                                     @if($eventDateId)
-                                                        @if($eventDateId == $ed->id)
-                                                            @foreach ($ed->eventDateTickets as $eventTicket)
-                                                                @if ($eventTicket->active)
-                                                                    <x-card
-                                                                        class="{{ $ccy !== null && $ccy !== $eventTicket->currency->ccy ? '!bg-gray-50' : '' }}">
-                                                                        <div
-                                                                            class="p-1 flex justify-between"
-                                                                        >
-                                                                            <div class="flex flex-col gap-y-4 w-full">
-                                                                                <p class="border-t-0 flex gap-x-2"
-                                                                                   style="width: 75%;">
-                                                                                    {{ $eventTicket->name }}
-
-                                                                                    @if($eventTicket->description)
-                                                                                        <x-fas-info
-                                                                                            x-tooltip.raw="{{ $eventTicket->description }}"
-                                                                                            class="h-5 w-5 bg-blue-500 p-1 rounded-full text-white"
-                                                                                        />
-                                                                                    @endif
-                                                                                </p>
-
-                                                                                <div class="font-semibold">
-                                                                                    @if (!$eventTicket->isOnSale())
-                                                                                        <span
-                                                                                            class="badge {{ $eventTicket->stringifyStatusClass() }}">No tickets on sales</span>
-                                                                                    @elseif($eventTicket->free)
-                                                                                        {{ __('Free') }}
-                                                                                    @elseif($eventTicket->promotionalprice)
-                                                                                        @php
-                                                                                            $isStartDate = $eventTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
-                                                                                            $isEndDate = $eventTicket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
-                                                                                        @endphp
-
-                                                                                        @if($isStartDate && $isEndDate)
-                                                                                            <del class="text-gray-500">
-                                                                                                {{ $eventTicket->currency->ccy }} {{ $eventTicket->price }}
-                                                                                            </del>
-
-                                                                                            <span>
-                                                                                            @if($eventTicket->currency_symbol_position === 'left')
-                                                                                                    {{ $eventTicket->currency->ccy }}
-                                                                                                @endif
-                                                                                                {{ $eventTicket->price - $eventTicket->promotionalprice }}
-                                                                                                @if($eventTicket->currency_symbol_position === 'right')
-                                                                                                    {{ $eventTicket->currency->ccy }}
-                                                                                                @endif
-                                                                                        </span>
-                                                                                        @else
-                                                                                            <span>
-                                                                                          {{ $eventTicket->currency->ccy }} {{ $eventTicket->price }}
-                                                                                        </span>
-                                                                                        @endif
-                                                                                    @else
-                                                                                        <p class="text-gray-500">
-                                                                                            @if($eventTicket->currency_symbol_position === 'left')
-                                                                                                {{ $eventTicket->currency->ccy }}
-                                                                                            @endif
-                                                                                            {{ $eventTicket->price }}
-                                                                                            @if($eventTicket->currency_symbol_position === 'right')
-                                                                                                {{ $eventTicket->currency->ccy }}
-                                                                                            @endif
-                                                                                        </p>
-                                                                                    @endif
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div class="w-20">
-                                                                                @php
-                                                                                    $options = $eventTicket->ticketsperattendee
-                                                                                                ? range(0, $eventTicket->ticketsperattendee)
-                                                                                                : ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
-                                                                                @endphp
-
-                                                                                <x-native-select
-                                                                                    label="Quantity"
-                                                                                    placeholder=""
-                                                                                    wire:model.live="quantity.{{ $eventTicket->id }}"
-                                                                                    :disabled="($ccy !== null && $ccy !== $eventTicket->currency->ccy) || !$eventTicket->isOnSale()"
-                                                                                    :options="$options"
-                                                                                />
-                                                                            </div>
-                                                                        </div>
-                                                                    </x-card>
-                                                                @endif
-                                                            @endforeach
+                                                        @php
+                                                            $selectedEventDate = $event->eventDates()->where('id', $eventDateId)->first();
+                                                        @endphp
+                                                        @if($selectedEventDate)
+                                                            @if($selectedEventDate->recurrent)
+                                                                {{-- Use recurrent fields for time display --}}
+                                                                ({{ Carbon::make($selectedEventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                - {{ Carbon::make($selectedEventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                )
+                                                            @else
+                                                                {{-- Use standard start and end dates for time display --}}
+                                                                ({{ Carbon::make($selectedEventDate->startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                - {{ Carbon::make($selectedEventDate->enddate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                )
+                                                            @endif
                                                         @endif
-                                                    @elseif ($ed->isOnSale())
+                                                    @else
+                                                        {{-- Fallback to eventDate if eventDateId is not provided --}}
+                                                        @if($eventDate)
+                                                            @if($eventDate->recurrent)
+                                                                {{-- Use recurrent fields for time display --}}
+                                                                ({{ Carbon::make($eventDate->recurrent_startdate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                - {{ Carbon::make($eventDate->recurrent_enddate)->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                )
+                                                            @else
+                                                                {{-- Use standard start and end dates for time display --}}
+                                                                ({{ $eventDate->startdate->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                - {{ $eventDate->enddate->timezone($event->eventtimezone ?? $timezone[0])->format('h:i A') }}
+                                                                )
+                                            @endif
+                                            @else
+                                                <p>No event date available.</p>
+                                                @endif
+                                                @endif
+                                                @endif
+                                                </p>
+
+                                        </div>
+
+
+                                        <div class="px-8 py-4">
+                                            <x-input
+                                                label="Promo Code"
+                                                wire:model="promoCode"
+                                                placeholder="Promo Code"
+                                            >
+                                                <x-slot name="append">
+                                                    <x-button
+                                                        class="h-full"
+                                                        label="Apply"
+                                                        rounded="rounded-r-md"
+                                                        primary
+                                                        spinner="promoApply"
+                                                        wire:click="promoApply"
+                                                        flat
+                                                    />
+                                                </x-slot>
+                                            </x-input>
+                                        </div>
+
+                                        <div class="flex flex-col gap-y-2 divide-y-2 my-4 mx-2">
+                                            @foreach($event->eventDates as $ed)
+                                                @if($eventDateId)
+                                                    @if($eventDateId == $ed->id)
                                                         @foreach ($ed->eventDateTickets as $eventTicket)
                                                             @if ($eventTicket->active)
                                                                 <x-card
@@ -979,7 +887,7 @@
                                                                             <div class="font-semibold">
                                                                                 @if (!$eventTicket->isOnSale())
                                                                                     <span
-                                                                                        class="badge {{ $eventTicket->stringifyStatusClass() }}">{{ __($eventTicket->stringifyStatus()) }}</span>
+                                                                                        class="badge {{ $eventTicket->stringifyStatusClass() }}">No tickets on sales</span>
                                                                                 @elseif($eventTicket->free)
                                                                                     {{ __('Free') }}
                                                                                 @elseif($eventTicket->promotionalprice)
@@ -992,12 +900,12 @@
                                                                                         <del class="text-gray-500">
                                                                                             {{ $eventTicket->currency->ccy }} {{ $eventTicket->price }}
                                                                                         </del>
+
                                                                                         <span>
                                                                                             @if($eventTicket->currency_symbol_position === 'left')
                                                                                                 {{ $eventTicket->currency->ccy }}
                                                                                             @endif
-                                                                                            {{-- {{ $eventTicket->price - $eventTicket->promotionalprice }} --}} <!-- Display the discounted price-->
-                                                                                            {{ $eventTicket->promotionalprice }} <!-- Display the promotional price -->
+                                                                                            {{ $eventTicket->price - $eventTicket->promotionalprice }}
                                                                                             @if($eventTicket->currency_symbol_position === 'right')
                                                                                                 {{ $eventTicket->currency->ccy }}
                                                                                             @endif
@@ -1032,7 +940,7 @@
                                                                                 label="Quantity"
                                                                                 placeholder=""
                                                                                 wire:model.live="quantity.{{ $eventTicket->id }}"
-                                                                                :disabled="$ccy !== null && $ccy !== $eventTicket->currency->ccy"
+                                                                                :disabled="($ccy !== null && $ccy !== $eventTicket->currency->ccy) || !$eventTicket->isOnSale()"
                                                                                 :options="$options"
                                                                             />
                                                                         </div>
@@ -1041,185 +949,270 @@
                                                             @endif
                                                         @endforeach
                                                     @endif
-                                                @endforeach
-                                            </div>
-                                        </div>
+                                                @elseif ($ed->isOnSale())
+                                                    @foreach ($ed->eventDateTickets as $eventTicket)
+                                                        @if ($eventTicket->active)
+                                                            <x-card
+                                                                class="{{ $ccy !== null && $ccy !== $eventTicket->currency->ccy ? '!bg-gray-50' : '' }}">
+                                                                <div
+                                                                    class="p-1 flex justify-between"
+                                                                >
+                                                                    <div class="flex flex-col gap-y-4 w-full">
+                                                                        <p class="border-t-0 flex gap-x-2"
+                                                                           style="width: 75%;">
+                                                                            {{ $eventTicket->name }}
 
-                                        <div class="lg:col-span-3 md:cols-span-2">
-                                            <img
-                                                src="{{ Storage::url('events/' . $event->image_name) }}"
-                                                alt="{{ $eventTranslation->name }}"
-                                                loading="lazy"
-                                                class="w-full opacity-100 h-40"
-                                            />
+                                                                            @if($eventTicket->description)
+                                                                                <x-fas-info
+                                                                                    x-tooltip.raw="{{ $eventTicket->description }}"
+                                                                                    class="h-5 w-5 bg-blue-500 p-1 rounded-full text-white"
+                                                                                />
+                                                                            @endif
+                                                                        </p>
 
-                                            <div class="mt-1">
-                                                <h1 class="font-semibold">Order Summary</h1>
+                                                                        <div class="font-semibold">
+                                                                            @if (!$eventTicket->isOnSale())
+                                                                                <span
+                                                                                    class="badge {{ $eventTicket->stringifyStatusClass() }}">{{ __($eventTicket->stringifyStatus()) }}</span>
+                                                                            @elseif($eventTicket->free)
+                                                                                {{ __('Free') }}
+                                                                            @elseif($eventTicket->promotionalprice)
+                                                                                @php
+                                                                                    $isStartDate = $eventTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
+                                                                                    $isEndDate = $eventTicket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
+                                                                                @endphp
 
-                                                @if(count($quantity))
-                                                    @php $subtotal = 0; $fee = 0; @endphp
+                                                                                @if($isStartDate && $isEndDate)
+                                                                                    <del class="text-gray-500">
+                                                                                        {{ $eventTicket->currency->ccy }} {{ $eventTicket->price }}
+                                                                                    </del>
+                                                                                    <span>
+                                                                                            @if($eventTicket->currency_symbol_position === 'left')
+                                                                                            {{ $eventTicket->currency->ccy }}
+                                                                                        @endif
+                                                                                        {{-- {{ $eventTicket->price - $eventTicket->promotionalprice }} --}} <!-- Display the discounted price-->
+                                                                                        {{ $eventTicket->promotionalprice }} <!-- Display the promotional price -->
+                                                                                        @if($eventTicket->currency_symbol_position === 'right')
+                                                                                            {{ $eventTicket->currency->ccy }}
+                                                                                        @endif
+                                                                                        </span>
+                                                                                @else
+                                                                                    <span>
+                                                                                          {{ $eventTicket->currency->ccy }} {{ $eventTicket->price }}
+                                                                                        </span>
+                                                                                @endif
+                                                                            @else
+                                                                                <p class="text-gray-500">
+                                                                                    @if($eventTicket->currency_symbol_position === 'left')
+                                                                                        {{ $eventTicket->currency->ccy }}
+                                                                                    @endif
+                                                                                    {{ $eventTicket->price }}
+                                                                                    @if($eventTicket->currency_symbol_position === 'right')
+                                                                                        {{ $eventTicket->currency->ccy }}
+                                                                                    @endif
+                                                                                </p>
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
 
-                                                    @foreach($quantity as $id => $value)
-                                                        @if($value > 0)
-                                                            @php
-                                                                $eventDateTicket = \App\Models\EventDateTicket::find($id);
-                                                                $price = $eventDateTicket->price;
+                                                                    <div class="w-20">
+                                                                        @php
+                                                                            $options = $eventTicket->ticketsperattendee
+                                                                                        ? range(0, $eventTicket->ticketsperattendee)
+                                                                                        : ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+                                                                        @endphp
 
-                                                                if ($eventDateTicket->promotionalprice) {
-                                                                    $isStartDate = $eventDateTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
-                                                                    $isEndDate = $eventDateTicket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
-                                                                    if ($isStartDate && $isEndDate) {
-                                                                        // Check if promotional price exists and set price accordingly
-                                                                        if ($eventDateTicket->promotionalprice) {
-                                                                            $price = $eventDateTicket->promotionalprice; // Set price to promotional price
-                                                                        } else {
-                                                                            $price = $eventDateTicket->price; // Fallback to original price
-                                                                        }
-                                                                    }
-                                                                }
-
-                                                                if (array_key_exists($value, $this->promotions)) {
-                                                                    $discountPercentage = $this->promotions[$value];
-                                                                    $discountAmount = ($price * $discountPercentage) / 100;
-                                                                    $price -= $discountAmount;
-                                                                }
-
-                                                                $subtotal += $price * $value;
-                                                                $fee += $eventDateTicket->ticket_fee * $value;
-
-                                                                if ($this->couponType === 'percentage') {
-                                                                     $discount = ($subtotal * $this->couponDiscount) / 100;
-                                                                     $subtotal -= $discount;
-                                                                }
-
-                                                                if ($this->couponType === 'fixed_amount') {
-                                                                    $subtotal -= $this->couponDiscount;
-                                                                }
-
-                                                                if ($subtotal < 0) {
-                                                                    $subtotal = 0;
-                                                                }
-                                                            @endphp
-
-                                                            <div class="flex justify-between items-center m-2">
-                                                                <p>{{ $value }} x {{ $eventDateTicket->name }}</p>
-
-                                                                <p class="font-semibold">
-                                                                    @if($eventDateTicket->currency_symbol_position === 'left')
-                                                                        {{ $eventDateTicket->currency->ccy }}
-                                                                    @endif
-                                                                    {{ $price * $value }}
-                                                                    @if($eventDateTicket->currency_symbol_position === 'right')
-                                                                        {{ $eventDateTicket->currency->ccy }}
-                                                                    @endif
-                                                                </p>
-                                                            </div>
+                                                                        <x-native-select
+                                                                            label="Quantity"
+                                                                            placeholder=""
+                                                                            wire:model.live="quantity.{{ $eventTicket->id }}"
+                                                                            :disabled="$ccy !== null && $ccy !== $eventTicket->currency->ccy"
+                                                                            :options="$options"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </x-card>
                                                         @endif
                                                     @endforeach
-
-                                                    @if($subtotal > 0)
-                                                        <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
-
-                                                        <div class="flex justify-between items-center m-2">
-                                                            <p>Subtotal</p>
-
-                                                            <p class="font-semibold">
-                                                                @if($eventDateTicket->currency_symbol_position === 'left')
-                                                                    {{ $ccy }}
-                                                                @endif
-                                                                {{ $subtotal }}
-                                                                @if($eventDateTicket->currency_symbol_position === 'right')
-                                                                    {{ $ccy }}
-                                                                @endif
-                                                            </p>
-                                                        </div>
-                                                    @endif
-
-                                                    @if($fee > 0)
-                                                        <div class="flex justify-between items-center m-2">
-                                                            <p>Fees</p>
-
-                                                            <p class="font-semibold">
-                                                                @if($eventDateTicket->currency_symbol_position === 'left')
-                                                                    {{ $ccy }}
-                                                                @endif
-                                                                {{ $fee }}
-                                                                @if($eventDateTicket->currency_symbol_position === 'right')
-                                                                    {{ $ccy }}
-                                                                @endif
-                                                            </p>
-                                                        </div>
-                                                    @endif
-
-                                                    @if($subtotal > 0)
-                                                        <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
-
-                                                        <div class="flex justify-between items-center m-2">
-                                                            <p class="font-bold">Total</p>
-
-                                                            <p class="font-bold">
-                                                                @if($eventDateTicket->currency_symbol_position === 'left')
-                                                                    {{ $ccy }}
-                                                                @endif
-                                                                {{ $fee + $subtotal }}
-                                                                @if($eventDateTicket->currency_symbol_position === 'right')
-                                                                    {{ $ccy }}
-                                                                @endif
-                                                            </p>
-                                                        </div>
-                                                    @endif
                                                 @endif
-                                            </div>
+                                            @endforeach
                                         </div>
                                     </div>
 
-                                    <x-slot name="footer" class="flex justify-end gap-x-4">
-                                        <x-button flat label="Cancel" x-on:click="close"/>
+                                    <div class="lg:col-span-3 md:cols-span-2">
+                                        <img
+                                            src="{{ Storage::url('events/' . $event->image_name) }}"
+                                            alt="{{ $eventTranslation->name }}"
+                                            loading="lazy"
+                                            class="w-full opacity-100 h-40"
+                                        />
 
-                                        <x-button primary label="Checkout" spinner="submit"
-                                                  wire:click="submit('{{ $eventDate->id }}')"/>
-                                    </x-slot>
-                                </x-modal-card>
+                                        <div class="mt-1">
+                                            <h1 class="font-semibold">Order Summary</h1>
 
-                                <hr class="border-gray-300">
+                                            @if(count($quantity))
+                                                @php $subtotal = 0; $fee = 0; @endphp
 
-                                @if ($eventDate->venue)
-                                    <div class="text-gray-500 mt-2">
+                                                @foreach($quantity as $id => $value)
+                                                    @if($value > 0)
+                                                        @php
+                                                            $eventDateTicket = \App\Models\EventDateTicket::find($id);
+                                                            $price = $eventDateTicket->price;
+
+                                                            if ($eventDateTicket->promotionalprice) {
+                                                                $isStartDate = $eventDateTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
+                                                                $isEndDate = $eventDateTicket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
+                                                                if ($isStartDate && $isEndDate) {
+                                                                    // Check if promotional price exists and set price accordingly
+                                                                    if ($eventDateTicket->promotionalprice) {
+                                                                        $price = $eventDateTicket->promotionalprice; // Set price to promotional price
+                                                                    } else {
+                                                                        $price = $eventDateTicket->price; // Fallback to original price
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            if (array_key_exists($value, $this->promotions)) {
+                                                                $discountPercentage = $this->promotions[$value];
+                                                                $discountAmount = ($price * $discountPercentage) / 100;
+                                                                $price -= $discountAmount;
+                                                            }
+
+                                                            $subtotal += $price * $value;
+                                                            $fee += $eventDateTicket->ticket_fee * $value;
+
+                                                            if ($this->couponType === 'percentage') {
+                                                                 $discount = ($subtotal * $this->couponDiscount) / 100;
+                                                                 $subtotal -= $discount;
+                                                            }
+
+                                                            if ($this->couponType === 'fixed_amount') {
+                                                                $subtotal -= $this->couponDiscount;
+                                                            }
+
+                                                            if ($subtotal < 0) {
+                                                                $subtotal = 0;
+                                                            }
+                                                        @endphp
+
+                                                        <div class="flex justify-between items-center m-2">
+                                                            <p>{{ $value }} x {{ $eventDateTicket->name }}</p>
+
+                                                            <p class="font-semibold">
+                                                                @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                    {{ $eventDateTicket->currency->ccy }}
+                                                                @endif
+                                                                {{ $price * $value }}
+                                                                @if($eventDateTicket->currency_symbol_position === 'right')
+                                                                    {{ $eventDateTicket->currency->ccy }}
+                                                                @endif
+                                                            </p>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+
+                                                @if($subtotal > 0)
+                                                    <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
+
+                                                    <div class="flex justify-between items-center m-2">
+                                                        <p>Subtotal</p>
+
+                                                        <p class="font-semibold">
+                                                            @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                            {{ $subtotal }}
+                                                            @if($eventDateTicket->currency_symbol_position === 'right')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                        </p>
+                                                    </div>
+                                                @endif
+
+                                                @if($fee > 0)
+                                                    <div class="flex justify-between items-center m-2">
+                                                        <p>Fees</p>
+
+                                                        <p class="font-semibold">
+                                                            @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                            {{ $fee }}
+                                                            @if($eventDateTicket->currency_symbol_position === 'right')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                        </p>
+                                                    </div>
+                                                @endif
+
+                                                @if($subtotal > 0)
+                                                    <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
+
+                                                    <div class="flex justify-between items-center m-2">
+                                                        <p class="font-bold">Total</p>
+
+                                                        <p class="font-bold">
+                                                            @if($eventDateTicket->currency_symbol_position === 'left')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                            {{ $fee + $subtotal }}
+                                                            @if($eventDateTicket->currency_symbol_position === 'right')
+                                                                {{ $ccy }}
+                                                            @endif
+                                                        </p>
+                                                    </div>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <x-slot name="footer" class="flex justify-end gap-x-4">
+                                    <x-button flat label="Cancel" x-on:click="close"/>
+
+                                    <x-button primary label="Checkout" spinner="submit"
+                                              wire:click="submit('{{ $eventDate->id }}')"/>
+                                </x-slot>
+                            </x-modal-card>
+
+                            <hr class="border-gray-300">
+
+                            @if ($eventDate->venue)
+                                <div class="text-gray-500 mt-2">
                                             <span
                                                 class="{{ app()->getLocale() == 'ar' ? 'float-right' : 'float-left' }}">{{ __('Venue') }}</span>
-                                        @if ($eventDate->venue->listedondirectory)
-                                            <a href="{{ route('venue', ['slug' => $eventDate->venue->slug]) }}"
-                                               class="{{ app()->getLocale() == 'ar' ? 'float-left' : 'float-right' }} flex items-center gap-x-1">
-                                                {{ __('More details') }}
-                                                <x-fas-chevron-right class="w-3 h-3"/>
-                                            </a>
-                                        @endif
-                                    </div>
-
-                                    <div class="text-center">
-                                        <a href="{{ $eventDate->venue->url }}" target="_blank">
-                                            <p class="font-bold">{{ $eventDate->venue->name }}</p>
-                                            <p>{{ $eventDate->venue->stringifyAddress }}</p>
+                                    @if ($eventDate->venue->listedondirectory)
+                                        <a href="{{ route('venue', ['slug' => $eventDate->venue->slug]) }}"
+                                           class="{{ app()->getLocale() == 'ar' ? 'float-left' : 'float-right' }} flex items-center gap-x-1">
+                                            {{ __('More details') }}
+                                            <x-fas-chevron-right class="w-3 h-3"/>
                                         </a>
+                                    @endif
+                                </div>
 
-                                        @if ($eventDate->venue->listedondirectory)
-                                            <p class="text-center">
-                                                <a href="{{ route('venue', ['slug' => $eventDate->venue->slug]) }}"
-                                                   class="text-center">
-                                                    {{ __('More details') }}
-                                                </a>
-                                            </p>
-                                        @endif
-                                    </div>
-                                @else
-                                    <dl>
-                                        <dt class="text-gray-500">{{ __('Venue') }}</dt>
-                                        <dd class="text-center">
-                                            <p>{{ __('Online event') }}</p>
-                                        </dd>
-                                    </dl>
-                                @endif
-                            </div>
+                                <div class="text-center">
+                                    <a href="{{ $eventDate->venue->url }}" target="_blank">
+                                        <p class="font-bold">{{ $eventDate->venue->name }}</p>
+                                        <p>{{ $eventDate->venue->stringifyAddress }}</p>
+                                    </a>
+
+                                    @if ($eventDate->venue->listedondirectory)
+                                        <p class="text-center">
+                                            <a href="{{ route('venue', ['slug' => $eventDate->venue->slug]) }}"
+                                               class="text-center">
+                                                {{ __('More details') }}
+                                            </a>
+                                        </p>
+                                    @endif
+                                </div>
+                            @else
+                                <dl>
+                                    <dt class="text-gray-500">{{ __('Venue') }}</dt>
+                                    <dd class="text-center">
+                                        <p>{{ __('Online event') }}</p>
+                                    </dd>
+                                </dl>
+                            @endif
                         @endif
                     @endforeach
                 </div>
