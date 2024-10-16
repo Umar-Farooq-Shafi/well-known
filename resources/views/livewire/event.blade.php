@@ -1242,19 +1242,21 @@
                 <div class="bg-gray-200 flex flex-col gap-y-2 justify-between items-center p-8">
                     <p class="text-blue-300 font-semibold">{{ $event->organizer->name }}</p>
 
-                    <button type="button"
-                            @if(!$event->organizer->followings()->where('User_id', auth()->id())->exists())
-                                wire:click="followOrganization"
-                            @endif
-                            class="text-white flex gap-x-1 items-center bg-blue-400 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 rounded-lg text-sm px-3 py-1 focus:outline-none">
-                        <x-fas-folder-plus class="w-3 h-3"/>
+                    @if(auth()->check())
+                        <button type="button"
+                                @if(!$event->organizer->followings()->where('User_id', auth()->id())->exists())
+                                    wire:click="followOrganization"
+                                @endif
+                                class="text-white flex gap-x-1 items-center bg-blue-400 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 rounded-lg text-sm px-3 py-1 focus:outline-none">
+                            <x-fas-folder-plus class="w-3 h-3"/>
 
-                        @if($event->organizer->followings()->where('User_id', auth()->id())->exists())
-                            Following
-                        @else
-                            Follow
-                        @endif
-                    </button>
+                            @if($event->organizer->followings()->where('User_id', auth()->id())->exists())
+                                Following
+                            @else
+                                Follow
+                            @endif
+                        </button>
+                    @endif
                 </div>
             </div>
         </div>

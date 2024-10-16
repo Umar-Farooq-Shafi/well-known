@@ -11,7 +11,7 @@
     </style>
 @endpush
 
-<div class="container ml-36 mr-44 p-6">
+<div class="container mx-auto p-6">
     <div class="bg-gray-100 flex items-center justify-between p-4 mb-4">
         <p><span class="font-semibold">{{ $events_count }}</span> event(s) found</p>
 

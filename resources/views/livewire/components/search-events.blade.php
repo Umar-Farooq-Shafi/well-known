@@ -16,7 +16,7 @@
                     option-label="name"
                     option-value="id"
                     wire:loading.attr="disabled"
-                    class="w-[180px]"
+                    class="w-auto lg:w-[180px]"
                     id="this-is-us"
                     :async-data="route('api.events.country')"
                 />
@@ -26,15 +26,15 @@
                     placeholder="All Dates"
                     wire:model.debounce.500ms="dates"
                     style="border-style: none none none solid !important; border-color: #d1d5db"
-                    class="appearance-none w-[180px] text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block pl-3 pr-8 py-2.5"
+                    class="appearance-none w-auto lg:w-[180px] text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block pl-3 pr-8 py-2.5"
                 />
 
-                <div class="relative w-[400px]">
+                <div class="relative w-auto lg:w-[400px]">
                     <input
                         type="text"
                         wire:model.debounce.500ms="query"
                         style="border-style: none none none solid !important; border-color: #d1d5db"
-                        class="w-[380px] bg-white text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block pl-10 pr-3 py-2.5"
+                        class="w-auto lg:w-[380px] bg-white text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block pl-10 pr-3 py-2.5"
                         placeholder="Search by Event"
                     />
 

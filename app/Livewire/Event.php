@@ -62,6 +62,7 @@ class Event extends Component
                 $eventPromotion->end_date->timezone($eventPromotion->timezone)->greaterThanOrEqualTo($now)
             ) {
                 $promotion = $eventPromotion;
+                break;
             }
         }
 
