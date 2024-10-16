@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $event_id
@@ -233,12 +233,27 @@ class EventDate extends Model
 
     public function isOnSale(): bool
     {
+        // Check if enddate exists and is valid, convert to timezone
+        $eventTimezone = $this->event->eventtimezone ?? 'UTC';
+        $endDateInUserTimezone = $this->enddate ? Carbon::make($this->enddate)->timezone($eventTimezone) : null;
+
+        // Recurrent event date check with recurrent_enddate
+        $recurrentEndDateInUserTimezone = $this->recurrent == true && $this->recurrent_enddate
+            ? Carbon::make($this->recurrent_enddate)->timezone($eventTimezone)
+            : null;
+
         return (
-            $this->event->organizer?->user?->enabled && $this->active && $this->event->published
-            && (Carbon::make($this->startdate)->greaterThan(now()) || $this->recurrent == true)
-            && (!$this->isSoldOut()) && $this->hasATicketOnSale() && (!$this->payoutRequested())
+            $this->event->organizer?->user?->enabled
+            && $this->active
+            && $this->event->published
+            && (($endDateInUserTimezone && $endDateInUserTimezone->greaterThan(now()))
+                || ($recurrentEndDateInUserTimezone && $recurrentEndDateInUserTimezone->greaterThan(now())))
+            && !$this->isSoldOut()
+            && $this->hasATicketOnSale()
+            && !$this->payoutRequested()
         );
     }
+
 
     public function getCurrencyCode()
     {

@@ -336,29 +336,22 @@ class EventDateTicket extends Model
         // Get the event's timezone or fallback to a default timezone (e.g., UTC)
         $eventTimezone = $this->eventDate->event->eventtimezone ?? 'UTC';
 
-        // Initialize date variables
-        $endDateInUserTimezone = null;
-        $recurrentEndDateInUserTimezone = null;
-
-        // Convert the enddate to the event's timezone if it exists
-        if ($this->eventDate->enddate) {
-            $endDateInUserTimezone = Carbon::make($this->eventDate->enddate)->timezone($eventTimezone);
-        }
-
-        // Convert the recurrent_enddate to the event's timezone if it exists
-        if ($this->eventDate->recurrent == true && $this->eventDate->recurrent_enddate) {
-            $recurrentEndDateInUserTimezone = Carbon::make($this->eventDate->recurrent_enddate)->timezone($eventTimezone);
-        }
+        // Convert both enddate and recurrent_enddate to the event's timezone if they exist
+        $endDateInUserTimezone = $this->eventDate->enddate ? Carbon::make($this->eventDate->enddate)->timezone($eventTimezone) : null;
+        $recurrentEndDateInUserTimezone = $this->eventDate->recurrent == true && $this->eventDate->recurrent_enddate
+            ? Carbon::make($this->eventDate->recurrent_enddate)->timezone($eventTimezone)
+            : null;
 
         return $this->eventDate->event->organizer->user->enabled
             && $this->eventDate->event->published
             && $this->eventDate->active
-            && (($endDateInUserTimezone && $endDateInUserTimezone->greaterThanOrEqualTo(now()))
+            && (($endDateInUserTimezone && $endDateInUserTimezone->greaterThan(now()))
                 || ($recurrentEndDateInUserTimezone && $recurrentEndDateInUserTimezone->greaterThan(now())))
             && $this->active
             && !$this->isSoldOut()
-            && (!$this->eventDate->payoutRequested());
+            && !$this->eventDate->payoutRequested();
     }
+
 
     /**
      * @return HasMany

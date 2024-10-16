@@ -553,15 +553,16 @@
                 @if ($event->hasTwoOrMoreEventDatesOnSale())
                     @php
                         $eventDatesCalendar = [];
+                        $eventTimezone = $event->eventtimezone ?? $timezone[0];
                     @endphp
 
                     @foreach ($event->eventDates as $eventDate)
                         @if ($eventDate->isOnSale())
                             @php
                                 $eventDatesCalendar[] = [
-                                    'Date' => $eventDate->timezone($event->eventtimezone ?? $timezone[0])->startdate,
-                                    'Title' => $eventDate->timezone($event->eventtimezone ?? $timezone[0])->startdate,
-                                    'Link' => $eventDate->timezone($event->eventtimezone ?? $timezone[0])->reference,
+                                    'Date' => Carbon::make($eventDate->startdate)->timezone($eventTimezone)->format('Y-m-d H:i:s'),
+                                    'Title' => Carbon::make($eventDate->startdate)->timezone($eventTimezone)->format('Y-m-d H:i:s'),
+                                    'Link' => $eventDate->reference,
                                 ];
                             @endphp
                         @endif
