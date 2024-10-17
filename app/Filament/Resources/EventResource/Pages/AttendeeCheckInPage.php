@@ -133,7 +133,7 @@ class AttendeeCheckInPage extends Page implements HasTable
                     ->action(function (array $data, Tables\Actions\Action $component) {
                         $orgUser = User::whereOrganizerId(auth()->user()->scanner->organizer_id)->firstOrFail();
 
-                        if ($orgUser->username !== $data['username'] || !Hash::check($data['password'], $orgUser->password)) {
+                        if (strtolower($orgUser->username) !== strtolower($data['username']) || !Hash::check($data['password'], $orgUser->password)) {
                             Notification::make()
                                 ->title('Credential does not match')
                                 ->danger()

@@ -25,7 +25,8 @@
         </div>
     </div>
 
-    <div class="flex flex-col divide-y-2 md:divide-x-2 md:flex-row justify-center rounded-lg shadow-lg bg-white container mx-auto">
+    <div
+        class="flex flex-col divide-y-2 md:divide-x-2 md:flex-row justify-center rounded-lg shadow-lg bg-white container mx-auto">
         <div class="container mx-auto">
             <div class="mt-8 p-6">
                 <div class="flex gap-x-4">
@@ -109,7 +110,7 @@
                             <dl class="mb-4">
                                 <dd>
                                     <div class="text-center flex flex-col gap-1">
-                                        @foreach ($event->eventDates as $eventDate)
+                                        @if ($eventDate)
                                             @php
                                                 $eventstartdate = '';
                                                 $eventenddate = '';
@@ -184,7 +185,7 @@
                                                     }
                                                 </script>
                                             @endif
-                                        @endforeach
+                                        @endif
 
                                     </div>
                                 </dd>
@@ -560,12 +561,6 @@
                         @endif
                     @endforeach
 
-                    <div class="flex gap-x-2 items-center bg-[#31708f] p-2 rounded text-white px-4">
-                        <x-fas-info-circle class="w-4 h-4"/>
-
-                        <p>Click on a date to view tickets</p>
-                    </div>
-
                     <div id="event-dates-calendar" class="mt-5"
                          data-event-dates="{{ json_encode($eventDatesCalendar) }}"></div>
 
@@ -576,8 +571,7 @@
                 @endif
 
                 <div>
-
-                    @foreach ($event->eventDates as $eventDate)
+                    @if ($eventDate)
                         @if ($eventDate->isOnSale())
                             <dl class="mt-4">
                                 <dt class="text-gray-500">{{ __('Tickets') }}</dt>
@@ -1211,7 +1205,7 @@
                                 </dl>
                             @endif
                         @endif
-                    @endforeach
+                    @endif
                 </div>
 
             @else

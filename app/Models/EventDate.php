@@ -93,7 +93,7 @@ class EventDate extends Model
         self::creating(function ($model) {
             $uniqueStr = Str::random(8);
 
-            while(EventDate::where('reference', $uniqueStr)->exists()) {
+            while (EventDate::where('reference', $uniqueStr)->exists()) {
                 $uniqueStr = Str::random(8);
             }
 
@@ -235,25 +235,29 @@ class EventDate extends Model
     {
         // Check if enddate exists and is valid, convert to timezone
         $eventTimezone = $this->event->eventtimezone ?? 'UTC';
-        $endDateInUserTimezone = $this->enddate ? Carbon::make($this->enddate)->timezone($eventTimezone) : null;
+        $now = now()->timezone($eventTimezone);
+        $endDateInUserTimezone = $this->enddate ? Carbon::make($this->enddate)->timezone($eventTimezone)->greaterThan($now) : null;
 
         // Recurrent event date check with recurrent_enddate
-        $recurrentEndDateInUserTimezone = $this->recurrent == true && $this->recurrent_enddate
+        $recurrentEndDateInUserTimezone = $this->recurrent && $this->recurrent_enddate
             ? Carbon::make($this->recurrent_enddate)->timezone($eventTimezone)
             : null;
+
+        // If the event is recurrent, return false if the recurrent end date is less than the current time
+        if ($this->recurrent && $recurrentEndDateInUserTimezone && $recurrentEndDateInUserTimezone->lessThan($now)) {
+            return false;
+        }
 
         return (
             $this->event->organizer?->user?->enabled
             && $this->active
             && $this->event->published
-            && (($endDateInUserTimezone && $endDateInUserTimezone->greaterThan(now()))
-                || ($recurrentEndDateInUserTimezone && $recurrentEndDateInUserTimezone->greaterThan(now())))
+            && $endDateInUserTimezone
             && !$this->isSoldOut()
             && $this->hasATicketOnSale()
             && !$this->payoutRequested()
         );
     }
-
 
     public function getCurrencyCode()
     {
@@ -316,7 +320,8 @@ class EventDate extends Model
         $user = "all",
         $formattedForPayoutApproval = false,
         $includeFees = false,
-    ): float|int {
+    ): float|int
+    {
         $sum = 0;
 
         foreach ($this->eventDateTickets as $eventDateTicket) {
