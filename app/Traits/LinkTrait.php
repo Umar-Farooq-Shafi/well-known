@@ -127,8 +127,6 @@ trait LinkTrait
         }
         $linksArray[__('Venues Pages')] = $venuesPagesArray;
 
-        dd($linksArray);
-
         return $linksArray;
     }
 
