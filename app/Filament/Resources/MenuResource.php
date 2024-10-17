@@ -28,9 +28,7 @@ class MenuResource extends Resource
 
     public static function canAccess(): bool
     {
-        $role = ucwords(str_replace('ROLE_', '', implode(', ', unserialize(auth()->user()->roles))));
-
-        return str_contains($role, 'SUPER_ADMIN') || str_contains($role, 'ADMINISTRATOR');
+        return auth()->user()->hasAnyRole(['ROLE_SUPER_ADMIN', 'ROLE_ADMINISTRATOR']);
     }
 
     public static function form(Form $form): Form
