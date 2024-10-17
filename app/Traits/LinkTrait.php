@@ -4,18 +4,13 @@ namespace App\Traits;
 
 use App\Filament\Resources\EventResource\Pages\CreateEvent;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
-use App\Models\BlogPost;
 use App\Models\BlogPostTranslation;
 use App\Models\CategoryTranslation;
-use App\Models\Event;
 use App\Models\EventTranslation;
-use App\Models\HelpCenterArticle;
 use App\Models\HelpCenterArticleTranslation;
-use App\Models\HelpCenterCategory;
 use App\Models\HelpCenterCategoryTranslation;
 use App\Models\PageTranslation;
 use App\Models\User;
-use App\Models\Venue;
 use App\Models\VenueTranslation;
 
 trait LinkTrait
@@ -86,7 +81,7 @@ trait LinkTrait
         foreach (
             EventTranslation::query()->where('locale', app()->getLocale())
                 ->select(['slug', 'name'])->get()
-                as $event
+            as $event
         ) {
             $eventPagesArray[route('event', ['slug' => $event->slug], false)] = __('Event') . ' - ' . $event->name;
         }
@@ -99,14 +94,14 @@ trait LinkTrait
         foreach (
             HelpCenterCategoryTranslation::query()->where('locale', app()->getLocale())
                 ->select(['slug', 'name'])->get()
-                as $category
+            as $category
         ) {
             $helpCenterPagesArray[route('help-center-category', ['slug' => $category->slug], false)] = __('Help Center Category') . ' - ' . $category->name;
         }
         foreach (
             HelpCenterArticleTranslation::query()->where('locale', app()->getLocale())
                 ->select(['slug', 'title'])->get()
-                as $article
+            as $article
         ) {
             $helpCenterPagesArray[route('help-center-article', ['slug' => $article->slug], false)] = __('Help Center Article') . ' - ' . $article->title;
         }
@@ -126,11 +121,13 @@ trait LinkTrait
         foreach (
             VenueTranslation::query()->where('locale', app()->getLocale())
                 ->select(['slug', 'name'])->get()
-                as $venue
+            as $venue
         ) {
             $venuesPagesArray[route('venue', ['slug' => $venue->slug], false)] = __('Venue') . ' - ' . $venue->name;
         }
         $linksArray[__('Venues Pages')] = $venuesPagesArray;
+
+        dd($linksArray);
 
         return $linksArray;
     }
