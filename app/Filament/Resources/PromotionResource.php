@@ -74,7 +74,7 @@ class PromotionResource extends Resource
                                 $events = Event::query()
                                     ->when(
                                         auth()->user()->hasRole('ROLE_ORGANIZER'),
-                                        fn (Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                                        fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
                                     )
                                     ->where('completed', false)->get();
 
@@ -92,7 +92,7 @@ class PromotionResource extends Resource
                                 $events = Event::query()->where('completed', false)
                                     ->whereHas(
                                         'eventTranslations',
-                                        fn (Builder $builder) => $builder->where('name', 'LIKE', '%' . $query . '%')
+                                        fn(Builder $builder) => $builder->where('name', 'LIKE', '%' . $query . '%')
                                     )
                                     ->get();
 
@@ -156,11 +156,14 @@ class PromotionResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                     ->label('Status')
                     ->state(function ($record) {
-                        if ($record->start_date->greaterThan(now()) && $record->end_date->lessThan(now())) {
+                        $now = now()->timezone($record->timezone);
+
+                        if ($record->start_date->timezone($record->timezone)->greaterThan($now)
+                            && $record->end_date->timezone($record->timezone)->lessThan($now)) {
                             return 'Running';
                         }
 
-                        if (now()->lessThan($record->start_date)) {
+                        if ($now->lessThan($record->timezone($record->timezone)->start_date)) {
                             return 'Future';
                         }
 
