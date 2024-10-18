@@ -1048,6 +1048,7 @@
                                                     @if($value > 0)
                                                         @php
                                                             $eventDateTicket = \App\Models\EventDateTicket::find($id);
+                                                            $originalPrice = $eventDateTicket->price;
                                                             $price = $eventDateTicket->price;
 
                                                             if ($eventDateTicket->promotionalprice) {
@@ -1057,16 +1058,16 @@
                                                                     // Check if promotional price exists and set price accordingly
                                                                     if ($eventDateTicket->promotionalprice) {
                                                                         $price = $eventDateTicket->promotionalprice; // Set price to promotional price
+                                                                        $originalPrice = $eventDateTicket->promotionalprice;
                                                                     } else {
                                                                         $price = $eventDateTicket->price; // Fallback to original price
+                                                                        $originalPrice = $eventDateTicket->price;
                                                                     }
                                                                 }
                                                             }
 
                                                             if (array_key_exists($value, $this->promotions)) {
-                                                                $discountPercentage = $this->promotions[$value];
-                                                                $discountAmount = ($price * $discountPercentage) / 100;
-                                                                $price -= $discountAmount;
+                                                                $price -= $this->promotions[$value];
                                                             }
 
                                                             $subtotal += $price * $value;
@@ -1093,6 +1094,9 @@
                                                                 @if($eventDateTicket->currency_symbol_position === 'left')
                                                                     {{ $eventDateTicket->currency->ccy }}
                                                                 @endif
+                                                                @if($price !== $originalPrice)
+                                                                    <del>{{ $originalPrice }}</del>
+                                                                @endif
                                                                 {{ $price * $value }}
                                                                 @if($eventDateTicket->currency_symbol_position === 'right')
                                                                     {{ $eventDateTicket->currency->ccy }}
@@ -1100,6 +1104,10 @@
                                                             </p>
                                                         </div>
                                                     @endif
+                                                @endforeach
+
+                                                @foreach($this->promotions as $quan => $promotion)
+                                                    <x-badge warning label="Promo Buy '{{ $quan }} Get ${{ $promotion }} off' applied" />
                                                 @endforeach
 
                                                 @if($subtotal > 0)
