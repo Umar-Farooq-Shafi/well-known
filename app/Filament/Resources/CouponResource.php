@@ -56,7 +56,7 @@ class CouponResource extends Resource
                             ->required(),
 
                         Forms\Components\TextInput::make('discount')
-                            ->label(fn (Forms\Get $get) => $get('type') === 'fixed_amount' ? 'Fixed Amount For Discount' : 'Percentage Off')
+                            ->label(fn(Forms\Get $get) => $get('type') === 'fixed_amount' ? 'Fixed Amount For Discount' : 'Percentage Off')
                             ->placeholder('Percentage off (In %) OR Amount off')
                             ->required(),
 
@@ -81,7 +81,7 @@ class CouponResource extends Resource
                                 $events = Event::query()
                                     ->when(
                                         auth()->user()->hasRole('ROLE_ORGANIZER'),
-                                        fn (Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
+                                        fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id)
                                     )
                                     ->where('completed', false)->get();
 
@@ -98,7 +98,7 @@ class CouponResource extends Resource
                                 $events = Event::query()->where('completed', false)
                                     ->whereHas(
                                         'eventTranslations',
-                                        fn (Builder $builder) => $builder->where('name', 'LIKE', '%' . $query . '%')
+                                        fn(Builder $builder) => $builder->where('name', 'LIKE', '%' . $query . '%')
                                     )
                                     ->get();
 
@@ -153,11 +153,14 @@ class CouponResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                     ->label('Status')
                     ->state(function ($record) {
-                        if ($record->start_date->greaterThan(now()) && $record->expire_date->lessThan(now())) {
+                        $now = now()->timezone($record->timezone);
+
+                        if ($record->start_date->timezone($record->timezone)->lessThanOrEqualTo($now)
+                            && $record->expire_date->timezone($record->timezone)->greaterThanOrEqualTo($now)) {
                             return 'Running';
                         }
 
-                        if (now()->lessThan($record->start_date)) {
+                        if ($now->lessThan($record->start_date->timezone($record->timezone))) {
                             return 'Future';
                         }
 
