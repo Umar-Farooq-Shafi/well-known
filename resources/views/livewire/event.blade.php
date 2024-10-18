@@ -1107,7 +1107,14 @@
                                                 @endforeach
 
                                                 @foreach($this->promotions as $quan => $promotion)
-                                                    <x-badge warning label="Promo Buy '{{ $quan }} Get ${{ $promotion }} off' applied" />
+                                                    <div x-data="{ show: true }" x-show="show" class="flex items-center gap-x-2">
+                                                        <x-badge warning label="Promo Buy '{{ $quan }} Get ${{ $promotion }} off' applied" />
+
+                                                        <x-heroicon-o-x-mark
+                                                            class="w-5 h-5 cursor-pointer text-red-500"
+                                                            @click="show = false"
+                                                        />
+                                                    </div>
                                                 @endforeach
 
                                                 @if($subtotal > 0)
