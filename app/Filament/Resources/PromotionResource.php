@@ -163,7 +163,7 @@ class PromotionResource extends Resource
                             return 'Running';
                         }
 
-                        if ($now->lessThan($record->timezone($record->timezone)->start_date)) {
+                        if ($now->lessThan($record->start_date->timezone($record->timezone))) {
                             return 'Future';
                         }
 
