@@ -158,8 +158,8 @@ class PromotionResource extends Resource
                     ->state(function ($record) {
                         $now = now()->timezone($record->timezone);
 
-                        if ($record->start_date->timezone($record->timezone)->greaterThan($now)
-                            && $record->end_date->timezone($record->timezone)->lessThan($now)) {
+                        if ($record->start_date->timezone($record->timezone)->lessThanOrEqualTo($now)
+                            && $record->end_date->timezone($record->timezone)->greaterThanOrEqualTo($now)) {
                             return 'Running';
                         }
 
