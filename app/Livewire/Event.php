@@ -198,9 +198,7 @@ class Event extends Component
                     'chosen_event_date' => $this->eventDatePick,
                 ]);
             }
-
-            dd(CartElement::whereUserId(\auth()->id())->get());
-
+            
             $this->reset('eventDatePick', 'quantity');
 
             $this->redirectRoute('event-checkout', ['slug' => $this->eventTranslation->slug]);
