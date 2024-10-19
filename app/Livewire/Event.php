@@ -186,8 +186,6 @@ class Event extends Component
                 ]);
             }
 
-            dd($this->quantity, \auth()->id());
-
             foreach ($this->quantity as $ticketId => $quantity) {
                 $ticket = EventDateTicket::find($ticketId);
 
@@ -200,6 +198,8 @@ class Event extends Component
                     'chosen_event_date' => $this->eventDatePick,
                 ]);
             }
+
+            dd(CartElement::whereUserId(\auth()->id()));
 
             $this->reset('eventDatePick', 'quantity');
 
