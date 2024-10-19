@@ -186,6 +186,8 @@ class Event extends Component
                 ]);
             }
 
+            dd($this->quantity, \auth()->id());
+
             foreach ($this->quantity as $ticketId => $quantity) {
                 $ticket = EventDateTicket::find($ticketId);
 
