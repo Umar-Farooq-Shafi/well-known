@@ -1037,8 +1037,8 @@
                                                     @if($value > 0)
                                                         @php
                                                             $eventDateTicket = \App\Models\EventDateTicket::find($id);
-                                                            $originalPrice = $eventDateTicket->price;
-                                                            $price = $eventDateTicket->price;
+                                                            $originalPrice = $eventDateTicket->free ? 0 : $eventDateTicket->price;
+                                                            $price = $eventDateTicket->free ? 0 : $eventDateTicket->price;
 
                                                             if ($eventDateTicket->promotionalprice) {
                                                                 $isStartDate = $eventDateTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo($now);
