@@ -101,10 +101,8 @@ class Checkout extends Component
 
         $this->sessionTime = Setting::query()->where('key', 'checkout_timeleft')->first()?->value;
 
-        dd($this->tickets, $this->sessionTime);
-
-        EmptyCard::dispatch($this->tickets, auth()->id())
-            ->delay(now()->addSeconds((int)$this->sessionTime));
+//        EmptyCard::dispatch($this->tickets, auth()->id())
+//            ->delay(now()->addSeconds((int)$this->sessionTime));
 
         $this->stripe = $this->eventTranslation->event->organizer->paymentGateways()
             ->where('factory_name', 'stripe_checkout')
