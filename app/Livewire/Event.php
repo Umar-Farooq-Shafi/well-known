@@ -198,7 +198,7 @@ class Event extends Component
                     'chosen_event_date' => $this->eventDatePick,
                 ]);
             }
-            
+
             $this->reset('eventDatePick', 'quantity');
 
             $this->redirectRoute('event-checkout', ['slug' => $this->eventTranslation->slug]);

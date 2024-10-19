@@ -58,23 +58,13 @@ class Checkout extends Component
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
 
-        if (!auth()->check()) {
-            $userId = Session::get('user_id');
-        } else {
-            $userId = auth()->id();
-        }
-
-        if (!$userId) {
-            abort(404);
-        }
-
         $promoCode = null;
 
         foreach ($this->eventTranslation->event->eventDates as $eventDate) {
             foreach ($eventDate->eventDateTickets as $ticket) {
 
                 $cartElements = $ticket->cartElements()
-                    ->where('user_id', $userId)
+                    ->where('user_id', auth()->id())
                     ->get();
 
                 if (count($cartElements)) {
@@ -111,7 +101,10 @@ class Checkout extends Component
 
         $this->sessionTime = Setting::query()->where('key', 'checkout_timeleft')->first()?->value;
 
-        EmptyCard::dispatch($this->tickets, auth()->id())->delay(now()->addSeconds((int)$this->sessionTime));
+        dd($this->tickets, $this->sessionTime);
+
+        EmptyCard::dispatch($this->tickets, auth()->id())
+            ->delay(now()->addSeconds((int)$this->sessionTime));
 
         $this->stripe = $this->eventTranslation->event->organizer->paymentGateways()
             ->where('factory_name', 'stripe_checkout')
