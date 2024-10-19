@@ -55,6 +55,7 @@ class PromotionResource extends Resource
                             ->columns(2)
                             ->columnSpanFull()
                             ->minItems(1)
+                            ->addable(false)
                             ->required()
                             ->schema([
                                 Forms\Components\TextInput::make('quantity')

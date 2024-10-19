@@ -233,47 +233,42 @@ class Checkout extends Component
         $ccy = null;
         $currencySymbol = null;
         $country = $this->eventTranslation->event?->country?->code;
-        $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country);
+        $timezone = \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country)[0];
+        $now = now()->timezone($event->eventtimezone ?? $timezone);
 
         foreach ($this->tickets as $ticket) {
-            foreach ($ticket->cartElements as $cartElement) {
-                $ccy = $ticket->currency->ccy;
-                $currencySymbol = $ticket->currency->symbol;
+            $cartElements = $ticket->cartElements()->where('user_id', auth()->id())->get();
 
-                $price = $ticket->price;
+            $ccy = $ticket->currency->ccy;
+            $currencySymbol = $ticket->currency->symbol;
 
-                if ($ticket->promotionalprice) {
-                    $isStartDate = $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
-                    $isEndDate = $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
+            foreach ($cartElements as $cartElement) {
+                $quantity = $cartElement->quantity;
+                $price = $ticket->promotionalprice
+                && $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone)?->lessThanOrEqualTo($now)
+                && $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone)?->greaterThanOrEqualTo($now)
+                    ? $ticket->price - $ticket->promotionalprice
+                    : $ticket->price;
 
-                    if ($isStartDate && $isEndDate) {
-                        $price = $ticket->price - $ticket->promotionalprice;
-                    }
+                // Apply promotions if applicable
+                if ($this->promotions && $quantity >= array_key_first($this->promotions)) {
+                    $discount = $this->promotions[array_key_first($this->promotions)];
+                    $price -= intval($quantity / array_key_first($this->promotions)) * $discount;
                 }
 
-                if (array_key_exists($cartElement->quantity, $this->promotions)) {
-                    $discountPercentage = $this->promotions[$cartElement->quantity];
-                    $discountAmount = ($price * $discountPercentage) / 100;
-                    $price -= $discountAmount;
-                }
-
-                $subtotal += $price * $cartElement->quantity;
-                $fee += $ticket->ticket_fee * $cartElement->quantity;
+                // Calculate subtotal and fees
+                $subtotal += max($price * $quantity, 0);
+                $fee += $ticket->ticket_fee * $quantity;
             }
         }
 
         if ($this->couponType === 'percentage') {
-            $discount = ($subtotal * $this->couponDiscount) / 100;
-            $subtotal -= $discount;
-        }
-
-        if ($this->couponType === 'fixed_amount') {
+            $subtotal -= ($subtotal * $this->couponDiscount) / 100;
+        } elseif ($this->couponType === 'fixed_amount') {
             $subtotal -= $this->couponDiscount;
         }
 
-        if ($subtotal < 0) {
-            $subtotal = 0;
-        }
+        $subtotal = max($subtotal, 0);
 
         $orderPayload = [
             'user_id' => auth()->id(),

@@ -170,20 +170,6 @@
                                                     </div>
                                                 </div>
 
-                                                <script>
-                                                    function changeColor(clickedElement) {
-                                                        // Get all boxes with the class 'event-date'
-                                                        const boxes = document.querySelectorAll('.event-date');
-
-                                                        // Reset background color for all boxes
-                                                        boxes.forEach(box => {
-                                                            box.style.backgroundColor = '#f9f9f9'; // Original color
-                                                        });
-
-                                                        // Change the background color of the clicked box
-                                                        clickedElement.style.backgroundColor = 'rgb(243, 229, 118)'; // New color
-                                                    }
-                                                </script>
                                             @endif
                                         @endif
 
@@ -1042,7 +1028,10 @@
                                             <h1 class="font-semibold">Order Summary</h1>
 
                                             @if(count($quantity))
-                                                @php $subtotal = 0; $fee = 0; @endphp
+                                                @php
+                                                    $subtotal = 0; $fee = 0;
+                                                    $now = now()->timezone($event->eventtimezone ?? $timezone);
+                                                @endphp
 
                                                 @foreach($quantity as $id => $value)
                                                     @if($value > 0)
@@ -1052,8 +1041,8 @@
                                                             $price = $eventDateTicket->price;
 
                                                             if ($eventDateTicket->promotionalprice) {
-                                                                $isStartDate = $eventDateTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo(now());
-                                                                $isEndDate = $eventDateTicket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo(now());
+                                                                $isStartDate = $eventDateTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo($now);
+                                                                $isEndDate = $eventDateTicket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo($now);
                                                                 if ($isStartDate && $isEndDate) {
                                                                     // Check if promotional price exists and set price accordingly
                                                                     if ($eventDateTicket->promotionalprice) {
@@ -1066,11 +1055,12 @@
                                                                 }
                                                             }
 
-                                                            if (array_key_exists($value, $this->promotions)) {
-                                                                $price -= $this->promotions[$value];
+                                                            if ($this->promotions && $value >= array_key_first($this->promotions)) {
+                                                                $discount = $this->promotions[array_key_first($this->promotions)];
+                                                                $price -= intval($value / array_key_first($this->promotions)) * $discount;
                                                             }
 
-                                                            $subtotal += $price * $value;
+                                                            $subtotal += max($price * $value, 0);
                                                             $fee += $eventDateTicket->ticket_fee * $value;
 
                                                             if ($this->couponType === 'percentage') {
@@ -1082,9 +1072,7 @@
                                                                 $subtotal -= $this->couponDiscount;
                                                             }
 
-                                                            if ($subtotal < 0) {
-                                                                $subtotal = 0;
-                                                            }
+                                                            $subtotal = max($subtotal, 0);
                                                         @endphp
 
                                                         <div class="flex justify-between items-center m-2">
@@ -1095,9 +1083,9 @@
                                                                     {{ $eventDateTicket->currency->ccy }}
                                                                 @endif
                                                                 @if($price !== $originalPrice)
-                                                                    <del>{{ $originalPrice }}</del>
+                                                                    <del>{{ $originalPrice * $value }}</del>
                                                                 @endif
-                                                                {{ $price * $value }}
+                                                                {{ max($price * $value, 0) }}
                                                                 @if($eventDateTicket->currency_symbol_position === 'right')
                                                                     {{ $eventDateTicket->currency->ccy }}
                                                                 @endif
@@ -1169,6 +1157,7 @@
                                                     </div>
                                                 @endif
                                             @endif
+
                                         </div>
                                     </div>
                                 </div>

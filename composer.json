@@ -11,7 +11,7 @@
         "php": "^8.2",
         "abanoubnassem/filament-grecaptcha-field": "^0.0.7",
         "eluceo/ical": "^2.14",
-        "filament/filament": "^3.2",
+        "filament/filament": "^3.2.119",
         "flowframe/laravel-trend": "^0.2.0",
         "guava/filament-icon-picker": "^2.2",
         "intervention/image": "^3.7",
