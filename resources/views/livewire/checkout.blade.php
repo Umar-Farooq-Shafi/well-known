@@ -179,8 +179,8 @@
                                 @php
                                     $ccy = $ticket->currency->ccy;
                                     $price = $ticket->price;
-                                    $originalPrice = $ticket->price;
-                                    $value = $cartElement->quantity;
+                                    $originalPrice = $ticket->free ? 0 : $ticket->price;
+                                    $value = $ticket->free ? 0 : $cartElement->quantity;
 
                                     if ($ticket->promotionalprice) {
                                         $now = now()->timezone($event->eventtimezone ?? $timezone[0]);

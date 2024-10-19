@@ -237,28 +237,30 @@ class Checkout extends Component
         $now = now()->timezone($event->eventtimezone ?? $timezone);
 
         foreach ($this->tickets as $ticket) {
-            $cartElements = $ticket->cartElements()->where('user_id', auth()->id())->get();
+            if (!$ticket->free) {
+                $cartElements = $ticket->cartElements()->where('user_id', auth()->id())->get();
 
-            $ccy = $ticket->currency->ccy;
-            $currencySymbol = $ticket->currency->symbol;
+                $ccy = $ticket->currency->ccy;
+                $currencySymbol = $ticket->currency->symbol;
 
-            foreach ($cartElements as $cartElement) {
-                $quantity = $cartElement->quantity;
-                $price = $ticket->promotionalprice
-                && $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone)?->lessThanOrEqualTo($now)
-                && $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone)?->greaterThanOrEqualTo($now)
-                    ? $ticket->price - $ticket->promotionalprice
-                    : $ticket->price;
+                foreach ($cartElements as $cartElement) {
+                    $quantity = $cartElement->quantity;
+                    $price = $ticket->promotionalprice
+                    && $ticket->salesstartdate?->timezone($event->eventtimezone ?? $timezone)?->lessThanOrEqualTo($now)
+                    && $ticket->salesenddate?->timezone($event->eventtimezone ?? $timezone)?->greaterThanOrEqualTo($now)
+                        ? $ticket->price - $ticket->promotionalprice
+                        : $ticket->price;
 
-                // Apply promotions if applicable
-                if ($this->promotions && $quantity >= array_key_first($this->promotions)) {
-                    $discount = $this->promotions[array_key_first($this->promotions)];
-                    $price -= intval($quantity / array_key_first($this->promotions)) * $discount;
+                    // Apply promotions if applicable
+                    if ($this->promotions && $quantity >= array_key_first($this->promotions)) {
+                        $discount = $this->promotions[array_key_first($this->promotions)];
+                        $price -= intval($quantity / array_key_first($this->promotions)) * $discount;
+                    }
+
+                    // Calculate subtotal and fees
+                    $subtotal += max($price * $quantity, 0);
+                    $fee += $ticket->ticket_fee * $quantity;
                 }
-
-                // Calculate subtotal and fees
-                $subtotal += max($price * $quantity, 0);
-                $fee += $ticket->ticket_fee * $quantity;
             }
         }
 
