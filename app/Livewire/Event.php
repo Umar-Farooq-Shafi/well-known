@@ -199,7 +199,7 @@ class Event extends Component
                 ]);
             }
 
-            dd(CartElement::whereUserId(\auth()->id()));
+            dd(CartElement::whereUserId(\auth()->id())->get());
 
             $this->reset('eventDatePick', 'quantity');
 
