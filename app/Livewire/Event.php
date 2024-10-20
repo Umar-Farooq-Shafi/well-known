@@ -218,7 +218,7 @@ class Event extends Component
 
     public function clearPromoCode()
     {
-        $this->reset('promoCode');
+        $this->reset('promoCode', 'couponType', 'couponDiscount');
     }
 
     public function render()
