@@ -1131,9 +1131,26 @@
                                                     @endif
                                                 @endforeach
 
-                                                @foreach($this->promotions as $quan => $promotion)
-                                                    <x-badge warning label="Promo Buy '{{ $quan }} Get ${{ $promotion }} off' applied" />
-                                                @endforeach
+                                                @if($this->promotions)
+                                                    @php
+                                                        $shouldShow = false;
+
+                                                        foreach($quantity as $id => $value) {
+                                                            $promoThreshold = array_key_first($this->promotions);
+                                                            $discountPerPromo = $this->promotions[$promoThreshold];
+
+                                                            if ($value >= $promoThreshold) {
+                                                                $shouldShow = true;
+                                                            }
+                                                        }
+                                                    @endphp
+
+                                                    @if($shouldShow)
+                                                        @foreach($this->promotions as $quan => $promotion)
+                                                            <x-badge warning label="Promo Buy '{{ $quan }} Get ${{ $promotion }} off' applied" />
+                                                        @endforeach
+                                                    @endif
+                                                @endif
 
                                                 @if($subtotal > 0)
                                                     <hr class="my-2 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10"/>
