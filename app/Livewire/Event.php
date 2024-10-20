@@ -216,6 +216,11 @@ class Event extends Component
         ]);
     }
 
+    public function clearPromoCode()
+    {
+        $this->reset('promoCode');
+    }
+
     public function render()
     {
         $reviews = $this->eventTranslation->event->reviews;

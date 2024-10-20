@@ -852,6 +852,18 @@
                                                     />
                                                 </x-slot>
                                             </x-input>
+
+                                            @if($couponType)
+                                                <x-badge flat red :label="$promoCode" class="mt-2">
+                                                    <x-slot name="append" class="relative flex items-center w-2 h-2">
+                                                        <badge type="badge" class="cursor-pointer" wire:click="clearPromoCode">
+                                                            <x-icon name="x-mark" class="w-4 h-4" wire:loading.remove />
+                                                            <x-icon name="arrow-path" wire:loading class="animate-spin h-4 w-4 text-white" />
+                                                        </badge>
+                                                    </x-slot>
+                                                </x-badge>
+                                            @endif
+
                                         </div>
 
                                         <div class="flex flex-col gap-y-2 divide-y-2 my-4 mx-2">
@@ -1120,14 +1132,7 @@
                                                 @endforeach
 
                                                 @foreach($this->promotions as $quan => $promotion)
-                                                    <div x-data="{ show: true }" x-show="show" class="flex items-center gap-x-2">
-                                                        <x-badge warning label="Promo Buy '{{ $quan }} Get ${{ $promotion }} off' applied" />
-
-                                                        <x-heroicon-o-x-mark
-                                                            class="w-5 h-5 cursor-pointer text-red-500"
-                                                            @click="show = false"
-                                                        />
-                                                    </div>
+                                                    <x-badge warning label="Promo Buy '{{ $quan }} Get ${{ $promotion }} off' applied" />
                                                 @endforeach
 
                                                 @if($subtotal > 0)
