@@ -101,8 +101,7 @@ class Checkout extends Component
 
         $this->sessionTime = Setting::query()->where('key', 'checkout_timeleft')->first()?->value;
 
-//        EmptyCard::dispatch($this->tickets, auth()->id())
-//            ->delay(now()->addSeconds((int)$this->sessionTime));
+        EmptyCard::dispatch($this->tickets, auth()->id())->delay(now()->addSeconds((int)$this->sessionTime));
 
         $this->stripe = $this->eventTranslation->event->organizer->paymentGateways()
             ->where('factory_name', 'stripe_checkout')
@@ -251,14 +250,21 @@ class Checkout extends Component
                         ? $ticket->price - $ticket->promotionalprice
                         : $ticket->price;
 
-                    // Apply promotions if applicable
-                    if ($this->promotions && $quantity >= array_key_first($this->promotions)) {
-                        $discount = $this->promotions[array_key_first($this->promotions)];
-                        $price -= intval($quantity / array_key_first($this->promotions)) * $discount;
+                    $ticketTotal = $price * $quantity;
+
+                    if ($this->promotions) {
+                        $promoThreshold = array_key_first($this->promotions);
+                        $discountPerPromo = $this->promotions[$promoThreshold];
+
+                        if ($quantity >= $promoThreshold) {
+                            $eligiblePromos = floor($quantity / $promoThreshold);
+                            $totalDiscount = $eligiblePromos * $discountPerPromo;
+
+                            $ticketTotal -= $totalDiscount;
+                        }
                     }
 
-                    // Calculate subtotal and fees
-                    $subtotal += max($price * $quantity, 0);
+                    $subtotal += max($ticketTotal, 0);
                     $fee += $ticket->ticket_fee * $quantity;
                 }
             }
@@ -282,12 +288,23 @@ class Checkout extends Component
             'ticket_price_percentage_cut' => $this->couponType === 'percentage' ? $this->couponDiscount : 0
         ];
 
+        if (max($subtotal + $fee, 0) === 0) {
+            $this->createOrder(
+                $this->tickets,
+                auth()->id(),
+                $orderPayload,
+                0,
+            );
+
+            return;
+        }
+
         if ($paymentGateway->factory_name === 'stripe_checkout') {
             $orderPayload['status'] = 1;
 
             Session::put('order_payload', [
                 'payload' => $orderPayload,
-                'subtotal' => $subtotal
+                'subtotal' => $subtotal + $fee
             ]);
 
             return;

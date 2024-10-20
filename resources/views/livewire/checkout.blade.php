@@ -192,12 +192,21 @@
                                         }
                                     }
 
-                                    if ($this->promotions && $value >= array_key_first($this->promotions)) {
-                                        $discount = $this->promotions[array_key_first($this->promotions)];
-                                        $price -= intval($value / array_key_first($this->promotions)) * $discount;
+                                    $ticketTotal = $price * $value;
+
+                                    if ($this->promotions) {
+                                        $promoThreshold = array_key_first($this->promotions);
+                                        $discountPerPromo = $this->promotions[$promoThreshold];
+
+                                        if ($value >= $promoThreshold) {
+                                            $eligiblePromos = floor($value / $promoThreshold);
+                                            $totalDiscount = $eligiblePromos * $discountPerPromo;
+
+                                            $ticketTotal -= $totalDiscount;
+                                        }
                                     }
 
-                                    $subtotal += max($price * $value, 0);
+                                    $subtotal += max($ticketTotal, 0);
                                     $fee += $ticket->ticket_fee * $cartElement->quantity;
 
                                     if ($this->couponType === 'percentage') {
@@ -217,10 +226,10 @@
 
                                     <div class="font-semibold">
                                         <span>{{ $ccy }}</span>
-                                        @if($price !== $originalPrice)
+                                        @if($ticketTotal !== $originalPrice * $value)
                                             <del>{{ $originalPrice * $value }}</del>
                                         @endif
-                                        <span>{{ max($price * $value, 0) }}</span>
+                                        <span>{{ max($ticketTotal, 0) }}</span>
                                     </div>
                                 </div>
 

@@ -691,13 +691,30 @@
                                         </div>
                                     @endif
 
-                                    <div class="flex items-center justify-center w-full py-2">
+                                    <div class="items-center justify-center w-full py-2 hidden sm:flex">
                                         <x-button
                                             wire:click="buyTicket"
                                             spinner="buyTicket"
                                             yellow
                                             label="Buy Tickets"
                                         />
+                                    </div>
+
+                                    <div class="sm:hidden">
+                                        <div class="fixed inset-x-0 bottom-0 p-4 bg-white">
+                                            <div
+                                                class="bg-orange-600 hover:bg-orange-700 text-white font-bold w-full rounded-full text-lg focus:outline-none focus:ring-4 focus:ring-orange-300"
+                                            >
+                                                <x-button
+                                                    negative
+                                                    wire:click="buyTicket"
+                                                    spinner="buyTicket"
+                                                    class="py-3 w-full text-center"
+                                                >
+                                                    Get tickets
+                                                </x-button>
+                                            </div>
+                                        </div>
                                     </div>
 
                                 </dd>
@@ -1044,23 +1061,31 @@
                                                                 $isStartDate = $eventDateTicket->salesstartdate?->timezone($event->eventtimezone ?? $timezone[0])?->lessThanOrEqualTo($now);
                                                                 $isEndDate = $eventDateTicket->salesenddate?->timezone($event->eventtimezone ?? $timezone[0])?->greaterThanOrEqualTo($now);
                                                                 if ($isStartDate && $isEndDate) {
-                                                                    // Check if promotional price exists and set price accordingly
                                                                     if ($eventDateTicket->promotionalprice) {
-                                                                        $price = $eventDateTicket->promotionalprice; // Set price to promotional price
+                                                                        $price = $eventDateTicket->promotionalprice;
                                                                         $originalPrice = $eventDateTicket->promotionalprice;
                                                                     } else {
-                                                                        $price = $eventDateTicket->price; // Fallback to original price
+                                                                        $price = $eventDateTicket->price;
                                                                         $originalPrice = $eventDateTicket->price;
                                                                     }
                                                                 }
                                                             }
 
-                                                            if ($this->promotions && $value >= array_key_first($this->promotions)) {
-                                                                $discount = $this->promotions[array_key_first($this->promotions)];
-                                                                $price -= intval($value / array_key_first($this->promotions)) * $discount;
+                                                            $ticketTotal = $price * $value;
+
+                                                            if ($this->promotions) {
+                                                                $promoThreshold = array_key_first($this->promotions);
+                                                                $discountPerPromo = $this->promotions[$promoThreshold];
+
+                                                                if ($value >= $promoThreshold) {
+                                                                    $eligiblePromos = floor($value / $promoThreshold);
+                                                                    $totalDiscount = $eligiblePromos * $discountPerPromo;
+
+                                                                    $ticketTotal -= $totalDiscount;
+                                                                }
                                                             }
 
-                                                            $subtotal += max($price * $value, 0);
+                                                            $subtotal += max($ticketTotal, 0);
                                                             $fee += $eventDateTicket->ticket_fee * $value;
 
                                                             if ($this->couponType === 'percentage') {
@@ -1082,10 +1107,10 @@
                                                                 @if($eventDateTicket->currency_symbol_position === 'left')
                                                                     {{ $eventDateTicket->currency->ccy }}
                                                                 @endif
-                                                                @if($price !== $originalPrice)
+                                                                @if($ticketTotal !== $originalPrice * $value)
                                                                     <del>{{ $originalPrice * $value }}</del>
                                                                 @endif
-                                                                {{ max($price * $value, 0) }}
+                                                                {{ max($ticketTotal, 0) }}
                                                                 @if($eventDateTicket->currency_symbol_position === 'right')
                                                                     {{ $eventDateTicket->currency->ccy }}
                                                                 @endif
