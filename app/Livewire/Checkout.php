@@ -497,8 +497,8 @@ class Checkout extends Component
             'currency' => $ccy,
             'customer' => $customer->id,
             'payment_method' => $paymentMethod->id,
-            'off_session' => true,  // for automatic payments without user interaction
-            'confirm' => true,      // immediately confirm the payment
+            'off_session' => true,
+            'confirm' => true,
         ]);
 
         if ($paymentIntent->status === 'succeeded') {

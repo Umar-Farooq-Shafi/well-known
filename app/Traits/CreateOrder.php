@@ -49,7 +49,7 @@ trait CreateOrder
                 'chosen_event_date' => $chosenDate
             ]);
 
-            Payment::create([
+            $payment = Payment::create([
                 'order_id' => $order->id,
                 'country_id' => $user->country_id,
                 'number' => Str::uuid(),
@@ -67,6 +67,8 @@ trait CreateOrder
                 'street' => $user->street,
                 'street2' => $user->street2
             ]);
+
+            $order->update(['payment_id' => $payment->id]);
         }
     }
 }

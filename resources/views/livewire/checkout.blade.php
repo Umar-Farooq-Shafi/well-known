@@ -13,30 +13,30 @@
 
 <div x-data="checkoutData">
     <div
-            class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-900 bg-opacity-80 text-white text-center"
-            x-show="isExpired"
-            style="pointer-events: none;">
+        class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-900 bg-opacity-80 text-white text-center"
+        x-show="isExpired"
+        style="pointer-events: none;">
         <div class="z-10" style="pointer-events: auto;">
             <h1 class="text-4xl font-bold mb-4">Time's up</h1>
             <p class="mb-6">The tickets have been released.</p>
             <x-button
-                    primary
-                    label="Return to Cart"
-                    wire:click="returnToCart"
+                primary
+                label="Return to Cart"
+                wire:click="returnToCart"
             />
         </div>
     </div>
 
     <div class="mt-[25%] lg:mt-[12%] md:mt-[17%] container mx-auto">
         <div
-                class="flex flex-col gap-y-1 md:flex-row justify-between bg-gray-300 px-4 py-2 md:rounded md:mx-16 lg:mx-32 my-4">
+            class="flex flex-col gap-y-1 md:flex-row justify-between bg-gray-300 px-4 py-2 md:rounded md:mx-16 lg:mx-32 my-4">
             <div class="font-bold text-xl">{{ $eventTranslation->name }}</div>
 
             <x-breadcrumbs/>
         </div>
 
         <div
-                class="fixed top-0 left-0 w-full bg-red-400 text-white text-center py-2 shadow-lg z-50">
+            class="fixed top-0 left-0 w-full bg-red-400 text-white text-center py-2 shadow-lg z-50">
             <div class="timer flex justify-center space-x-2">
                 <h1 class="text-lg font-bold" x-text="time.days"></h1>
                 <span class="text-lg font-bold">:</span>
@@ -83,42 +83,42 @@
 
                         <div class="flex gap-x-2 my-2">
                             <x-input
-                                    icon="user"
-                                    label="First Name"
-                                    wire:model="firstName"
-                                    placeholder="Enter First Name"
+                                icon="user"
+                                label="First Name"
+                                wire:model="firstName"
+                                placeholder="Enter First Name"
                             />
 
                             <x-input
-                                    icon="user"
-                                    label="Last Name"
-                                    wire:model="lastName"
-                                    placeholder="Enter Last Name"
-                            />
-                        </div>
-
-                        <div class="flex gap-x-2 my-2">
-                            <x-input
-                                    icon="envelope"
-                                    label="Email address"
-                                    wire:model="email"
-                                    placeholder="Enter Email Address"
-                            />
-
-                            <x-input
-                                    icon="envelope"
-                                    label="Confirm email"
-                                    wire:model="confirmEmail"
-                                    placeholder="Enter Confirm email"
+                                icon="user"
+                                label="Last Name"
+                                wire:model="lastName"
+                                placeholder="Enter Last Name"
                             />
                         </div>
 
                         <div class="flex gap-x-2 my-2">
                             <x-input
-                                    icon="phone"
-                                    label="Phone No"
-                                    wire:model="phone"
-                                    placeholder="Enter Phone No"
+                                icon="envelope"
+                                label="Email address"
+                                wire:model="email"
+                                placeholder="Enter Email Address"
+                            />
+
+                            <x-input
+                                icon="envelope"
+                                label="Confirm email"
+                                wire:model="confirmEmail"
+                                placeholder="Enter Confirm email"
+                            />
+                        </div>
+
+                        <div class="flex gap-x-2 my-2">
+                            <x-input
+                                icon="phone"
+                                label="Phone No"
+                                wire:model="phone"
+                                placeholder="Enter Phone No"
                             />
 
                             <div></div>
@@ -129,7 +129,7 @@
                         <div class="flex flex-col gap-y-2">
                             @foreach($paymentGateways as $paymentGateway)
                                 <div
-                                        class="rounded-lg border border-gray-200 bg-gray-50 p-4 ps-4 dark:border-gray-700 dark:bg-gray-800">
+                                    class="rounded-lg border border-gray-200 bg-gray-50 p-4 ps-4 dark:border-gray-700 dark:bg-gray-800">
                                     <div class="flex items-center">
                                         <div class="flex h-5 items-center">
                                             <input id="credit-card"
@@ -142,7 +142,7 @@
                                         </div>
 
                                         <div
-                                                class="ms-4 text-sm flex justify-between items-center w-full">
+                                            class="ms-4 text-sm flex justify-between items-center w-full">
                                             <label for="credit-card"
                                                    class="font-medium leading-none text-gray-900 dark:text-white">
                                                 {{ $paymentGateway->name }}
@@ -150,9 +150,9 @@
 
                                             <div>
                                                 <img
-                                                        src="{{ Storage::url('payment/gateways/' . $paymentGateway->gateway_logo_name) }}"
-                                                        alt="{{ $paymentGateway->name }}"
-                                                        class="w-8 h-8"
+                                                    src="{{ Storage::url('payment/gateways/' . $paymentGateway->gateway_logo_name) }}"
+                                                    alt="{{ $paymentGateway->name }}"
+                                                    class="w-8 h-8"
                                                 />
                                             </div>
                                         </div>
@@ -165,10 +165,10 @@
 
                 <div class="lg:col-span-3 md:col-span-2">
                     <img
-                            src="{{ Storage::url('events/' . $event->image_name) }}"
-                            alt="{{ $eventTranslation->name }}"
-                            loading="lazy"
-                            class="w-full opacity-100 h-40"
+                        src="{{ Storage::url('events/' . $event->image_name) }}"
+                        alt="{{ $eventTranslation->name }}"
+                        loading="lazy"
+                        class="w-full opacity-100 h-40"
                     />
 
                     <div class="mt-1">
@@ -290,16 +290,22 @@
                             @if($this->stripe && $paymentGateway->factory_name === 'stripe_checkout')
                                 <div class="mt-8">
                                     <x-input
-                                            label="Name"
-                                            placeholder="Card Holder Name"
-                                            id="card-holder-name"
+                                        label="Name"
+                                        placeholder="Card Holder Name"
+                                        id="card-holder-name"
                                     />
 
                                     <div id="card-element" class="my-4">
 
                                     </div>
 
-                                    <x-button spinner="purchase" label="Place Order" id="card-button"/>
+                                    <x-button
+                                        spinner="placeOrder"
+                                        wire:target="placeOrder"
+                                        wire:click="placeOrder"
+                                        label="Place Order"
+                                        id="card-button"
+                                    />
                                 </div>
                             @endif
                         @endif
@@ -317,10 +323,10 @@
                         <x-button flat label="Cancel" x-on:click="close"/>
 
                         <x-button
-                                primary
-                                label="Place Order"
-                                spinner="placeOrder"
-                                wire:click="placeOrder"
+                            primary
+                            label="Place Order"
+                            spinner="placeOrder"
+                            wire:click="placeOrder"
                         />
                     </div>
                 @endif
@@ -459,8 +465,8 @@
                                     });
                                 } else {
                                     Livewire.dispatch('purchase', {
-                                        paymentMethodId: paymentMethod.id, // Send the PaymentMethod ID
-                                        amount: @js($subtotal),
+                                        paymentMethodId: paymentMethod.id,
+                                        amount: @js($subtotal + $fee),
                                         ccy: @js($ccy)
                                     });
                                 }
