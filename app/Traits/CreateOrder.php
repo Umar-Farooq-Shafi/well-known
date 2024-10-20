@@ -2,10 +2,12 @@
 
 namespace App\Traits;
 
+use App\Mail\OrderConfirmation;
 use App\Models\Order;
 use App\Models\OrderElement;
 use App\Models\Payment;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 trait CreateOrder
@@ -69,6 +71,9 @@ trait CreateOrder
             ]);
 
             $order->update(['payment_id' => $payment->id]);
+
+            Mail::to(auth()->user()->email)->send(new OrderConfirmation($order));
+
         }
     }
 }
