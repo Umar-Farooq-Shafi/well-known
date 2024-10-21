@@ -72,35 +72,35 @@
                 </section>
 
                 <nav>
-                    <div class="max-w-screen-xl px-4 py-3" id="scroll-to-category">
+                    <div class="max-w-screen-xl px-4 py-3 overflow-auto" id="scroll-to-category">
                         <div class="flex items-center">
                             <ul class="flex flex-row font-medium mt-0 space-x-8 rtl:space-x-reverse text-sm">
-                                <li>
+                                <li class="text-nowrap">
                                     <a href="?country={{ $country }}&scroll-to-category=true"
                                        class="{{ $category === '' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-blue-700 text-base  dark:text-white hover:underline"
                                        aria-current="page">
                                         All
                                     </a>
                                 </li>
-                                <li>
+                                <li class="text-nowrap">
                                     <a href="?category=online&country={{ $country }}&scroll-to-category=true"
                                        class="{{ $category === 'online' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                         Online
                                     </a>
                                 </li>
-                                <li>
+                                <li class="text-nowrap">
                                     <a href="?category=today&country={{ $country }}&scroll-to-category=true"
                                        class="{{ $category === 'today' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                         Today
                                     </a>
                                 </li>
-                                <li>
+                                <li class="text-nowrap">
                                     <a href="?category=this-weekend&country={{ $country }}&scroll-to-category=true"
                                        class="{{ $category === 'this-weekend' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                         This Weekend
                                     </a>
                                 </li>
-                                <li>
+                                <li class="text-nowrap">
                                     <a href="?category=free&country={{ $country }}&scroll-to-category=true"
                                        class="{{ $category === 'free' ? 'text-blue-700 underline decoration-blue-500 decoration-2 underline-offset-8' : 'text-gray-900' }} text-base dark:text-white hover:underline">
                                         Free
@@ -336,7 +336,7 @@
 
                 @if(count($featuredEvents))
                     <div
-                        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 py-10 overflow-x-auto hide-scroll-bar">
+                        class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 py-10 overflow-x-auto hide-scroll-bar">
                         @foreach($featuredEvents as $event)
                             @php
                                 $country = $event->country;
@@ -592,7 +592,8 @@
             });
 
             new Swiper(".eventSlider", {
-                slidesPerView: 4,
+                slidesPerView: 1,
+                grabCursor: true,
                 spaceBetween: 10,
                 navigation: {
                     nextEl: ".swiper-button-next",
@@ -604,6 +605,16 @@
                 },
                 mousewheel: true,
                 keyboard: true,
+                breakpoints: {
+                    640: {
+                        slidesPerView: 3,
+                        spaceBetween: 20
+                    },
+                    1024: {
+                        slidesPerView: 4,
+                        spaceBetween: 10
+                    }
+                }
             });
         </script>
     @endpush
