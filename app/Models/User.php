@@ -7,6 +7,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -73,56 +74,56 @@ use Laravel\Cashier\Billable;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Review> $reviews
  * @property-read int|null $reviews_count
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|User onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|User query()
- * @method static \Illuminate\Database\Eloquent\Builder|User whereApiKey($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatarDimensions($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatarMimeType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatarName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatarOriginalName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatarSize($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereBirthdate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereCity($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereConfirmationToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereCountryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailCanonical($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereEnabled($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereFacebookAccessToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereFacebookId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereFacebookProfilePicture($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereFirstname($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereGender($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereGoogleAccessToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereGoogleId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereIsorganizeronhomepagesliderId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereLastLogin($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereLastname($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereMembershipType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereOrganizerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User wherePasswordRequestedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User wherePhone($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User wherePointofsaleId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User wherePostalcode($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereRoles($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereSalt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereScannerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereState($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereStreet($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereStreet2($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereUsername($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereUsernameCanonical($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|User withoutTrashed()
+ * @method static Builder|User newModelQuery()
+ * @method static Builder|User newQuery()
+ * @method static Builder|User onlyTrashed()
+ * @method static Builder|User query()
+ * @method static Builder|User whereApiKey($value)
+ * @method static Builder|User whereAvatarDimensions($value)
+ * @method static Builder|User whereAvatarMimeType($value)
+ * @method static Builder|User whereAvatarName($value)
+ * @method static Builder|User whereAvatarOriginalName($value)
+ * @method static Builder|User whereAvatarSize($value)
+ * @method static Builder|User whereBirthdate($value)
+ * @method static Builder|User whereCity($value)
+ * @method static Builder|User whereConfirmationToken($value)
+ * @method static Builder|User whereCountryId($value)
+ * @method static Builder|User whereCreatedAt($value)
+ * @method static Builder|User whereDeletedAt($value)
+ * @method static Builder|User whereEmail($value)
+ * @method static Builder|User whereEmailCanonical($value)
+ * @method static Builder|User whereEnabled($value)
+ * @method static Builder|User whereFacebookAccessToken($value)
+ * @method static Builder|User whereFacebookId($value)
+ * @method static Builder|User whereFacebookProfilePicture($value)
+ * @method static Builder|User whereFirstname($value)
+ * @method static Builder|User whereGender($value)
+ * @method static Builder|User whereGoogleAccessToken($value)
+ * @method static Builder|User whereGoogleId($value)
+ * @method static Builder|User whereId($value)
+ * @method static Builder|User whereIsorganizeronhomepagesliderId($value)
+ * @method static Builder|User whereLastLogin($value)
+ * @method static Builder|User whereLastname($value)
+ * @method static Builder|User whereMembershipType($value)
+ * @method static Builder|User whereOrganizerId($value)
+ * @method static Builder|User wherePassword($value)
+ * @method static Builder|User wherePasswordRequestedAt($value)
+ * @method static Builder|User wherePhone($value)
+ * @method static Builder|User wherePointofsaleId($value)
+ * @method static Builder|User wherePostalcode($value)
+ * @method static Builder|User whereRememberToken($value)
+ * @method static Builder|User whereRoles($value)
+ * @method static Builder|User whereSalt($value)
+ * @method static Builder|User whereScannerId($value)
+ * @method static Builder|User whereSlug($value)
+ * @method static Builder|User whereState($value)
+ * @method static Builder|User whereStreet($value)
+ * @method static Builder|User whereStreet2($value)
+ * @method static Builder|User whereUpdatedAt($value)
+ * @method static Builder|User whereUsername($value)
+ * @method static Builder|User whereUsernameCanonical($value)
+ * @method static Builder|User withTrashed()
+ * @method static Builder|User withoutTrashed()
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Scanner> $scanners
  * @property-read int|null $scanners_count
  * @property-read \App\Models\PointsOfSale|null $pointOfSale
@@ -131,8 +132,8 @@ use Laravel\Cashier\Billable;
  * @property-read int|null $ticket_reservations_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Cashier\Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
- * @method static \Illuminate\Database\Eloquent\Builder|User hasExpiredGenericTrial()
- * @method static \Illuminate\Database\Eloquent\Builder|User onGenericTrial()
+ * @method static Builder|User hasExpiredGenericTrial()
+ * @method static Builder|User onGenericTrial()
  * @mixin \Eloquent
  */
 class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
@@ -186,6 +187,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
         'api_key',
         'facebook_profile_picture',
         'membership_type',
+        'guest'
     ];
 
     /**
@@ -207,6 +209,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
     {
         return [
             'password' => 'hashed',
+            'guest' => 'boolean'
         ];
     }
 

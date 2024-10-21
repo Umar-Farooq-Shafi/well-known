@@ -169,6 +169,10 @@ class Event extends Component
                 $password = fake()->password;
                 $username = fake()->userName;
 
+                while (User::query()->where('email_canonical', $email)->exists()) {
+                    $email = fake()->unique()->safeEmail;
+                }
+
                 User::create([
                     'username' => $username,
                     'username_canonical' => $username,
@@ -178,6 +182,7 @@ class Event extends Component
                     'password' => Hash::make($password),
                     'roles' => 'a:1:{i:0;s:13:"ROLE_ATTENDEE";}',
                     'slug' => Str::slug($username),
+                    'guest' => true
                 ]);
 
                 Auth::attempt([

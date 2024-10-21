@@ -10,11 +10,13 @@ use Filament\Events\Auth\Registered;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
 use Filament\Notifications\Notification;
 use Filament\Pages\Auth\Register as AuthRegister;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class Register extends AuthRegister
@@ -44,11 +46,28 @@ class Register extends AuthRegister
             return null;
         }
 
-        $user = DB::transaction(function () {
-            $data = $this->form->getState();
+        $data = $this->form->getState();
 
-            return $this->getUserModel()::create($data);
-        });
+        $userExists = $this->getUserModel()::where('guest', false)->where('email', $data['email'])->exists();
+
+        if ($userExists) {
+            Notification::make()
+                ->title(__('User already exists'))
+                ->body(__('A user with this email address is already registered. Please log in or use a different email.'))
+                ->danger()
+                ->send();
+
+            return null;
+        }
+
+        $user = DB::transaction(fn () => $this->getUserModel()::create([
+            ...$data,
+            'username_canonical' => $data['username'],
+            'email_canonical' => $data['email'] . '-guest',
+            'enabled' => 1,
+            'roles' => 'a:1:{i:0;s:13:"' . $data['roles'] . '";}',
+            'slug' => Str::slug($data['username']),
+        ]));
 
         event(new Registered($user));
 
@@ -86,6 +105,15 @@ class Register extends AuthRegister
         ];
     }
 
+    protected function getEmailFormComponent(): Component
+    {
+        return TextInput::make('email')
+            ->label(__('filament-panels::pages/auth/register.form.email.label'))
+            ->email()
+            ->maxLength(255)
+            ->required();
+    }
+
     protected function getUsernameFormComponent(): Component
     {
         return Forms\Components\TextInput::make('username')
@@ -97,15 +125,24 @@ class Register extends AuthRegister
     {
         return Forms\Components\ToggleButtons::make('roles')
             ->label('')
-            ->icons([
-                'ROLE_ATTENDEE' => 'heroicon-o-check',
-            ])
+            ->icons(function ($state) {
+                if ($state === 'ROLE_ATTENDEE') {
+                    return [
+                        'ROLE_ATTENDEE' => 'heroicon-o-check',
+                    ];
+                }
+
+                return [
+                    'ROLE_ORGANIZER' => 'heroicon-o-check',
+                ];
+            })
             ->live()
             ->extraAttributes([
                 'class' => 'w-full'
             ])
             ->grouped()
             ->columnSpanFull()
+            ->default('ROLE_ATTENDEE')
             ->options([
                 'ROLE_ATTENDEE' => 'Attendee',
                 'ROLE_ORGANIZER' => 'Organizer',
