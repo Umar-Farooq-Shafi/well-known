@@ -430,6 +430,7 @@
 
                             const elements = stripe.elements();
                             const cardElement = elements.create('card', {
+                                hidePostalCode: true,
                                 style: {
                                     base: {
                                         fontSize: '16px',

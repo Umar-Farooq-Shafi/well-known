@@ -47,7 +47,7 @@ class Event extends Component
             ->where('recurrent', true)
             ->exists();
 
-        if (!$isRecurrent) {
+        if (!$isRecurrent && $this->eventTranslation->event->eventDates->count() < 2) {
             $this->eventDatePick = EventDate::whereEventId($this->eventTranslation->translatable_id)
                 ->first()->startdate;
         }
