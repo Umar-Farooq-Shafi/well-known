@@ -854,7 +854,17 @@
                                             </x-input>
 
                                             @if($couponType)
-                                                <x-badge flat red :label="$promoCode" class="mt-2">
+                                                @php
+                                                    $innerText = '';
+                                                    if ($this->couponType === 'percentage') {
+                                                         $innerText = 'Coupon "' . $this->couponDiscount . '% off" applied';
+                                                    }
+
+                                                    if ($this->couponType === 'fixed_amount') {
+                                                         $innerText = 'Coupon "' . $this->couponDiscount . ' off" applied';
+                                                    }
+                                                @endphp
+                                                <x-badge flat red :label="$innerText" class="mt-2">
                                                     <x-slot name="append" class="relative flex items-center w-2 h-2">
                                                         <badge type="badge" class="cursor-pointer" wire:click="clearPromoCode">
                                                             <x-icon name="x-mark" class="w-4 h-4" wire:loading.remove />

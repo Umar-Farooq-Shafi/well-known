@@ -36,13 +36,18 @@ class PayPalController extends Controller
         $response = $provider->capturePaymentOrder($request['token']);
 
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
-            $this->createOrder(
+            $orderIds = $this->createOrder(
                 $order['tickets'],
                 $order['user_id'],
                 $order['payload'],
                 $order['subtotal'],
                 $response
             );
+
+            if (count($orderIds)) {
+                return redirect()
+                    ->route('filament.admin.resources.orders.view', ['record' => $orderIds[0]]);
+            }
 
             return redirect()
                 ->route('events', [

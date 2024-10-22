@@ -6,6 +6,7 @@ use App\Filament\Resources\PromotionResource;
 use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Carbon;
 
 class CreatePromotion extends CreateRecord
 {
@@ -17,6 +18,14 @@ class CreatePromotion extends CreateRecord
     {
         if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
             $data['organizer_id'] = auth()->user()->organizer_id;
+
+            $data['start_date'] = Carbon::parse($data['start_date'], 'UTC')
+                ->setTimezone($data['timezone'])
+                ->format('Y-m-d H:i:s');
+
+            $data['end_date'] = Carbon::parse($data['end_date'], 'UTC')
+                ->setTimezone($data['timezone'])
+                ->format('Y-m-d H:i:s');
         }
 
         return $data;

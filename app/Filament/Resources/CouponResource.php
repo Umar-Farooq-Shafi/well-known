@@ -100,6 +100,7 @@ class CouponResource extends Resource
                                         'eventTranslations',
                                         fn(Builder $builder) => $builder->where('name', 'LIKE', '%' . $query . '%')
                                     )
+                                    ->limit(20)
                                     ->get();
 
                                 $options = [];
@@ -166,9 +167,6 @@ class CouponResource extends Resource
 
                         return 'Completed';
                     })
-            ])
-            ->filters([
-                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

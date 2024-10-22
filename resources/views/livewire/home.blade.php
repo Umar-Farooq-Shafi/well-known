@@ -153,7 +153,7 @@
 
                                                         @break
                                                     @elseif($eventDate->isOnSale())
-                                                        <div
+
                                                         <div
                                                             class="absolute w-[50px] top-2.5 left-1 justify-center items-center shadow z-10 bg-white flex flex-col gap-y-2 text-gray-700">
                                                             @php
@@ -350,7 +350,7 @@
 
                             <div class="inline-block">
                                 <div
-                                    class="relative h-96 overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
+                                    class="relative h-96 overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out mx-4 sm:mx-0"
                                 >
                                     <a
                                         class="flex flex-col justify-between h-full"

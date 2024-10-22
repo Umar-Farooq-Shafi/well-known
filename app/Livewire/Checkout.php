@@ -289,13 +289,15 @@ class Checkout extends Component
         ];
 
         if (max($subtotal + $fee, 0) === 0) {
-            $this->createOrder(
+            $orderIds = $this->createOrder(
                 $this->tickets,
                 auth()->id(),
                 $orderPayload,
                 0,
             );
 
+            if (count($orderIds))
+                $this->redirect(route('filament.admin.resources.orders.view', ['record' => $orderIds[0]]));
             return;
         }
 
@@ -451,12 +453,15 @@ class Checkout extends Component
             return;
         }
 
-        $this->createOrder(
+        $orderIds = $this->createOrder(
             $this->tickets,
             auth()->id(),
             $orderPayload,
             $subtotal,
         );
+
+        if (count($orderIds))
+            $this->redirect(route('filament.admin.resources.orders.view', ['record' => $orderIds[0]]));
     }
 
     #[On('clear-cart')]
@@ -509,7 +514,7 @@ class Checkout extends Component
 
             $orderPayload = Session::get('order_payload');
 
-            $this->createOrder(
+            $orderIds = $this->createOrder(
                 $this->tickets,
                 auth()->id(),
                 $orderPayload['payload'],
@@ -520,7 +525,9 @@ class Checkout extends Component
             Session::forget('order_payload');
 
             $this->clearCart();
-            $this->returnToCart();
+
+            if (count($orderIds))
+                $this->redirect(route('filament.admin.resources.orders.view', ['record' => $orderIds[0]]));
         } else {
             $this->notification()->send([
                 'icon' => 'error',

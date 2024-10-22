@@ -28,13 +28,18 @@ class ESewaController extends Controller
         $data = json_decode($decodedString, true);
 
         if (data_get($data, 'status', '') === "COMPLETE") {
-            $this->createOrder(
+            $orderIds = $this->createOrder(
                 $order['tickets'],
                 $order['user_id'],
                 $order['payload'],
                 $order['subtotal'],
                 $data
             );
+
+            if (count($orderIds)) {
+                return redirect()
+                    ->route('filament.admin.resources.orders.view', ['record' => $orderIds[0]]);
+            }
 
             return redirect()
                 ->route('events', [

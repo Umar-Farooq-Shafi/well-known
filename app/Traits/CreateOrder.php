@@ -18,9 +18,10 @@ trait CreateOrder
         array $orderPayload,
         $subtotal,
         $detail = [],
-    ): void
+    ): array
     {
         $user = User::find($userId);
+        $orderIds = [];
 
         foreach ($tickets as $ticket) {
             $order = Order::create($orderPayload);
@@ -71,9 +72,12 @@ trait CreateOrder
             ]);
 
             $order->update(['payment_id' => $payment->id]);
+            $orderIds[] = $order->id;
 
             Mail::to(auth()->user()->email)->send(new OrderConfirmation($order));
 
         }
+
+        return $orderIds;
     }
 }

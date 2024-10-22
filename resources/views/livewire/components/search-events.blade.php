@@ -8,7 +8,7 @@
 
     <div class="flex items-center w-full mt-2 mb-5 justify-center gap-x-4">
         <form wire:submit.prevent="submit" class="flex items-center justify-center">
-            <div class="relative flex items-center divide-x-2 rounded bg-white p-1">
+            <div class="relative flex items-center sm:divide-x-2 rounded bg-white p-1">
                 <x-select
                     label=""
                     placeholder="Select Country"
@@ -16,7 +16,7 @@
                     option-label="name"
                     option-value="id"
                     wire:loading.attr="disabled"
-                    class="w-auto lg:w-[180px]"
+                    class="w-auto lg:w-[180px] hidden sm:inline-flex"
                     id="this-is-us"
                     :async-data="route('api.events.country')"
                 />
@@ -26,8 +26,35 @@
                     placeholder="All Dates"
                     wire:model.debounce.500ms="dates"
                     style="border-style: none none none solid !important; border-color: #d1d5db"
-                    class="appearance-none w-auto lg:w-[180px] text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block pl-3 pr-8 py-2.5"
+                    class="appearance-none hidden sm:inline-flex w-auto lg:w-[180px] text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block pl-3 pr-8 py-2.5"
                 />
+
+                <div x-data="{ isOpen: false, openedWithKeyboard: false }" class="relative inline-flex sm:hidden" @keydown.esc.window="isOpen = false, openedWithKeyboard = false">
+                    <x-heroicon-o-funnel @click="isOpen = ! isOpen" class="w-6 h-6 mx-2" />
+
+                    <div x-cloak x-show="isOpen || openedWithKeyboard" x-transition x-trap="openedWithKeyboard" @click.outside="isOpen = false, openedWithKeyboard = false" @keydown.down.prevent="$focus.wrap().next()" @keydown.up.prevent="$focus.wrap().previous()" class="absolute top-11 left-0 flex w-full min-w-[12rem] flex-col overflow-hidden rounded-md border border-neutral-300 bg-neutral-50 py-1.5 dark:border-neutral-700 dark:bg-neutral-900" role="menu">
+                        <x-select
+                            label=""
+                            placeholder="Select Country"
+                            wire:model.debounce.500ms="country"
+                            option-label="name"
+                            option-value="id"
+                            wire:loading.attr="disabled"
+                            class="w-auto lg:w-[180px]"
+                            id="this-is-us"
+                            :async-data="route('api.events.country')"
+                        />
+
+                        <input
+                            id="date-picker-input-2"
+                            placeholder="All Dates"
+                            wire:model.debounce.500ms="dates"
+                            style="border-style: none none none solid !important; border-color: #d1d5db"
+                            class="appearance-none w-auto lg:w-[180px] text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block pl-3 pr-8 py-2.5"
+                        />
+                    </div>
+                </div>
+
 
                 <div class="relative w-auto lg:w-[400px]">
                     <input
@@ -46,14 +73,16 @@
                         <div wire:loading.class="hidden" wire:target="query">
                             <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
                                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2"
                                       d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                             </svg>
                         </div>
                     </div>
 
                     @if($events)
-                        <div class="absolute z-10 max-w-md w-full border divide-y shadow-2xl overflow-y-auto bg-white left-0 mt-1">
+                        <div
+                            class="absolute z-10 max-w-md w-full border divide-y shadow-2xl overflow-y-auto bg-white left-0 mt-1">
                             @if(count($events))
                                 <div class="flex flex-col gap-y-2">
                                     @foreach($events as $eventTranslation)
@@ -90,10 +119,12 @@
         </form>
 
         @if(auth()->check())
-            <a href="{{ route('event-checkout') }}" class="relative w-fit text-neutral-600 dark:text-neutral-300" aria-label="notifications">
-                <x-heroicon-o-shopping-cart class="h-8 w-8 text-white" />
+            <a href="{{ route('event-checkout') }}" class="relative w-fit text-neutral-600 dark:text-neutral-300"
+               aria-label="notifications">
+                <x-heroicon-o-shopping-cart class="h-8 w-8 text-white"/>
 
-                <span class="absolute left-1/2 -top-1 rounded-full bg-red-500 px-1 leading-4 text-xs font-medium text-white">
+                <span
+                    class="absolute left-1/2 -top-1 rounded-full bg-red-500 px-1 leading-4 text-xs font-medium text-white">
                     {{ $cartElements }}
                 </span>
             </a>
@@ -104,8 +135,14 @@
         <script>
             addEventListener("load", () => {
                 const input = document.getElementById('date-picker-input');
+                const input2 = document.getElementById('date-picker-input-2');
 
                 flatpickr(input, {
+                    mode: "range",
+                    dateFormat: "M-d",
+                });
+
+                flatpickr(input2, {
                     mode: "range",
                     dateFormat: "M-d",
                 });

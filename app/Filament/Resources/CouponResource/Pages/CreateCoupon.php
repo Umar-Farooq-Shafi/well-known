@@ -6,6 +6,7 @@ use App\Filament\Resources\CouponResource;
 use App\Traits\FilamentNavigationTrait;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Carbon;
 
 class CreateCoupon extends CreateRecord
 {
@@ -17,6 +18,14 @@ class CreateCoupon extends CreateRecord
     {
         if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
             $data['organizer_id'] = auth()->user()->organizer_id;
+
+            $data['start_date'] = Carbon::parse($data['start_date'], 'UTC')
+                ->setTimezone($data['timezone'])
+                ->format('Y-m-d H:i:s');
+
+            $data['expire_date'] = Carbon::parse($data['expire_date'], 'UTC')
+                ->setTimezone($data['timezone'])
+                ->format('Y-m-d H:i:s');
         }
 
         return $data;
