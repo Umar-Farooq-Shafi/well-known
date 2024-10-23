@@ -14,12 +14,12 @@ class EditPromotion extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
-            $data['start_date'] = Carbon::parse($data['start_date'], 'UTC')
-                ->setTimezone($data['timezone'])
+            $data['start_date'] = Carbon::parse($data['start_date'], $data['timezone'])
+                ->setTimezone('UTC')
                 ->format('Y-m-d H:i:s');
 
-            $data['end_date'] = Carbon::parse($data['end_date'], 'UTC')
-                ->setTimezone($data['timezone'])
+            $data['end_date'] = Carbon::parse($data['end_date'], $data['timezone'])
+                ->setTimezone('UTC')
                 ->format('Y-m-d H:i:s');
         }
 

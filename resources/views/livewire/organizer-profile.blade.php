@@ -1,4 +1,6 @@
-<div class="mt-24">
+@php use Illuminate\Support\Facades\Storage; @endphp
+
+<div class="mt-36">
     @push('styles')
         <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/>
     @endpush
@@ -8,7 +10,7 @@
         <div class="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg mb-4">
             @if($organizer->logo_name)
                 <img
-                    src="{{ \Illuminate\Support\Facades\Storage::url("organizers/" . $organizer->logo_name) }}"
+                    src="{{ Storage::url("organizers/cover/" . $organizer->logo_name) }}"
                     loading="lazy"
                     alt="{{ $organizer->name }}"
                     class="w-44 h-44"

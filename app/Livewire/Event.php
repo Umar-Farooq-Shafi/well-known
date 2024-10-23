@@ -35,6 +35,8 @@ class Event extends Component
 
     public $couponDiscount;
 
+    public $couponName;
+
     public $eventDateId;
 
     public ?EventTranslation $eventTranslation = null;
@@ -122,6 +124,7 @@ class Event extends Component
 
         $this->couponType = $coupon->type;
         $this->couponDiscount = $coupon->discount;
+        $this->couponName = $coupon->name;
 
         $this->reset('promoCode');
 

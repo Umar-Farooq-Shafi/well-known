@@ -857,11 +857,11 @@
                                                 @php
                                                     $innerText = '';
                                                     if ($this->couponType === 'percentage') {
-                                                         $innerText = 'Coupon "' . $this->couponDiscount . '% off" applied';
+                                                         $innerText = 'Coupon "' . $this->couponName . '% off" applied';
                                                     }
 
                                                     if ($this->couponType === 'fixed_amount') {
-                                                         $innerText = 'Coupon "' . $this->couponDiscount . ' off" applied';
+                                                         $innerText = 'Coupon "' . $this->couponName . ' off" applied';
                                                     }
                                                 @endphp
                                                 <x-badge flat red :label="$innerText" class="mt-2">

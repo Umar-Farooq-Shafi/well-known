@@ -19,12 +19,12 @@ class CreateCoupon extends CreateRecord
         if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
             $data['organizer_id'] = auth()->user()->organizer_id;
 
-            $data['start_date'] = Carbon::parse($data['start_date'], 'UTC')
-                ->setTimezone($data['timezone'])
+            $data['start_date'] = Carbon::parse($data['start_date'], $data['timezone'])
+                ->setTimezone('UTC')
                 ->format('Y-m-d H:i:s');
 
-            $data['expire_date'] = Carbon::parse($data['expire_date'], 'UTC')
-                ->setTimezone($data['timezone'])
+            $data['expire_date'] = Carbon::parse($data['expire_date'], $data['timezone'])
+                ->setTimezone('UTC')
                 ->format('Y-m-d H:i:s');
         }
 

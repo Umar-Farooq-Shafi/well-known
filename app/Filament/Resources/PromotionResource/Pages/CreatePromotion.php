@@ -19,12 +19,12 @@ class CreatePromotion extends CreateRecord
         if (auth()->user()->hasRole('ROLE_ORGANIZER')) {
             $data['organizer_id'] = auth()->user()->organizer_id;
 
-            $data['start_date'] = Carbon::parse($data['start_date'], 'UTC')
-                ->setTimezone($data['timezone'])
+            $data['start_date'] = Carbon::parse($data['start_date'], $data['timezone'])
+                ->setTimezone('UTC')
                 ->format('Y-m-d H:i:s');
 
-            $data['end_date'] = Carbon::parse($data['end_date'], 'UTC')
-                ->setTimezone($data['timezone'])
+            $data['end_date'] = Carbon::parse($data['end_date'], $data['timezone'])
+                ->setTimezone('UTC')
                 ->format('Y-m-d H:i:s');
         }
 
