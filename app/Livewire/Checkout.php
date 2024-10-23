@@ -67,9 +67,11 @@ class Checkout extends Component
                     ->where('user_id', auth()->id())
                     ->get();
 
-                if (count($cartElements)) {
-                    $this->tickets[] = $ticket;
+                if (count($cartElements) === 0) {
+                    continue;
                 }
+
+                $this->tickets[] = $ticket;
 
                 foreach ($cartElements as $cartElement) {
                     $this->eventDatePick = $cartElement->chosen_event_date;

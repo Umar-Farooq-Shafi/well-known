@@ -459,8 +459,7 @@ class EventResource extends Resource
                             ->multiple()
                             ->relationship('scanners')
                             ->getSearchResultsUsing(
-                                fn(string $query)
-                                => Scanner::whereOrganizerId(auth()->user()->organizer_id)
+                                fn(string $query) => Scanner::whereOrganizerId(auth()->user()->organizer_id)
                                     ->where('name', 'like', "%{$query}%")
                                     ->pluck('name', 'id'),
                             )
@@ -474,8 +473,7 @@ class EventResource extends Resource
                             ->multiple()
                             ->relationship('pointOfSales')
                             ->getSearchResultsUsing(
-                                fn(string $query)
-                                => PointsOfSale::whereOrganizerId(auth()->user()->organizer_id)
+                                fn(string $query) => PointsOfSale::whereOrganizerId(auth()->user()->organizer_id)
                                     ->where('name', 'like', "%{$query}%")
                                     ->pluck('name', 'id'),
                             )
@@ -513,12 +511,12 @@ class EventResource extends Resource
                                     ->label('Currency')
                                     ->required()
                                     ->live()
-                                    ->hidden(fn (Forms\Get $get) => $get('free'))
+                                    ->hidden(fn(Forms\Get $get) => $get('free'))
                                     ->options(Currency::pluck('ccy', 'id')),
 
                                 Forms\Components\Radio::make('currency_symbol_position')
                                     ->required()
-                                    ->hidden(fn (Forms\Get $get) => $get('free'))
+                                    ->hidden(fn(Forms\Get $get) => $get('free'))
                                     ->options([
                                         'left' => 'Left',
                                         'right' => 'Right',
@@ -526,16 +524,15 @@ class EventResource extends Resource
 
                                 Forms\Components\Select::make('paymentGateways')
                                     ->multiple()
-                                    ->hidden(fn (Forms\Get $get) => $get('free'))
+                                    ->hidden(fn(Forms\Get $get) => $get('free'))
                                     ->relationship(
                                         'paymentGateways',
                                         'name',
                                         function (Builder $query) {
                                             $query
                                                 ->when(
-                                                    auth()->user()->membership_type === 'Membership',
-                                                    fn(Builder $query)
-                                                    => $query
+                                                    auth()->user()->hasRole('ROLE_ORGANIZER'),
+                                                    fn(Builder $query) => $query
                                                         ->where(
                                                             'organizer_id',
                                                             auth()->user()->organizer_id,
@@ -553,7 +550,7 @@ class EventResource extends Resource
 
                                 Forms\Components\TextInput::make('price')
                                     ->numeric()
-                                    ->hidden(fn (Forms\Get $get) => $get('free'))
+                                    ->hidden(fn(Forms\Get $get) => $get('free'))
                                     ->prefix(function (Forms\Get $get) {
                                         $currencyCode = $get('currency_code_id');
 
@@ -567,7 +564,7 @@ class EventResource extends Resource
                                 Forms\Components\TextInput::make('ticket_fee')
                                     ->label('Ticket fee (Online)')
                                     ->required()
-                                    ->hidden(fn (Forms\Get $get) => $get('free'))
+                                    ->hidden(fn(Forms\Get $get) => $get('free'))
                                     ->numeric()
                                     ->helperText(
                                         'This fee will be added to the ticket sale price which are bought online, put 0 to disable additional fees for tickets which are bought online, does not apply for free tickets, will be applied to future orders',
@@ -584,7 +581,7 @@ class EventResource extends Resource
 
                                 Forms\Components\TextInput::make('promotionalprice')
                                     ->label('Promotional price')
-                                    ->hidden(fn (Forms\Get $get) => $get('free'))
+                                    ->hidden(fn(Forms\Get $get) => $get('free'))
                                     ->helperText(
                                         'Set a price lesser than than the original price to indicate a promotion (this price will be the SALE price)',
                                     )
@@ -642,7 +639,6 @@ class EventResource extends Resource
 
                                 return $data;
                             })
-
                             ->mutateRelationshipDataBeforeCreateUsing(function ($data) {
                                 $data['position'] = 0;
                                 $data['currency_symbol_position'] = $data['currency_symbol_position'] ?? 'left';
@@ -740,8 +736,7 @@ class EventResource extends Resource
                         return EventTranslation::query()
                             ->when(
                                 auth()->user()->hasRole('ROLE_ORGANIZER'),
-                                fn(Builder $query)
-                                => $query->whereHas(
+                                fn(Builder $query) => $query->whereHas(
                                     'event',
                                     fn(Builder $query) => $query->where('organizer_id', auth()->user()->organizer_id),
                                 ),
@@ -749,8 +744,7 @@ class EventResource extends Resource
                             ->pluck('name', 'translatable_id');
                     })
                     ->query(
-                        fn(Builder $query, array $data)
-                        => $query->when(
+                        fn(Builder $query, array $data) => $query->when(
                             $data['value'],
                             fn(Builder $query, $value) => $query->where('id', $value),
                         ),
@@ -787,8 +781,7 @@ class EventResource extends Resource
                                     ->eventTranslations()
                                     ->where('locale', App::getLocale())->first()?->name . ' : Payout request',
                         )
-                        ->modalContent(fn(Event $record)
-                        => view(
+                        ->modalContent(fn(Event $record) => view(
                             'filament.resources.event-resource.payout-request',
                             ['record' => $record],
                         ))
@@ -1024,16 +1017,14 @@ class EventResource extends Resource
             )
             ->when(
                 auth()->user()->hasRole('ROLE_SCANNER'),
-                fn(Builder $query)
-                => $query->whereHas(
+                fn(Builder $query) => $query->whereHas(
                     'eventDates.scanners',
                     fn(Builder $query) => $query->where('scanner_id', auth()->user()->scanner->id),
                 ),
             )
             ->when(
                 auth()->user()->hasRole('ROLE_POINTOFSALE'),
-                fn(Builder $query)
-                => $query->whereHas(
+                fn(Builder $query) => $query->whereHas(
                     'eventDates.pointOfSales',
                     fn(Builder $query) => $query->where('pointofsale_id', auth()->user()->pointOfSale->id),
                 ),
