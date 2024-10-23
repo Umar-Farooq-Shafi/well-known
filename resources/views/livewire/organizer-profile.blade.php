@@ -10,7 +10,7 @@
         <div class="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg mb-4">
             @if($organizer->logo_name)
                 <img
-                    src="{{ Storage::url("organizers/cover/" . $organizer->logo_name) }}"
+                    src="{{ Storage::url("organizers/covers/" . $organizer->logo_name) }}"
                     loading="lazy"
                     alt="{{ $organizer->name }}"
                     class="w-44 h-44"
