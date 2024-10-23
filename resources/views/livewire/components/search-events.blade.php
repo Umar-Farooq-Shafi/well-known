@@ -1,4 +1,4 @@
-<div>
+<div x-show="@js($homepage->show_search_box)">
     <style>
         [form-wrapper="this-is-us"] label {
             --tw-ring-opacity: 0;

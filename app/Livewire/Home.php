@@ -42,6 +42,7 @@ class Home extends Component
     {
         $homepage_categories_number = Setting::where('key', 'homepage_categories_number')->first()?->value;
         $homepage_featured_events_nb = Setting::where('key', 'homepage_featured_events_nb')->first()?->value;
+        $homepage_events_number = Setting::where('key', 'homepage_events_number')->first()?->value;
 
         $categories = Category::with([
             'categoryTranslations' => function ($query) {
@@ -92,7 +93,7 @@ class Home extends Component
                         function (Builder $query) {
                             $query->whereHas(
                                 'eventDateTickets',
-                                fn (Builder $query) => $query->where('free', true)
+                                fn(Builder $query) => $query->where('free', true)
                             );
                         }
                     );
@@ -147,7 +148,7 @@ class Home extends Component
         $countries = CountryTranslation::query()
             ->whereHas(
                 'country',
-                fn (Builder $query) => $query->whereIn(
+                fn(Builder $query) => $query->whereIn(
                     'id',
                     Event::query()->select('country_id')
                         ->pluck('country_id')
@@ -161,11 +162,28 @@ class Home extends Component
             })
             ->toArray();
 
+        $upcomingEvents = Event::with([
+            'eventTranslations' => function ($query) {
+                $query->where('locale', App::getLocale());
+            },
+            'category' => function ($query) {
+                $query->with([
+                    'categoryTranslations' => function ($query) {
+                        $query->where('locale', App::getLocale());
+                    },
+                ]);
+            },
+        ])->where('completed', false)
+            ->orderBy('created_at', 'desc')
+            ->take((int) $homepage_events_number)
+            ->get();
+
         return view('livewire.home', [
             'categories' => $categories,
             'featuredEvents' => $featuredEvents,
             'events' => $events,
             'countries' => $countries,
+            'upcomingEvents' => $upcomingEvents
         ]);
     }
 }

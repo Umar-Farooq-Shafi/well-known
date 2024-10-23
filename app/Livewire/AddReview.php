@@ -66,7 +66,7 @@ class AddReview extends Component
             'description' => 'Your review has been submitted.',
         ]);
 
-        $this->redirect(route(Url::previous()));
+        $this->redirect(Url::previous());
     }
 
     #[Title("Add Review | 'Aafno Ticket Nepal'")]

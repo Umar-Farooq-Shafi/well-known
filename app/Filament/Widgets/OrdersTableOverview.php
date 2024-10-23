@@ -21,6 +21,7 @@ class OrdersTableOverview extends BaseWidget
     {
         return $table
             ->query(Order::query())
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('reference')
                     ->searchable(isIndividual: true)

@@ -4,6 +4,7 @@ namespace App\Livewire\Components;
 
 use App\Models\CartElement;
 use App\Models\EventTranslation;
+use App\Models\HomepageHeroSetting;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
@@ -20,11 +21,15 @@ class SearchEvents extends Component
 
     public $cartElements;
 
+    public $homepage;
+
     public function mount()
     {
         $this->cartElements = CartElement::query()
             ->where('user_id', auth()->id())
             ->count();
+
+        $this->homepage = HomepageHeroSetting::query()->first();
     }
 
     public function submit()
