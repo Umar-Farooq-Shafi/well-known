@@ -26,6 +26,25 @@ class EditPromotion extends EditRecord
         return $data;
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $timezone = data_get($data, 'timezone', 'UTC');
+
+        if (isset($data['start_date'])) {
+            $data['start_date'] = Carbon::parse($data['start_date'])
+                ->setTimezone($timezone)
+                ->format('Y-m-d H:i:s');
+        }
+
+        if (isset($data['expire_date'])) {
+            $data['expire_date'] = Carbon::parse($data['expire_date'])
+                ->setTimezone($timezone)
+                ->format('Y-m-d H:i:s');
+        }
+
+        return $data;
+    }
+
     protected function getHeaderActions(): array
     {
         return [
