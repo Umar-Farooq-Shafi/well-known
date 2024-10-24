@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $content
@@ -53,6 +53,10 @@ class HomepageHeroSetting extends Model
         'custom_background_dimensions',
         'show_search_box',
         'homepage_featured_events_nb'
+    ];
+
+    protected $casts = [
+        'show_search_box' => 'boolean'
     ];
 
     /**

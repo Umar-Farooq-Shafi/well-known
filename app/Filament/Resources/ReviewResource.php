@@ -18,7 +18,7 @@ class ReviewResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return !auth()->user()->hasAnyRole(['ROLE_ATTENDEE', 'ROLE_SCANNER', 'ROLE_POINTOFSALE']);
+        return auth()->user()->hasAnyRole(['ROLE_ATTENDEE']);
     }
 
     public static function table(Table $table): Table
