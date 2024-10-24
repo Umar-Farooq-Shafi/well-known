@@ -7,6 +7,7 @@ use App\Models\EventDate;
 use App\Models\EventDateTicket;
 use App\Models\EventTranslation;
 use App\Models\Organizer;
+use App\Models\Setting;
 use App\Models\User;
 use App\Traits\RatingTrait;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +42,8 @@ class Event extends Component
 
     public ?EventTranslation $eventTranslation = null;
 
+    public $showLeftQuantity;
+
     public function mount(string $slug)
     {
         $this->eventTranslation = EventTranslation::whereSlug($slug)->firstOrFail();
@@ -67,6 +70,8 @@ class Event extends Component
                 break;
             }
         }
+
+        $this->showLeftQuantity = Setting::query()->where('key', 'show_tickets_left_on_cart_modal')->first()?->value;
 
         $this->promotions = $promotion?->promotionQuantities?->pluck('discount', 'quantity')?->toArray() ?? [];
     }

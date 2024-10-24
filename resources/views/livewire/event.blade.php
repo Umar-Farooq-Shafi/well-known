@@ -866,9 +866,11 @@
                                                 @endphp
                                                 <x-badge flat red :label="$innerText" class="mt-2">
                                                     <x-slot name="append" class="relative flex items-center w-2 h-2">
-                                                        <badge type="badge" class="cursor-pointer" wire:click="clearPromoCode">
-                                                            <x-icon name="x-mark" class="w-4 h-4" wire:loading.remove />
-                                                            <x-icon name="arrow-path" wire:loading class="animate-spin h-4 w-4 text-white" />
+                                                        <badge type="badge" class="cursor-pointer"
+                                                               wire:click="clearPromoCode">
+                                                            <x-icon name="x-mark" class="w-4 h-4" wire:loading.remove/>
+                                                            <x-icon name="arrow-path" wire:loading
+                                                                    class="animate-spin h-4 w-4 text-white"/>
                                                         </badge>
                                                     </x-slot>
                                                 </x-badge>
@@ -881,6 +883,7 @@
                                                 @if($eventDateId)
                                                     @if($eventDateId == $ed->id)
                                                         @foreach ($ed->eventDateTickets as $eventTicket)
+
                                                             @if ($eventTicket->active)
                                                                 <x-card
                                                                     class="{{ $ccy !== null && $ccy !== $eventTicket->currency->ccy ? '!bg-gray-50' : '' }}">
@@ -892,9 +895,17 @@
                                                                                style="width: 75%;">
                                                                                 {{ $eventTicket->name }}
 
+
                                                                                 @if($eventTicket->description)
                                                                                     <x-fas-info
                                                                                         x-tooltip.raw="{{ $eventTicket->description }}"
+                                                                                        class="h-5 w-5 bg-blue-500 p-1 rounded-full text-white"
+                                                                                    />
+                                                                                @endif
+
+                                                                                @if($showLeftQuantity === 'yes')
+                                                                                    <x-fas-info
+                                                                                        x-tooltip.raw="{{ $ed->quantity }}"
                                                                                         class="h-5 w-5 bg-blue-500 p-1 rounded-full text-white"
                                                                                     />
                                                                                 @endif
@@ -983,6 +994,10 @@
                                                                                     x-tooltip.raw="{{ $eventTicket->description }}"
                                                                                     class="h-5 w-5 bg-blue-500 p-1 rounded-full text-white"
                                                                                 />
+                                                                            @endif
+
+                                                                            @if($showLeftQuantity === 'yes' && $ed->quantity)
+                                                                                <x-badge :label="$ed->quantity" />
                                                                             @endif
                                                                         </p>
 
@@ -1157,7 +1172,8 @@
 
                                                     @if($shouldShow)
                                                         @foreach($this->promotions as $quan => $promotion)
-                                                            <x-badge warning label="Promo Buy '{{ $quan }} Get ${{ $promotion }} off' applied" />
+                                                            <x-badge warning
+                                                                     label="Promo Buy '{{ $quan }} Get ${{ $promotion }} off' applied"/>
                                                         @endforeach
                                                     @endif
                                                 @endif
