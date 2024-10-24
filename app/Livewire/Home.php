@@ -8,22 +8,34 @@ use App\Models\Event;
 use App\Models\Setting;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\App;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Home extends Component
 {
+    use WithPagination;
+
     #[Url]
     public $country = 'All';
 
     #[Url]
     public $category = '';
 
-    #[Url]
-    public $page = 1;
-
     public $perPage = 12;
+
+    public $hasMorePages;
+
+    public function mount()
+    {
+        $homepageFeaturedEventsNb = (int)Setting::where('key', 'homepage_featured_events_nb')->first()?->value;
+
+        if ($homepageFeaturedEventsNb && $this->perPage > $homepageFeaturedEventsNb) {
+            $this->perPage = $homepageFeaturedEventsNb;
+        }
+    }
 
     public function updateCountry($country)
     {
@@ -34,14 +46,45 @@ class Home extends Component
 
     public function loadMore()
     {
-        $this->perPage += 12;
+        $homepageFeaturedEventsNb = (int)Setting::where('key', 'homepage_featured_events_nb')->first()?->value;
+
+        if ($homepageFeaturedEventsNb && ($this->perPage + 12) <= $homepageFeaturedEventsNb) {
+            $this->perPage += 12;
+        } else if ($homepageFeaturedEventsNb && $this->perPage < $homepageFeaturedEventsNb) {
+            $this->perPage = $homepageFeaturedEventsNb;
+        }
+    }
+
+    #[Computed()]
+    public function paginate()
+    {
+        // Fetch the featured events based on the current perPage value
+        $featuredEvents = Event::with([
+            'eventTranslations' => function ($query) {
+                $query->where('locale', App::getLocale());
+            },
+            'category' => function ($query) {
+                $query->with([
+                    'categoryTranslations' => function ($query) {
+                        $query->where('locale', App::getLocale());
+                    },
+                ]);
+            },
+        ])
+            ->where('is_featured', true)
+            ->where('completed', false)
+            ->orderBy('created_at', 'desc')
+            ->paginate($this->perPage, total: (int)Setting::where('key', 'homepage_featured_events_nb')->first()?->value);
+
+        $this->hasMorePages = $featuredEvents->hasMorePages();
+
+        return $featuredEvents->items();
     }
 
     #[Title("Nepal's 1st event ticketing platform. We provide complete solution regarding your event tickets from selling to door verification. | 'Aafno Ticket Nepal'")]
     public function render()
     {
         $homepage_categories_number = Setting::where('key', 'homepage_categories_number')->first()?->value;
-        $homepage_featured_events_nb = Setting::where('key', 'homepage_featured_events_nb')->first()?->value;
         $homepage_events_number = Setting::where('key', 'homepage_events_number')->first()?->value;
 
         $categories = Category::with([
@@ -127,24 +170,6 @@ class Home extends Component
             ->take(20)
             ->get();
 
-        $featuredEvents = Event::with([
-            'eventTranslations' => function ($query) {
-                $query->where('locale', App::getLocale());
-            },
-            'category' => function ($query) {
-                $query->with([
-                    'categoryTranslations' => function ($query) {
-                        $query->where('locale', App::getLocale());
-                    },
-                ]);
-            },
-        ])
-            ->where('is_featured', '=', true)
-            ->where('completed', false)
-            ->orderBy('created_at', 'desc')
-            ->take($homepage_featured_events_nb)
-            ->paginate($this->perPage);
-
         $countries = CountryTranslation::query()
             ->whereHas(
                 'country',
@@ -175,12 +200,12 @@ class Home extends Component
             },
         ])->where('completed', false)
             ->orderBy('created_at', 'desc')
-            ->take((int) $homepage_events_number)
+            ->take((int)$homepage_events_number)
             ->get();
 
         return view('livewire.home', [
             'categories' => $categories,
-            'featuredEvents' => $featuredEvents,
+            'featuredEvents' => $this->paginate(),
             'events' => $events,
             'countries' => $countries,
             'upcomingEvents' => $upcomingEvents

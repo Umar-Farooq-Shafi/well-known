@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property \App\Enums\Setting $key
@@ -33,6 +33,6 @@ class Setting extends Model
     ];
 
     protected $casts = [
-        'key' => \App\Enums\Setting::class
+        'key' => \App\Enums\Setting::class,
     ];
 }
